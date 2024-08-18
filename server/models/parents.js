@@ -1,7 +1,7 @@
 const mongoose = require("mongoose"); //(npm i mongoose)
 const { Schema } = mongoose;
 
-const userSchema = new Schema(
+const parentsSchema = new Schema(
   {
     UserID: {
       type: String,
@@ -13,13 +13,19 @@ const userSchema = new Schema(
     },
     FirstName: String,
     LastName: String,
-    password: String,
+    Section: String,
+    Department: String,
+    Age: String,
+    Birthday: String,
+    Address: String,
+    Status: String,
+    Gender: String,
+    ContactNumber: String,
     role: String,
-    verified: Boolean,
   },
   { timestamps: true }
 );
 
-const UserModel = mongoose.model("Users", userSchema);
+const ParentModel = mongoose.model("Parents", parentsSchema);
 
-module.exports = UserModel;
+module.exports = ParentModel;

@@ -1,60 +1,44 @@
 import React, { useState } from "react";
-import { CalendarDate } from "@internationalized/date";
-import {
-  Input,
-  Button,
-  Card,
-  CardBody,
-  DatePicker,
-  Select,
-  SelectItem,
-  Checkbox,
-  CheckboxGroup,
-} from "@nextui-org/react";
+import axios from "axios";
+import { toast } from "react-hot-toast";
+import { Input, Button, Card, CardBody } from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
-import {
-  faUser,
-  faEnvelope,
-  faLock,
-  faIdCard,
-  faEye,
-  faEyeSlash,
-  faPhone,
-  faLocationDot,
-  faPersonHalfDress,
-  faCakeCandles,
-} from "@fortawesome/free-solid-svg-icons";
+import { Link, useNavigate } from "react-router-dom";
+import { faLock } from "@fortawesome/free-solid-svg-icons";
 
 const VerifyEmail = () => {
-  const [data, setData] = useState({
-    FirstName: "",
-    LastName: "",
-    Age: "",
-    Birthday: "",
-    Gender: "",
-    Address: "",
-    Status: "",
-    ContactNumber: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const navigate = useNavigate();
+  const [otp, setOtp] = useState("");
 
-  const [isInvalid, setIsInvalid] = useState(true);
-  const [isVisible, setIsVisible] = useState(false);
-  const toggleVisibility = () => setIsVisible(!isVisible);
-  const [isVisibleConfirm, setIsVisibleConfirm] = useState(false);
-  const toggleVisibilityConfirm = () => setIsVisibleConfirm(!isVisibleConfirm);
+  const verifyUser = async (e) => {
+    e.preventDefault();
+    const userId = localStorage.getItem("userId"); // Retrieve userId from localStorage
 
-  const handleChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
+    if (!userId) {
+      toast.error("User ID is missing. Please try registering again.");
+      return;
+    }
+
+    try {
+      const response = await axios.post("/verify", { userId, otp });
+
+      if (response.data.error) {
+        toast.error(response.data.error);
+      } else {
+        setOtp("");
+        toast.success("Verification successful. Please log in.");
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("An error occurred during verification. Please try again.");
+    }
   };
 
   return (
-    <div className="flex bg-[#f4e7c9] w-full h-screen ">
+    <div className="flex bg-[#f4e7c9] w-full h-screen">
       <div className="w-full flex flex-col items-center justify-center m-3">
-        <Card className="w-[50%] flex flex-col p-4 ">
+        <Card className="w-[50%] flex flex-col p-4">
           <h1 className="text-3xl font-bold items-center justify-center">
             Verify Email
           </h1>
@@ -63,14 +47,15 @@ const VerifyEmail = () => {
             verification.
           </p>
           <CardBody>
-            <form>
+            <form onSubmit={verifyUser}>
               <div className="flex flex-col gap-2">
                 <Input
                   type="text"
-                  label="OTP Code"
+                  label="Enter the code"
                   variant="bordered"
                   className="bg-transparent py-1 my-1"
-                  onChange={handleChange}
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
                   endContent={
                     <FontAwesomeIcon
                       icon={faLock}
@@ -81,7 +66,9 @@ const VerifyEmail = () => {
               </div>
               <div className="w-full flex items-center justify-center gap-6 my-4">
                 <Button className="my-2" size="lg" radius="md" color="danger">
-                  <Link to="/login">Cancel</Link>
+                  <Link to="/login" className="text-white no-underline">
+                    Cancel
+                  </Link>
                 </Button>
                 <Button
                   type="submit"
@@ -90,7 +77,7 @@ const VerifyEmail = () => {
                   radius="md"
                   color="primary"
                 >
-                  Next
+                  Submit
                 </Button>
               </div>
             </form>

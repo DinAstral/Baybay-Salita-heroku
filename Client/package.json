@@ -20,6 +20,7 @@
     "@mui/material": "^5.16.7",
     "@mui/x-charts": "^7.12.1",
     "@nextui-org/react": "^2.4.6",
+    "@react-aria/i18n": "^3.12.1",
     "axios": "^1.7.3",
     "bootstrap": "^5.3.3",
     "framer-motion": "^11.3.28",

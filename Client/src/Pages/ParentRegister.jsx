@@ -54,7 +54,8 @@ const ParentRegister = () => {
     const {
       FirstName,
       LastName,
-      Age,
+      Student,
+      LRN,
       Birthday,
       Address,
       Status,
@@ -74,7 +75,8 @@ const ParentRegister = () => {
       const response = await axios.post("/register", {
         FirstName,
         LastName,
-        Age,
+        Student,
+        LRN,
         Birthday,
         Address,
         Status,
@@ -146,15 +148,32 @@ const ParentRegister = () => {
                 />
                 <Input
                   type="text"
-                  name="Age"
-                  label="Age"
+                  label="Name of Grade 1 student"
+                  name="Name of Grade 1 student"
                   variant="bordered"
                   className="bg-transparent py-1 my-1"
-                  value={data.Age}
-                  onChange={(e) => setData({ ...data, Age: e.target.value })}
+                  value={data.Student}
+                  onChange={(e) =>
+                    setData({ ...data, Student: e.target.value })
+                  }
                   endContent={
                     <FontAwesomeIcon
-                      icon={faIdCard}
+                      icon={faUser}
+                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                    />
+                  }
+                />
+                <Input
+                  type="text"
+                  label="LRN of Grade 1 student"
+                  name="LRN of Grade 1 student"
+                  variant="bordered"
+                  className="bg-transparent py-1 my-1"
+                  value={data.LRN}
+                  onChange={(e) => setData({ ...data, LRN: e.target.value })}
+                  endContent={
+                    <FontAwesomeIcon
+                      icon={faUser}
                       className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
                     />
                   }

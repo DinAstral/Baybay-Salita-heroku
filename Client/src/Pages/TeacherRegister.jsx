@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { CalendarDate } from "@internationalized/date";
+import { parseDate, getLocalTimeZone } from "@internationalized/date";
+import { useDateFormatter } from "@react-aria/i18n";
 import {
   Input,
   Button,
@@ -14,7 +16,7 @@ import {
   CheckboxGroup,
 } from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   faUser,
   faEnvelope,
@@ -32,7 +34,8 @@ const TeacherRegister = () => {
   const [data, setData] = useState({
     FirstName: "",
     LastName: "",
-    Age: "",
+    Section: "",
+    Department: "",
     Birthday: "",
     Gender: "",
     Address: "",
@@ -43,18 +46,25 @@ const TeacherRegister = () => {
     confirmPassword: "",
   });
 
+  const navigate = useNavigate();
+
   const [isInvalid, setIsInvalid] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
   const [isVisibleConfirm, setIsVisibleConfirm] = useState(false);
   const toggleVisibilityConfirm = () => setIsVisibleConfirm(!isVisibleConfirm);
 
-  const registerUser = async (e) => {
+  const [value, setValue] = React.useState(parseDate("2024-04-04"));
+
+  let formatter = useDateFormatter({ dateStyle: "full" });
+
+  const registerTeacher = async (e) => {
     e.preventDefault();
     const {
       FirstName,
       LastName,
-      Age,
+      Section,
+      Department,
       Birthday,
       Address,
       Status,
@@ -71,10 +81,11 @@ const TeacherRegister = () => {
     }
 
     try {
-      const response = await axios.post("/register", {
+      const response = await axios.post("/registerTeacher", {
         FirstName,
         LastName,
-        Age,
+        Section,
+        Department,
         Birthday,
         Address,
         Status,
@@ -87,9 +98,9 @@ const TeacherRegister = () => {
         toast.error(response.data.error);
       } else {
         setData({});
-        toast.success("Register Verification.");
-        localStorage.setItem("userId", response.data.data.userId); // Store userId for verification step
-        navigate("/verify");
+        toast.success("Register Successful.");
+        localStorage.setItem("userId", response.data.userId); // Store userId for verification step
+        navigate("/verifyEmail");
       }
     } catch (error) {
       console.log(error);
@@ -108,7 +119,7 @@ const TeacherRegister = () => {
             Please fill up the details needed!
           </p>
           <CardBody>
-            <form>
+            <form onSubmit={registerTeacher}>
               <div className="grid grid-cols-2 gap-4">
                 <Input
                   type="text"
@@ -150,31 +161,44 @@ const TeacherRegister = () => {
                   placeholder="Select your handled section"
                   variant="bordered"
                   className="bg-transparent py-1 my-1"
-                  value={data.Gender}
-                  onChange={(e) => setData({ ...data, Gender: e.target.value })}
+                  value={data.Section}
+                  onChange={(e) =>
+                    setData({ ...data, Section: e.target.value })
+                  }
                 >
                   <SelectItem key="" disabled>
-                    Select Gender
+                    Select Section
                   </SelectItem>
-                  <SelectItem key="Male">Male</SelectItem>
-                  <SelectItem key="Female">Female</SelectItem>
-                  <SelectItem key="Other">Other</SelectItem>
+                  <SelectItem key="Daffodil">Daffodil</SelectItem>
+                  <SelectItem key="Sampagita">Sampagita</SelectItem>
+                  <SelectItem key="Banaba">Banaba</SelectItem>
                 </Select>
-                <DatePicker
+                <Select
+                  label="Department"
+                  name="section"
+                  placeholder="Select your handled department"
                   variant="bordered"
-                  label={"Birth date"}
-                  showMonthAndYearPickers
-                  placeholderValue={new CalendarDate(1995, 11, 6)}
                   className="bg-transparent py-1 my-1"
-                  selected={data.Birthday}
-                  onDateChange={(date) => setData({ ...data, Birthday: date })}
-                  endContent={
-                    <FontAwesomeIcon
-                      icon={faCakeCandles}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                    />
+                  value={data.Department}
+                  onChange={(e) =>
+                    setData({ ...data, Department: e.target.value })
+                  }
+                >
+                  <SelectItem key="" disabled>
+                    Select Department
+                  </SelectItem>
+                  <SelectItem key="Filipino">Filipino</SelectItem>
+                </Select>
+
+                <Input
+                  type="date"
+                  placeholder="Ilagay ang iyong Kaarawan"
+                  value={data.Birthday}
+                  onChange={(e) =>
+                    setData({ ...data, Birthday: e.target.value })
                   }
                 />
+
                 <Select
                   label="Gender"
                   name="Gender"
