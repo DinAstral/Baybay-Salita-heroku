@@ -28,7 +28,7 @@ import {
   faCakeCandles,
 } from "@fortawesome/free-solid-svg-icons";
 
-const Register = () => {
+const ParentRegister = () => {
   const [data, setData] = useState({
     FirstName: "",
     LastName: "",
@@ -102,7 +102,7 @@ const Register = () => {
       <div className="w-full flex flex-col items-center justify-center m-3">
         <Card className="w-[70%] flex flex-col p-4 ">
           <h1 className="text-3xl font-bold items-center justify-center">
-            Registration
+            Parent Registration
           </h1>
           <p className="text-sm items-center justify-center">
             Please fill up the details needed!
@@ -110,19 +110,6 @@ const Register = () => {
           <CardBody>
             <form>
               <div className="grid grid-cols-2 gap-4">
-                <CheckboxGroup
-                  isRequired
-                  description="Select only one"
-                  orientation="horizontal"
-                  isInvalid={isInvalid}
-                  label="Select role"
-                  onValueChange={(value) => {
-                    setIsInvalid(value.length > 1);
-                  }}
-                >
-                  <Checkbox value="Parent">Parent</Checkbox>
-                  <Checkbox value="Teacher">Teacher</Checkbox>
-                </CheckboxGroup>
                 <Input
                   type="text"
                   name="FirstName"
@@ -335,7 +322,7 @@ const Register = () => {
               </div>
               <div className="w-full flex items-center justify-center gap-6 my-4">
                 <Button className="my-2" size="lg" radius="md" color="danger">
-                  <Link to="/login">Cancel</Link>
+                  <Link to="/register">Cancel</Link>
                 </Button>
                 <Button
                   type="submit"
@@ -344,7 +331,7 @@ const Register = () => {
                   radius="md"
                   color="primary"
                 >
-                  Next
+                  Submit
                 </Button>
               </div>
             </form>
@@ -355,4 +342,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default ParentRegister;

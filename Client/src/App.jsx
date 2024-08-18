@@ -5,7 +5,9 @@ import { Route, Routes, useNavigate } from "react-router-dom"; // Import Browser
 import axios from "axios";
 import { Toaster } from "react-hot-toast";
 import Login from "./Pages/Login";
-import Register from "./Pages/Register";
+import RegisterSelect from "./Pages/RegisterSelect";
+import ForgotPassword from "./Pages/ForgotPassword";
+import VerifyEmail from "./Pages/VerifyEmail";
 import AdminDashboard from "./Pages/AdminDashboard/AdminDashboard";
 import AdminEditProfile from "./Pages/AdminDashboard/AdminEditProfile";
 import AdminUser from "./Pages/AdminDashboard/AdminUser";
@@ -21,9 +23,9 @@ import AdminAddUser from "./Pages/AdminDashboard/AdminAddUser";
 import AdminViewTeacher from "./Pages/AdminDashboard/AdminViewTeacher";
 import AdminEditTeacher from "./Pages/AdminDashboard/AdminEditTeacher";
 import AdminProfile from "./Pages/AdminDashboard/AdminProfile";
-import ForgotPassword from "./Pages/ForgotPassword";
-import VerifyEmail from "./Pages/VerifyEmail";
 import AdminAddStudent from "./Pages/AdminDashboard/AdminAddStudent";
+import TeacherRegister from "./Pages/TeacherRegister";
+import ParentRegister from "./Pages/ParentRegister";
 
 axios.defaults.baseURL = "http://localhost:8000";
 axios.defaults.withCredentials = true;
@@ -41,7 +43,9 @@ const App = () => {
         <Routes>
           {/* Main Home Page*/}
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/register" element={<RegisterSelect />} />
+          <Route path="/registerTeacher" element={<TeacherRegister />} />
+          <Route path="/registerParent" element={<ParentRegister />} />
           <Route path="/forgotPassword" element={<ForgotPassword />} />
           <Route path="/verifyEmail" element={<VerifyEmail />} />
 
