@@ -1,38 +1,31 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { CalendarDate } from "@internationalized/date";
 import {
   Input,
   Button,
   Card,
   CardBody,
-  DatePicker,
   Select,
   SelectItem,
-  Checkbox,
-  CheckboxGroup,
 } from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   faUser,
   faEnvelope,
-  faLock,
-  faIdCard,
   faEye,
   faEyeSlash,
   faPhone,
   faLocationDot,
-  faPersonHalfDress,
-  faCakeCandles,
 } from "@fortawesome/free-solid-svg-icons";
 
 const ParentRegister = () => {
   const [data, setData] = useState({
     FirstName: "",
     LastName: "",
-    Age: "",
+    StudentName: "",
+    LRN: "",
     Birthday: "",
     Gender: "",
     Address: "",
@@ -43,18 +36,19 @@ const ParentRegister = () => {
     confirmPassword: "",
   });
 
-  const [isInvalid, setIsInvalid] = useState(true);
+  const navigate = useNavigate();
+
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
   const [isVisibleConfirm, setIsVisibleConfirm] = useState(false);
   const toggleVisibilityConfirm = () => setIsVisibleConfirm(!isVisibleConfirm);
 
-  const registerUser = async (e) => {
+  const registerParent = async (e) => {
     e.preventDefault();
     const {
       FirstName,
       LastName,
-      Student,
+      StudentName,
       LRN,
       Birthday,
       Address,
@@ -75,7 +69,7 @@ const ParentRegister = () => {
       const response = await axios.post("/register", {
         FirstName,
         LastName,
-        Student,
+        StudentName,
         LRN,
         Birthday,
         Address,
@@ -110,7 +104,7 @@ const ParentRegister = () => {
             Please fill up the details needed!
           </p>
           <CardBody>
-            <form>
+            <form onSubmit={registerParent}>
               <div className="grid grid-cols-2 gap-4">
                 <Input
                   type="text"
@@ -152,9 +146,9 @@ const ParentRegister = () => {
                   name="Name of Grade 1 student"
                   variant="bordered"
                   className="bg-transparent py-1 my-1"
-                  value={data.Student}
+                  value={data.StudentName}
                   onChange={(e) =>
-                    setData({ ...data, Student: e.target.value })
+                    setData({ ...data, StudentName: e.target.value })
                   }
                   endContent={
                     <FontAwesomeIcon
@@ -178,21 +172,15 @@ const ParentRegister = () => {
                     />
                   }
                 />
-                <DatePicker
-                  variant="bordered"
-                  label={"Birth date"}
-                  showMonthAndYearPickers
-                  placeholderValue={new CalendarDate(1995, 11, 6)}
-                  className="bg-transparent py-1 my-1"
-                  selected={data.Birthday}
-                  onDateChange={(date) => setData({ ...data, Birthday: date })}
-                  endContent={
-                    <FontAwesomeIcon
-                      icon={faCakeCandles}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                    />
+                <Input
+                  type="date"
+                  placeholder="Ilagay ang iyong Kaarawan"
+                  value={data.Birthday}
+                  onChange={(e) =>
+                    setData({ ...data, Birthday: e.target.value })
                   }
                 />
+
                 <Select
                   label="Gender"
                   name="Gender"

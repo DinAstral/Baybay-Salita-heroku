@@ -349,7 +349,8 @@ const registerParent = async (req, res) => {
     const {
       FirstName,
       LastName,
-      Age,
+      LRN,
+      StudentName,
       Birthday,
       Address,
       Status,
@@ -365,11 +366,11 @@ const registerParent = async (req, res) => {
     if (!LastName) {
       return res.json({ error: "Last Name is required" });
     }
-    if (!Age) {
-      return res.json({ error: "Age is required" });
+    if (!LRN) {
+      return res.json({ error: "LRN is required" });
     }
-    if (!isNumber(Age)) {
-      return res.json({ error: "Invalid age inputted" });
+    if (!StudentName) {
+      return res.json({ error: "StudentName is required" });
     }
     if (!Birthday) {
       return res.json({ error: "Birthday is required" });
@@ -406,11 +407,12 @@ const registerParent = async (req, res) => {
     const hashedPassword = await hashPassword(password); // Hash the password
 
     // Create Parent and User records
-    const user = new User({
+    const parent = new Parent({
       UserID: ParentID,
       FirstName,
       LastName,
-      Age,
+      LRN,
+      StudentName,
       Birthday,
       Gender,
       Address,
@@ -422,7 +424,19 @@ const registerParent = async (req, res) => {
       verified: false,
     });
 
-    user
+    const user = new User({
+      UserID: ParentID,
+      FirstName,
+      LastName,
+      email,
+      role: "Parent",
+      password: hashedPassword,
+      verified: false,
+    });
+
+    // Save both teacher and user records
+    await parent.save();
+    await user
       .save()
       .then((result) => {
         sendVerificationEmail(result, res);

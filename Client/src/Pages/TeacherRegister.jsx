@@ -1,33 +1,23 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { CalendarDate } from "@internationalized/date";
-import { parseDate, getLocalTimeZone } from "@internationalized/date";
-import { useDateFormatter } from "@react-aria/i18n";
 import {
   Input,
   Button,
   Card,
   CardBody,
-  DatePicker,
   Select,
   SelectItem,
-  Checkbox,
-  CheckboxGroup,
 } from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link, useNavigate } from "react-router-dom";
 import {
   faUser,
   faEnvelope,
-  faLock,
-  faIdCard,
   faEye,
   faEyeSlash,
   faPhone,
   faLocationDot,
-  faPersonHalfDress,
-  faCakeCandles,
 } from "@fortawesome/free-solid-svg-icons";
 
 const TeacherRegister = () => {
@@ -48,15 +38,10 @@ const TeacherRegister = () => {
 
   const navigate = useNavigate();
 
-  const [isInvalid, setIsInvalid] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
   const [isVisibleConfirm, setIsVisibleConfirm] = useState(false);
   const toggleVisibilityConfirm = () => setIsVisibleConfirm(!isVisibleConfirm);
-
-  const [value, setValue] = React.useState(parseDate("2024-04-04"));
-
-  let formatter = useDateFormatter({ dateStyle: "full" });
 
   const registerTeacher = async (e) => {
     e.preventDefault();

@@ -1,5 +1,4 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import React from "react";
 import { NextUIProvider } from "@nextui-org/react";
 import { Route, Routes, useNavigate } from "react-router-dom"; // Import BrowserRouter, Route, and Routes
 import axios from "axios";
@@ -26,6 +25,7 @@ import AdminProfile from "./Pages/AdminDashboard/AdminProfile";
 import AdminAddStudent from "./Pages/AdminDashboard/AdminAddStudent";
 import TeacherRegister from "./Pages/TeacherRegister";
 import ParentRegister from "./Pages/ParentRegister";
+import Main from "./Pages/Home/Main";
 
 axios.defaults.baseURL = "http://localhost:8000";
 axios.defaults.withCredentials = true;
@@ -42,6 +42,7 @@ const App = () => {
 
         <Routes>
           {/* Main Home Page*/}
+          <Route path="/" element={<Main />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegisterSelect />} />
           <Route path="/registerTeacher" element={<TeacherRegister />} />
