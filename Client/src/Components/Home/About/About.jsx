@@ -35,7 +35,7 @@ const About = () => {
           Ang aming komprehensibong approach ay pinagsasama ang pinakabagong
           pananaliksik sa edukasyon at praktikal na mga estratehiya sa pagtuturo
           upang suportahan ang mga estudyante sa pag-develop ng malakas na
-          kakayahan sa pag-unawa sa pagbasa. Nag-aalok kami ng iba't ibang
+          kakayahan sa pag-unawa sa pagbasa. Nag-aalok kami ng ibat ibang
           mapagkukunan, kabilang ang mga digital na libro, interaktibong
           ehersisyo, at mga tool sa pagtatasa, na lahat ay iniayon sa
           pangangailangan ng mga batang mambabasa. Sa suporta ng mga dedikadong

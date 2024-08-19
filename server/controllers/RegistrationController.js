@@ -496,7 +496,6 @@ const loginUser = async (req, res) => {
           ContactNumber: user.ContactNumber,
           Section: user.Section,
           Department: user.Department,
-          Age: user.Department,
         },
         process.env.JWT_SECRET,
         {},

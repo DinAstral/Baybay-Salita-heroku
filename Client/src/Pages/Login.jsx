@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
@@ -12,14 +12,7 @@ import {
 
 import Image1 from "../../src/assets/BaybaySalita_Logo.png";
 
-const colors = {
-  primary: "#060606",
-  background: "#E0E0E0",
-  disabled: "#D9D9D9",
-};
-
 const Login = () => {
-  const [value, setValue] = useState("");
   const [isVisible, setIsVisible] = useState(false);
 
   const navigate = useNavigate();
@@ -27,14 +20,6 @@ const Login = () => {
     email: "",
     password: "",
   });
-
-  const validateEmail = (value) =>
-    value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i);
-
-  const isInvalid = React.useMemo(() => {
-    if (value === "") return false;
-    return !validateEmail(value);
-  }, [value]);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
@@ -105,7 +90,6 @@ const Login = () => {
               variant="bordered"
               placeholder="Enter your email"
               className="bg-transparent py-1 my-1"
-              color={isInvalid ? "danger" : "none"}
               errorMessage="Please enter a valid email"
               value={data.email}
               onChange={(e) => setData({ ...data, email: e.target.value })}

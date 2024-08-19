@@ -43,7 +43,7 @@ const TeacherRegister = () => {
   const [isVisibleConfirm, setIsVisibleConfirm] = useState(false);
   const toggleVisibilityConfirm = () => setIsVisibleConfirm(!isVisibleConfirm);
 
-  const registerTeacher = async (e) => {
+  const registerParent = async (e) => {
     e.preventDefault();
     const {
       FirstName,
@@ -83,8 +83,8 @@ const TeacherRegister = () => {
         toast.error(response.data.error);
       } else {
         setData({});
-        toast.success("Register Successful.");
-        localStorage.setItem("userId", response.data.userId); // Store userId for verification step
+        toast.success("Register Verification.");
+        localStorage.setItem("userId", response.data.data.userId); // Store userId for verification step
         navigate("/verifyEmail");
       }
     } catch (error) {
@@ -104,7 +104,7 @@ const TeacherRegister = () => {
             Please fill up the details needed!
           </p>
           <CardBody>
-            <form onSubmit={registerTeacher}>
+            <form onSubmit={registerParent}>
               <div className="grid grid-cols-2 gap-4">
                 <Input
                   type="text"
@@ -142,8 +142,7 @@ const TeacherRegister = () => {
                 />
                 <Select
                   label="Section"
-                  name="section"
-                  placeholder="Select your handled section"
+                  placeholder="Select your section"
                   variant="bordered"
                   className="bg-transparent py-1 my-1"
                   value={data.Section}
@@ -155,13 +154,13 @@ const TeacherRegister = () => {
                     Select Section
                   </SelectItem>
                   <SelectItem key="Daffodil">Daffodil</SelectItem>
-                  <SelectItem key="Sampagita">Sampagita</SelectItem>
                   <SelectItem key="Banaba">Banaba</SelectItem>
+                  <SelectItem key="Sampagita">Sampagita</SelectItem>
                 </Select>
+
                 <Select
                   label="Department"
-                  name="section"
-                  placeholder="Select your handled department"
+                  placeholder="Select your department"
                   variant="bordered"
                   className="bg-transparent py-1 my-1"
                   value={data.Department}

@@ -66,7 +66,7 @@ const ParentRegister = () => {
     }
 
     try {
-      const response = await axios.post("/register", {
+      const response = await axios.post("/registerParent", {
         FirstName,
         LastName,
         StudentName,
@@ -85,7 +85,7 @@ const ParentRegister = () => {
         setData({});
         toast.success("Register Verification.");
         localStorage.setItem("userId", response.data.data.userId); // Store userId for verification step
-        navigate("/verify");
+        navigate("/verifyEmail");
       }
     } catch (error) {
       console.log(error);
