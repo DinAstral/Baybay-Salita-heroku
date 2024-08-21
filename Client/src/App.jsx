@@ -26,6 +26,7 @@ import AdminAddStudent from "./Pages/AdminDashboard/AdminAddStudent";
 import TeacherRegister from "./Pages/TeacherRegister";
 import ParentRegister from "./Pages/ParentRegister";
 import Main from "./Pages/Home/Main";
+import ResetPassword from "./Pages/REsetPassword";
 
 axios.defaults.baseURL = "http://localhost:8000";
 axios.defaults.withCredentials = true;
@@ -48,6 +49,10 @@ const App = () => {
           <Route path="/registerTeacher" element={<TeacherRegister />} />
           <Route path="/registerParent" element={<ParentRegister />} />
           <Route path="/forgotPassword" element={<ForgotPassword />} />
+          <Route
+            path="/reset-password/:id/:token"
+            element={<ResetPassword />}
+          />
           <Route path="/verifyEmail" element={<VerifyEmail />} />
 
           {/* Teacher Dashboard Routes*/}

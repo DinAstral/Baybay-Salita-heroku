@@ -7,6 +7,32 @@ const UserOTPVerification = require("../models/UserOTPVerification");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 
+function validatePassword(password) {
+  const minLength = 8;
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasDigit = /\d/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+  if (password.length < minLength) {
+    return "Password must be at least 8 characters long.";
+  }
+  if (!hasUpperCase) {
+    return "Password must contain at least one uppercase letter.";
+  }
+  if (!hasLowerCase) {
+    return "Password must contain at least one lowercase letter.";
+  }
+  if (!hasDigit) {
+    return "Password must contain at least one digit.";
+  }
+  if (!hasSpecialChar) {
+    return "Password must contain at least one special character.";
+  }
+
+  return null; // No error
+}
+
 function generateRandomCodeParent(length) {
   const characters = "0123456789";
   let result = "parentID_";
@@ -47,6 +73,38 @@ const sendCredentialEmail = async ({ email, password, role }, res) => {
               <h3>Password: ${password}</h3>
               <h3>Role: ${role}</h3>
               <p>To verify your account please use these credentials to login and input the verification code that will be given to you.</p>
+              <p>If you need any assistance, please don't hesitate to contact our team.</p>
+              <p>Thank you.</p>
+              <br>
+              <p>Best regards,<br>
+              <b>Technical Team</b></p>`,
+    };
+
+    transporter.sendMail(mailOptions);
+    console.log("Success");
+    res.json({
+      status: "SUCCESS",
+      message: "Credential email sent",
+      data: { email, password },
+    });
+  } catch (error) {
+    res.json({
+      status: "FAILED",
+      message: error.message,
+    });
+  }
+};
+
+const sendForgotPasswordEmail = async ({ email, link }, res) => {
+  try {
+    const mailOptions = {
+      from: process.env.AUTH_EMAIL,
+      to: email,
+      subject: "Reset your account",
+      html: `<p><i>Mabuhay!</i></p>
+             <p><b><i>This is BaybaySalita Admin!</i></b></p>
+              <p>To reset you account password please follow this link! This link is only valid for 30 minutes before it expires.</p>
+              <h3>Link: <a href="${link}">Reset Password</a> </h3>
               <p>If you need any assistance, please don't hesitate to contact our team.</p>
               <p>Thank you.</p>
               <br>
@@ -319,32 +377,6 @@ const registerParent = async (req, res) => {
     return !isNaN(input);
   }
 
-  function validatePassword(password) {
-    const minLength = 8;
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasDigit = /\d/.test(password);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-    if (password.length < minLength) {
-      return "Password must be at least 8 characters long.";
-    }
-    if (!hasUpperCase) {
-      return "Password must contain at least one uppercase letter.";
-    }
-    if (!hasLowerCase) {
-      return "Password must contain at least one lowercase letter.";
-    }
-    if (!hasDigit) {
-      return "Password must contain at least one digit.";
-    }
-    if (!hasSpecialChar) {
-      return "Password must contain at least one special character.";
-    }
-
-    return null; // No error
-  }
-
   try {
     const {
       FirstName,
@@ -522,9 +554,79 @@ const loginUser = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const userEmail = await User.findOne({ email });
+    if (!userEmail) {
+      return res.json({
+        error: "No User email has found",
+      });
+    } else {
+      const secret = process.env.JWT_SECRET + userEmail.password;
+      const token = jwt.sign({ email: userEmail, id: userEmail._id }, secret, {
+        expiresIn: "30m",
+      });
+      const link = `http://localhost:5173/reset-password/${userEmail._id}/${token}`;
+      console.log(link);
+      sendForgotPasswordEmail({ email, link }, res);
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { id, token } = req.params;
+    const { password } = req.body;
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.json({ error: "User not found" });
+    }
+
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      return res.json({ error: passwordError });
+    }
+
+    const secret = process.env.JWT_SECRET + user.password;
+
+    jwt.verify(token, secret, async (err, decoded) => {
+      if (err) {
+        return res.json({ status: "Error with token" });
+      } else {
+        try {
+          const hashedPassword = await hashPassword(password);
+          user.password = hashedPassword;
+          await user.save();
+          return res.json({
+            status: "Success",
+            message: "Password updated successfully",
+          });
+        } catch (err) {
+          console.error(err);
+          return res.status(500).json({
+            status: "FAILED",
+            message: "An error occurred while saving your account!",
+          });
+        }
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
 module.exports = {
   registerParent,
   registerTeacher,
   verifyOTP,
   loginUser,
+  forgotPassword,
+  resetPassword,
 };

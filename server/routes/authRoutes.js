@@ -31,6 +31,8 @@ const {
   registerTeacher,
   verifyOTP,
   loginUser,
+  forgotPassword,
+  resetPassword,
 } = require("../controllers/RegistrationController"); //registration functions
 
 // Configure CORS middleware
@@ -42,12 +44,16 @@ router.use(
   })
 );
 
-//Routes get data
-router.get("/", test);
-router.post("/registerParent", registerParent);
-router.post("/registerTeacher", registerTeacher);
+//Login Routes get data
+router.get("/", test); //okay
+router.post("/registerParent", registerParent); //okay
+router.post("/registerTeacher", registerTeacher); //okay
 router.post("/verify", verifyOTP); //okay
 router.post("/login", loginUser); //okay
+router.post("/forgotPass", forgotPassword); //okay
+router.post("/reset-password/:id/:token", resetPassword); //okay
+
+//Admin Routes
 router.post("/addUser", addUser);
 router.get("/users", getUsers); //okay
 router.get("/getUser/:id", getUser); //okay

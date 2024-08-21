@@ -24,14 +24,7 @@ import {
   Chip,
 } from "@nextui-org/react";
 import { columns, users } from "./data";
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Image,
-  Button,
-} from "@nextui-org/react";
+import { Card, CardHeader, CardBody, Image } from "@nextui-org/react";
 
 import { LineChart } from "@mui/x-charts/LineChart";
 
@@ -55,7 +48,7 @@ const BodyAdminDashboard = () => {
     const end = start + rowsPerPage;
 
     return users.slice(start, end);
-  }, [page, users]);
+  }, [page]);
 
   const renderTooltip = (props) => (
     <Tooltip id="button-tooltip" {...props}>
@@ -67,7 +60,7 @@ const BodyAdminDashboard = () => {
     setActiveIndex(index);
   };
 
-  const renderCell = React.useCallback((user, columnKey) => {
+  const renderCell = (user, columnKey) => {
     const cellValue = user[columnKey];
 
     switch (columnKey) {
@@ -77,9 +70,7 @@ const BodyAdminDashboard = () => {
             avatarProps={{ radius: "lg", src: user.avatar }}
             description={user.email}
             name={cellValue}
-          >
-            {user.email}
-          </User>
+          />
         );
       case "role":
         return (
@@ -106,10 +97,7 @@ const BodyAdminDashboard = () => {
           <div className="relative flex items-center gap-2">
             <Tooltip content="Details">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <FontAwesomeIcon
-                  icon={faEye}
-                  className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                />
+                <FontAwesomeIcon icon={faEye} />
               </span>
             </Tooltip>
             <Tooltip content="Edit user">
@@ -127,7 +115,7 @@ const BodyAdminDashboard = () => {
       default:
         return cellValue;
     }
-  }, []);
+  };
 
   return (
     <div className="content">
@@ -179,23 +167,13 @@ const BodyAdminDashboard = () => {
                 />
               </CardBody>
             </Card>
-            <div className="w-full ">
+            <div className="w-full">
               <Card className="py-4 w-full">
                 <CardBody className="overflow-visible py-2">
                   <Table
                     aria-label="Example table with custom cells"
                     bottomContent={
-                      <div className="flex w-full justify-center">
-                        <Pagination
-                          isCompact
-                          showControls
-                          showShadow
-                          color="secondary"
-                          page={page}
-                          total={pages}
-                          onChange={(page) => setPage(page)}
-                        />
-                      </div>
+                      <div className="flex w-full justify-center"></div>
                     }
                     classNames={{
                       wrapper: "min-h-[222px]",
@@ -215,9 +193,7 @@ const BodyAdminDashboard = () => {
                       {(item) => (
                         <TableRow key={item.id}>
                           {(columnKey) => (
-                            <TableCell>
-                              {getKeyValue(item, columnKey)}
-                            </TableCell>
+                            <TableCell>{renderCell(item, columnKey)}</TableCell>
                           )}
                         </TableRow>
                       )}

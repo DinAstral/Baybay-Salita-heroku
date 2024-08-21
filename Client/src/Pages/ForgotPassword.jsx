@@ -1,54 +1,40 @@
-import React, { useState } from "react";
-import { CalendarDate } from "@internationalized/date";
-import {
-  Input,
-  Button,
-  Card,
-  CardBody,
-  DatePicker,
-  Select,
-  SelectItem,
-  Checkbox,
-  CheckboxGroup,
-} from "@nextui-org/react";
+import { useState } from "react";
+import { Input, Button, Card, CardBody } from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
-import {
-  faUser,
-  faEnvelope,
-  faLock,
-  faIdCard,
-  faEye,
-  faEyeSlash,
-  faPhone,
-  faLocationDot,
-  faPersonHalfDress,
-  faCakeCandles,
-} from "@fortawesome/free-solid-svg-icons";
+import { Link, useNavigate } from "react-router-dom";
+import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
+
+import { toast } from "react-hot-toast";
+import axios from "axios";
 
 const ForgotPassword = () => {
+  const navigate = useNavigate();
+
   const [data, setData] = useState({
-    FirstName: "",
-    LastName: "",
-    Age: "",
-    Birthday: "",
-    Gender: "",
-    Address: "",
-    Status: "",
-    ContactNumber: "",
     email: "",
-    password: "",
-    confirmPassword: "",
   });
 
-  const [isInvalid, setIsInvalid] = useState(true);
-  const [isVisible, setIsVisible] = useState(false);
-  const toggleVisibility = () => setIsVisible(!isVisible);
-  const [isVisibleConfirm, setIsVisibleConfirm] = useState(false);
-  const toggleVisibilityConfirm = () => setIsVisibleConfirm(!isVisibleConfirm);
+  const forgotPassword = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post("/forgotPass", {
+        email: data.email,
+      });
 
-  const handleChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
+      const responseData = response.data;
+      if (responseData.error) {
+        toast.error(responseData.error);
+      } else {
+        setData({
+          email: "",
+        });
+        toast.success("User Existed, Reset link has sent to your email.");
+        navigate("/login");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Error occurred while logging in.");
+    }
   };
 
   return (
@@ -62,14 +48,15 @@ const ForgotPassword = () => {
             Please enter your registered email to reset your password.
           </p>
           <CardBody>
-            <form>
+            <form onSubmit={forgotPassword}>
               <div className="flex flex-col gap-2">
                 <Input
                   type="email"
                   label="Email"
                   variant="bordered"
                   className="bg-transparent py-1 my-1"
-                  onChange={handleChange}
+                  value={data.email}
+                  onChange={(e) => setData({ ...data, email: e.target.value })}
                   endContent={
                     <FontAwesomeIcon
                       icon={faEnvelope}
@@ -89,7 +76,7 @@ const ForgotPassword = () => {
                   radius="md"
                   color="primary"
                 >
-                  Next
+                  Submit
                 </Button>
               </div>
             </form>
