@@ -153,9 +153,15 @@ const TeacherRegister = () => {
                   <SelectItem key="" disabled>
                     Select Section
                   </SelectItem>
-                  <SelectItem key="Daffodil">Daffodil</SelectItem>
-                  <SelectItem key="Banaba">Banaba</SelectItem>
-                  <SelectItem key="Sampagita">Sampagita</SelectItem>
+                  <SelectItem key="Aster">Aster</SelectItem>
+                  <SelectItem key="Camia">Camia</SelectItem>
+                  <SelectItem key="Dahlia">Dahlia</SelectItem>
+                  <SelectItem key="Iris">Iris</SelectItem>
+                  <SelectItem key="Jasmin">Jasmin</SelectItem>
+                  <SelectItem key="Orchid">Orchid</SelectItem>
+                  <SelectItem key="Rose">Rose</SelectItem>
+                  <SelectItem key="Tulip">Tulip</SelectItem>
+                  <SelectItem key="SSC">SSC</SelectItem>
                 </Select>
 
                 <Select

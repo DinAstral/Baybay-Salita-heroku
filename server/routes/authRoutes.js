@@ -24,6 +24,8 @@ const {
   updateTeacher,
   getActivity,
   updateActivity,
+  getTeacherUsers,
+  getTeacherUser,
 } = require("../controllers/actControllers");
 
 const {
@@ -77,5 +79,7 @@ router.post("/createAssessment", createAssessment);
 router.get("/getAssessments", getActivities);
 router.get("/getAssessment/id", getActivity);
 router.patch("/updateAssessment/id", updateActivity);
+router.get("/getTeacher", getTeacherUsers);
+router.get("/getTeacher/:UserID", getTeacherUser);
 
 module.exports = router;

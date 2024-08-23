@@ -21,6 +21,7 @@ const teacherSchema = new Schema(
     Status: String,
     Gender: String,
     ContactNumber: String,
+    Picture: String,
     role: String,
   },
   { timestamps: true }

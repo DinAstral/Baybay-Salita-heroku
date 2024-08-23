@@ -1,19 +1,22 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useDownloadExcel } from 'react-export-table-to-excel';
-import ReactPaginate from 'react-paginate';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Tooltip from 'react-bootstrap/Tooltip';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faCircleInfo, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { Table, Modal, Button } from 'react-bootstrap';
-import { Link, useParams } from 'react-router-dom';
-import axios from 'axios';
-import '../ContentDasboard/Content.css';
-import toast from 'react-hot-toast';
-import TeacherContentHeader from '../ContentDasboard/TeacherContentHeader';
+import React, { useEffect, useState, useRef, useContext } from "react";
+import { UserContext } from "../../../context/userContext";
+import { useDownloadExcel } from "react-export-table-to-excel";
+import ReactPaginate from "react-paginate";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faSearch,
+  faCircleInfo,
+  faPrint,
+} from "@fortawesome/free-solid-svg-icons";
+import { Table, Modal, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import "../ContentDasboard/Content.css";
+import TeacherContentHeader from "../ContentDasboard/TeacherContentHeader";
 
-
-const PrintRecord = ({ show, onHide, print, role }) => {
+const PrintRecord = ({ show, onHide, print }) => {
   return (
     <Modal
       show={show}
@@ -28,13 +31,18 @@ const PrintRecord = ({ show, onHide, print, role }) => {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>You are now going to generate a excel file of this data. Do you want to continue?</p>
+        <p>
+          You are now going to generate an Excel file of this data. Do you want
+          to continue?
+        </p>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="danger" onClick={onHide}>
           Cancel
         </Button>
-          <Button variant="success" onClick={print}>Print</Button>
+        <Button variant="success" onClick={print}>
+          Print
+        </Button>
       </Modal.Footer>
     </Modal>
   );
@@ -98,46 +106,68 @@ const EditProfile = ({ show, onHide, student }) => {
   );
 };
 
-
 const BodyAdminStudent = () => {
+  const { user } = useContext(UserContext);
   const [modalShowPrint, setModalShowPrint] = useState(false);
   const [modalShowEdit, setModalShowEdit] = useState(false);
   const [modalShowView, setModalShowView] = useState(false);
 
   const [students, setStudents] = useState([]);
+  const [teacher, setTeacher] = useState({
+    Section: "",
+  });
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [usersPerPage] = useState(10);
-  const [filteredRoles, setFilteredRoles] = useState([]);
-  const [selectedRole, setSelectedRole] = useState('');
+  const [filteredStudents, setFilteredStudents] = useState([]);
 
   const tableRef = useRef(null);
 
   const { onDownload } = useDownloadExcel({
     currentTableRef: tableRef.current,
-    filename: 'Student_List_Report_table',
-    sheet: 'Student'
-})
-
+    filename: "Student_List_Report_table",
+    sheet: "Student",
+  });
 
   const handlePrintClick = () => {
     setModalShowPrint(true);
   };
 
+  // Fetch all students
   useEffect(() => {
     axios
-      .get('/getStudents') // Corrected route
+      .get("/getStudents")
       .then((response) => {
         setStudents(response.data);
-        setFilteredRoles(response.data);
-      }
-    )
+      })
       .catch((err) => console.log(err));
   }, []);
 
+  // Fetch teacher data
+  useEffect(() => {
+    axios
+      .get(`getTeacher/${user.UserID}`) // route to include student ID
+      .then((response) => {
+        console.log("Response:", response.data); // Log response data
+        setTeacher(response.data); // Assuming response.data contains teacher data
+      })
+      .catch((err) => console.log(err));
+  }, [user.UserID]);
+
+  // Filter students by teacher section when both are available
+  useEffect(() => {
+    if (teacher.Section && students.length > 0) {
+      setFilteredStudents(
+        students.filter((student) => student.Section === teacher.Section)
+      );
+    } else {
+      setFilteredStudents(students);
+    }
+  }, [teacher.Section, students]);
+
   const renderTooltip = (props) => (
     <Tooltip id="button-tooltip" {...props}>
-      This function will view Information of your students on each section.
+      This function will view information of your students on each section.
     </Tooltip>
   );
 
@@ -146,7 +176,6 @@ const BodyAdminStudent = () => {
       Generate report/Print table
     </Tooltip>
   );
-
 
   const handleViewClick = () => {
     setModalShowView(true);
@@ -162,27 +191,16 @@ const BodyAdminStudent = () => {
   };
 
   const offset = currentPage * usersPerPage;
-  const currentUsers = filteredRoles.slice(offset, offset + usersPerPage);
-
-  const handleSectionChange = (e) => {
-    const section = e.target.value;
-    setSelectedRole(section);
-    if (section === '') {
-      setFilteredRoles(students);
-    } else {
-      const filtered = students.filter(student => student.Section === section);
-      setFilteredRoles(filtered);
-    }
-  };
+  const currentUsers = filteredStudents.slice(offset, offset + usersPerPage);
 
   return (
     <div className="content">
       <TeacherContentHeader />
-       <div className="content-body">
+      <div className="content-body">
         <PrintRecord
           show={modalShowPrint}
           onHide={() => setModalShowPrint(false)}
-          print= {onDownload}
+          print={onDownload}
         />
         <ViewProfile
           show={modalShowView}
@@ -195,49 +213,51 @@ const BodyAdminStudent = () => {
         />
         <div className="content-title-header">
           <div>
-          Manage Student List
-          <OverlayTrigger
-         placement="bottom"
-         delay={{ show: 250, hide: 400 }}
-         overlay={renderTooltip}
-        >
-        <FontAwesomeIcon icon={faCircleInfo} size='1x' className="help-icon" />
-        </OverlayTrigger>
-        </div>
-        <div className='generate-report'>
-        <OverlayTrigger
-         placement="bottom"
-         delay={{ show: 250, hide: 400 }}
-         overlay={generateReport}
-        > 
-        <FontAwesomeIcon icon={faPrint} size='1x' className="print-icon" onClick={handlePrintClick}/>
-        </OverlayTrigger>
-        </div>
+            Manage Student List
+            <OverlayTrigger
+              placement="bottom"
+              delay={{ show: 250, hide: 400 }}
+              overlay={renderTooltip}
+            >
+              <FontAwesomeIcon
+                icon={faCircleInfo}
+                size="1x"
+                className="help-icon"
+              />
+            </OverlayTrigger>
+          </div>
+          <div className="generate-report">
+            <OverlayTrigger
+              placement="bottom"
+              delay={{ show: 250, hide: 400 }}
+              overlay={generateReport}
+            >
+              <FontAwesomeIcon
+                icon={faPrint}
+                size="1x"
+                className="print-icon"
+                onClick={handlePrintClick}
+              />
+            </OverlayTrigger>
+          </div>
         </div>
         <div className="content-container">
           <div className="row">
             <div className="col">
               <div className="card mt-1 border-0">
                 <div className="list-header-drop-score">
-                 <select name="" id="" onChange={handleSectionChange} value={selectedRole}>
-                  <option value="">Select Section</option>
-                  <option value="Camia">Camia</option>
-                  <option value="Daffodil">Daffodil</option>
-                  <option value="Daisy">Daisy</option>
-                  <option value="Gumamela">Gumamela</option>
-                  <option value="Lily">Lily</option>
-                  <option value="Rosal">Rosal</option>
-                  <option value="Rose">Rose</option>
-                  <option value="Santan">Santan</option>
-                  <option value="Speacial">Speacial</option>
-                  </select>
-                <div className="search-box-table">
-                    <FontAwesomeIcon icon={faSearch} size='1x' inverse className="con-icon"/>
-                    <input type="text" placeholder='Enter Student Name'/>
+                  <div className="search-box-table">
+                    <FontAwesomeIcon
+                      icon={faSearch}
+                      size="1x"
+                      inverse
+                      className="con-icon"
+                    />
+                    <input type="text" placeholder="Enter Student Name" />
                   </div>
                 </div>
                 <div className="card-body scrollable-table scrollable-container">
-                  <Table striped bordered hover responsive>
+                  <Table striped bordered hover responsive ref={tableRef}>
                     <thead>
                       <tr className="bg-primary text-dark font-weight-bold">
                         <th className="text-center">LRN</th>
@@ -247,7 +267,6 @@ const BodyAdminStudent = () => {
                         <th className="text-center">Section</th>
                         <th className="text-center">Birthday</th>
                         <th className="text-center">Mother Tongue</th>
-                        <th className="text-center">Nationality</th>
                         <th className="text-center">Gender</th>
                         <th className="text-center">Actions</th>
                       </tr>
@@ -261,13 +280,21 @@ const BodyAdminStudent = () => {
                           <td className="text-center">{student.Age}</td>
                           <td className="text-center">{student.Section}</td>
                           <td className="text-center">{student.Birthday}</td>
-                          <td className="text-center">{student.MotherTongue}</td>
-                          <td className="text-center">{student.Nationality}</td>
+                          <td className="text-center">
+                            {student.MotherTongue}
+                          </td>
                           <td className="text-center">{student.Gender}</td>
                           <td className="text-center">
                             <div className="table-buttons">
-                              <Button variant="info" onClick={() => handleViewClick()}>View</Button>
-                              <Button variant="primary" onClick={() => handleEditClick(student)}>Update</Button>
+                              <Button variant="info" onClick={handleViewClick}>
+                                View
+                              </Button>
+                              <Button
+                                variant="primary"
+                                onClick={() => handleEditClick(student)}
+                              >
+                                Update
+                              </Button>
                             </div>
                           </td>
                         </tr>
@@ -275,16 +302,18 @@ const BodyAdminStudent = () => {
                     </tbody>
                   </Table>
                   <ReactPaginate
-                    previousLabel={'Previous'}
-                    nextLabel={'Next'}
-                    breakLabel={'...'}
-                    breakClassName={'break-me'}
-                    pageCount={Math.ceil(filteredRoles.length / usersPerPage)}
+                    previousLabel={"Previous"}
+                    nextLabel={"Next"}
+                    breakLabel={"..."}
+                    breakClassName={"break-me"}
+                    pageCount={Math.ceil(
+                      filteredStudents.length / usersPerPage
+                    )}
                     marginPagesDisplayed={2}
                     pageRangeDisplayed={10}
                     onPageChange={handlePageClick}
-                    containerClassName={'pagination'}
-                    activeClassName={'active'}
+                    containerClassName={"pagination"}
+                    activeClassName={"active"}
                   />
                 </div>
               </div>

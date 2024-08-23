@@ -1,16 +1,16 @@
-import React from 'react'
-import Sidebar from '../../Components/TeacherDashboardComponent/Sidebar'
-import BodyAnalyticsTeacher from '../../Components/TeacherDashboardComponent/BodyAnalyticsTeacher'
+import React from "react";
+import BodyAnalyticsTeacher from "../../Components/TeacherDashboardComponent/BodyAnalyticsTeacher";
+import Sidebar from "../../Components/TeacherDashboardComponent/Sidebar";
 
 const Dashboard = () => {
   return (
-    <div className='dashboard'>
+    <div className="dashboard">
       <Sidebar />
       <div className="dashboard-content">
         <BodyAnalyticsTeacher />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;

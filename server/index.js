@@ -15,7 +15,6 @@ mongoose
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
-app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: false }));
 
 app.use("/", require("./routes/authRoutes"));

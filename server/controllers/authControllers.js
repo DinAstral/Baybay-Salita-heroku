@@ -149,7 +149,6 @@ const addStudent = async (req, res) => {
     const {
       LRN,
       FirstName,
-      MiddleName,
       LastName,
       Age,
       Level,
@@ -157,7 +156,6 @@ const addStudent = async (req, res) => {
       Birthday,
       Address,
       MotherTongue,
-      Nationality,
       Gender,
     } = req.body;
     // Check if name is entered
@@ -167,11 +165,12 @@ const addStudent = async (req, res) => {
       });
     }
     if (!isNumber(LRN)) {
-      return res.json({ error: "Invalid LRN inputted" });
+      return res.json({ error: "Invalid LRN" });
     }
     if (LRN.length != 12) {
       return res.json({ error: "LRN must 12 numbers long" });
     }
+
     const exist = await Student.findOne({ LRN });
     if (exist) {
       return res.json({
@@ -182,11 +181,6 @@ const addStudent = async (req, res) => {
     if (!FirstName) {
       return res.json({
         error: "First Name is required",
-      });
-    }
-    if (!MiddleName) {
-      return res.json({
-        error: "Middle Name is required",
       });
     }
     if (!LastName) {
@@ -200,7 +194,7 @@ const addStudent = async (req, res) => {
       });
     }
     if (!isNumber(Age)) {
-      return res.json({ error: "Invalid Age inputted" });
+      return res.json({ error: "Invalid Age" });
     }
     if (!Level) {
       return res.json({
@@ -227,11 +221,6 @@ const addStudent = async (req, res) => {
         error: "MotherTongue is required",
       });
     }
-    if (!Nationality) {
-      return res.json({
-        error: "Nationality is required",
-      });
-    }
     if (!Gender) {
       return res.json({
         error: "Gender is required",
@@ -242,7 +231,6 @@ const addStudent = async (req, res) => {
     const student = await Student.create({
       LRN,
       FirstName,
-      MiddleName,
       LastName,
       Age,
       Level,
@@ -250,7 +238,6 @@ const addStudent = async (req, res) => {
       Birthday,
       Address,
       MotherTongue,
-      Nationality,
       Gender,
       role: "student",
     });
