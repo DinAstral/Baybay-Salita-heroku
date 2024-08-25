@@ -10,18 +10,34 @@ import Footer from "../../Components/Home/Footer/Footer";
 import Navbar from "../../Components/Home/Nabvar/Navbar";
 
 const Main = () => {
-  //Loader state
+  // Loader state
   const [isLoading, setIsLoading] = useState(true);
 
-  //async method to fecth fake data
+  // Function to simulate data fetching or refreshing
+  const fetchData = () => {
+    console.log("Data refreshed"); // Replace with actual data fetching logic
+  };
+
   useEffect(() => {
-    const loader = () => {
+    // Initial data loading
+    const loadData = () => {
       setTimeout(() => {
         setIsLoading(false);
-      }, 2000);
+        fetchData();
+      }, 2000); // Initial load delay
     };
-    loader();
+    loadData();
+
+    // Immediately refresh data
+    setTimeout(() => {
+      fetchData();
+    }, 2000); // Refresh immediately after initial load
   }, []);
+
+  // Optionally, if you want to log state updates for debugging:
+  useEffect(() => {
+    console.log("Component re-rendered or data refreshed");
+  }, [isLoading]);
 
   return isLoading ? (
     <Loader />

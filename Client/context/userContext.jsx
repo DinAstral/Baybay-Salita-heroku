@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import axios from "axios";
 import { createContext, useState, useEffect } from "react";
 import toast from "react-hot-toast";
@@ -37,12 +38,8 @@ export function UserContextProvider({ children }) {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   return (
-    <UserContext.Provider value={{ user, setUser, clearCookie }}>
+    <UserContext.Provider value={{ user, setUser, clearCookie, loading }}>
       {children}
     </UserContext.Provider>
   );

@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { Link as LinkScroll } from "react-scroll";
 import "./Navbar.css";
 import logo from "../../../assets/logo1.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
+import { UserContext } from "../../../../context/userContext"; // Adjust the import path as needed
 
 function Navbar() {
   const [sticky, setSticky] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
+  const { user, clearCookie } = useContext(UserContext); // Access the user context
 
   useEffect(() => {
     const handleScroll = () => {
@@ -48,12 +50,30 @@ function Navbar() {
             Contact
           </LinkScroll>
         </li>
-        <li>
-          <Link to="/login" className="btn-home">
-            Login
-          </Link>
-        </li>{" "}
-        {/* Use Link component for navigation */}
+        {user && (
+          <>
+            <li>
+              <Link
+                to={`/${user.role.toLowerCase()}Dashboard`}
+                className="btn-home"
+              >
+                Dashboard
+              </Link>
+            </li>
+            <li>
+              <button onClick={() => clearCookie()} className="btn-home">
+                Logout
+              </button>
+            </li>
+          </>
+        )}
+        {!user && (
+          <li>
+            <Link to="/login" className="btn-home">
+              Login
+            </Link>
+          </li>
+        )}
       </ul>
       <FontAwesomeIcon
         icon={faBars}
