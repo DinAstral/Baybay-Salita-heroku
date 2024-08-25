@@ -6,6 +6,8 @@ const jwt = require("jsonwebtoken");
 const UserOTPVerification = require("../models/UserOTPVerification");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
+const multer = require("multer");
+const path = require("path");
 
 function validatePassword(password) {
   const minLength = 8;
@@ -229,7 +231,6 @@ const verifyOTP = async (req, res) => {
   }
 };
 
-// Register User function
 const registerTeacher = async (req, res) => {
   const TeacherID = generateRandomCodeTeacher(6);
 
@@ -259,7 +260,6 @@ const registerTeacher = async (req, res) => {
     if (!hasSpecialChar) {
       return "Password must contain at least one special character.";
     }
-
     return null; // No error
   }
 
@@ -267,6 +267,8 @@ const registerTeacher = async (req, res) => {
     const {
       FirstName,
       LastName,
+      Section,
+      Department,
       Birthday,
       Address,
       Status,
@@ -274,8 +276,6 @@ const registerTeacher = async (req, res) => {
       ContactNumber,
       email,
       password,
-      Section,
-      Department,
     } = req.body;
 
     if (!FirstName) {
@@ -324,7 +324,7 @@ const registerTeacher = async (req, res) => {
 
     const hashedPassword = await hashPassword(password); // Hash the password
 
-    // Create Teacher and User records
+    // Create Parent and User records
     const teacher = new Teacher({
       UserID: TeacherID,
       FirstName,
@@ -337,7 +337,9 @@ const registerTeacher = async (req, res) => {
       Status,
       ContactNumber,
       email,
+      password: hashedPassword,
       role: "Teacher",
+      verified: false,
     });
 
     const user = new User({
@@ -364,6 +366,42 @@ const registerTeacher = async (req, res) => {
           message: "An Error occurred while saving your account!",
         });
       });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
+const uploadFile = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.json({ error: "No file uploaded" });
+    }
+
+    // Here you would typically save the file information to the database or perform other actions.
+    // Since we're associating this with a teacher, we'll assume the teacher's ID is passed via req.body
+    const { TeacherID } = req.body;
+
+    if (!TeacherID) {
+      return res.json({ error: "TeacherID is required" });
+    }
+
+    // Find the teacher and update the Picture field
+    const teacher = await Teacher.findOneAndUpdate(
+      { UserID: TeacherID },
+      { Picture: req.file.filename },
+      { new: true }
+    );
+
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
+    return res.json({
+      status: "SUCCESS",
+      message: "File uploaded and associated with teacher successfully",
+      teacher,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Server error" });
@@ -531,7 +569,7 @@ const loginUser = async (req, res) => {
           // Set cookie with token
           res
             .cookie("token", token, { httpOnly: true })
-            .json({ success: true, role: user.role, user });
+            .json({ success: true, token, role: user.role, user });
         }
       );
     }
@@ -614,11 +652,18 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const logout = (req, res) => {
+  res.clearCookie("token", { path: "/" }); // Adjust the path as necessary
+  res.status(200).json({ message: "Logged out successfully" });
+};
+
 module.exports = {
   registerParent,
   registerTeacher,
+  uploadFile,
   verifyOTP,
   loginUser,
   forgotPassword,
   resetPassword,
+  logout,
 };

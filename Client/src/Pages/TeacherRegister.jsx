@@ -10,7 +10,7 @@ import {
   SelectItem,
 } from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   faUser,
   faEnvelope,
@@ -43,7 +43,7 @@ const TeacherRegister = () => {
   const [isVisibleConfirm, setIsVisibleConfirm] = useState(false);
   const toggleVisibilityConfirm = () => setIsVisibleConfirm(!isVisibleConfirm);
 
-  const registerParent = async (e) => {
+  const registerTeacher = async (e) => {
     e.preventDefault();
     const {
       FirstName,
@@ -83,7 +83,7 @@ const TeacherRegister = () => {
         toast.error(response.data.error);
       } else {
         setData({});
-        toast.success("Register Verification.");
+        toast.success(response.data.message);
         localStorage.setItem("userId", response.data.data.userId); // Store userId for verification step
         navigate("/verifyEmail");
       }
@@ -104,7 +104,7 @@ const TeacherRegister = () => {
             Please fill up the details needed!
           </p>
           <CardBody>
-            <form onSubmit={registerParent}>
+            <form onSubmit={registerTeacher}>
               <div className="grid grid-cols-2 gap-4">
                 <Input
                   type="text"
@@ -336,8 +336,14 @@ const TeacherRegister = () => {
                 />
               </div>
               <div className="w-full flex items-center justify-center gap-6 my-4">
-                <Button className="my-2" size="lg" radius="md" color="danger">
-                  <Link to="/register">Cancel</Link>
+                <Button
+                  className="my-2"
+                  size="lg"
+                  radius="md"
+                  color="danger"
+                  onClick={() => navigate(-1)}
+                >
+                  Cancel
                 </Button>
                 <Button
                   type="submit"

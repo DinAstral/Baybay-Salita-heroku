@@ -25,6 +25,10 @@ const Login = () => {
 
   const [isSelected, setIsSelected] = React.useState(false);
 
+  const registerButton = () => {
+    navigate("/register");
+  };
+
   const loginUser = async (e) => {
     e.preventDefault();
     try {
@@ -37,11 +41,13 @@ const Login = () => {
       if (responseData.error) {
         toast.error(responseData.error);
       } else {
+        // Store the token in localStorage
+        localStorage.setItem("token", responseData.token);
+
         setData({
           email: "",
           password: "",
         });
-
         if (responseData.role === "Parent") {
           toast.success("Login Successful.");
           navigate("/parentKidTab");
@@ -159,8 +165,13 @@ const Login = () => {
               Login
             </Button>
 
-            <Button className="my-2" size="lg" radius="md">
-              <Link to="/register">Register</Link>
+            <Button
+              className="my-2"
+              size="lg"
+              radius="md"
+              onClick={registerButton}
+            >
+              Register
             </Button>
           </div>
         </div>

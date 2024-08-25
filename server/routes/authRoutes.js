@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const cors = require("cors");
+const multer = require("multer");
+const path = require("path");
+
 const {
   test,
   getUsers,
@@ -31,10 +34,12 @@ const {
 const {
   registerParent,
   registerTeacher,
+  uploadFile,
   verifyOTP,
   loginUser,
   forgotPassword,
   resetPassword,
+  logout,
 } = require("../controllers/RegistrationController"); //registration functions
 
 // Configure CORS middleware
@@ -46,14 +51,31 @@ router.use(
   })
 );
 
+// Set up multer storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "../public/Images")); // Ensure the correct path
+  },
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`
+    );
+  },
+});
+
+const upload = multer({ storage: storage });
+
 //Login Routes get data
 router.get("/", test); //okay
 router.post("/registerParent", registerParent); //okay
 router.post("/registerTeacher", registerTeacher); //okay
+router.post("/uploadFile", upload.single("file"), uploadFile); //okay
 router.post("/verify", verifyOTP); //okay
 router.post("/login", loginUser); //okay
 router.post("/forgotPass", forgotPassword); //okay
 router.post("/reset-password/:id/:token", resetPassword); //okay
+router.post("/logout", logout);
 
 //Admin Routes
 router.post("/addUser", addUser);

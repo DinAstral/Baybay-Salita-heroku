@@ -38,6 +38,8 @@ import EditStudent from "./Pages/TeacherDashboard/EditStudent";
 import ViewAssessment from "./Pages/TeacherDashboard/ViewAssessment";
 import ViewStudent from "./Pages/TeacherDashboard/ViewStudent";
 import { UserContextProvider } from "../context/userContext";
+import RoleBasedRoute from "./Components/RoleBasedRoute";
+import UnauthorizedPage from "./Pages/UnauthorizedPage";
 
 axios.defaults.baseURL = "http://localhost:8000";
 axios.defaults.withCredentials = true;
@@ -66,62 +68,221 @@ const App = () => {
               element={<ResetPassword />}
             />
             <Route path="/verifyEmail" element={<VerifyEmail />} />
+            <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
             {/* Teacher Dashboard Routes*/}
-            <Route path="/teacherDashboard" element={<Dashboard />} />
-            <Route path="/teacherProfile" element={<TeacherProfile />} />
+            <Route
+              path="/teacherDashboard"
+              element={
+                <RoleBasedRoute allowedRoles={["Teacher"]}>
+                  <Dashboard />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/teacherProfile"
+              element={
+                <RoleBasedRoute allowedRoles={["Teacher"]}>
+                  <TeacherProfile />
+                </RoleBasedRoute>
+              }
+            />
             <Route
               path="/teacherUpdateProfile/:id"
-              element={<UpdateProfileTeacher />}
+              element={
+                <RoleBasedRoute allowedRoles={["Teacher"]}>
+                  <UpdateProfileTeacher />
+                </RoleBasedRoute>
+              }
             />
             <Route
               path="/teacherProfileEduc"
-              element={<TeacherProfileEducation />}
+              element={
+                <RoleBasedRoute allowedRoles={["Teacher"]}>
+                  <TeacherProfileEducation />
+                </RoleBasedRoute>
+              }
             />
-            <Route path="/manageStudent" element={<ManageStudent />} />
-            <Route path="/addStudent" element={<AddStudent />} />
-            <Route path="/viewStudent" element={<ViewStudent />} />
-            <Route path="/editStudent/:id" element={<EditStudent />} />
-            <Route path="/viewAssessment" element={<ViewAssessment />} />
-            <Route path="/viewScore" element={<ViewScore />} />
+            <Route
+              path="/manageStudent"
+              element={
+                <RoleBasedRoute allowedRoles={["Teacher"]}>
+                  <ManageStudent />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/addStudent"
+              element={
+                <RoleBasedRoute allowedRoles={["Teacher"]}>
+                  <AddStudent />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/viewStudent"
+              element={
+                <RoleBasedRoute allowedRoles={["Teacher"]}>
+                  <ViewStudent />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/editStudent/:id"
+              element={
+                <RoleBasedRoute allowedRoles={["Teacher"]}>
+                  <EditStudent />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/viewAssessment"
+              element={
+                <RoleBasedRoute allowedRoles={["Teacher"]}>
+                  <ViewAssessment />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/viewScore"
+              element={
+                <RoleBasedRoute allowedRoles={["Teacher"]}>
+                  <ViewScore />
+                </RoleBasedRoute>
+              }
+            />
 
             {/* Parent DAshboard Routes */}
 
             {/* Admin Dashboard Routes */}
-            <Route path="/AdminDashboard" element={<AdminDashboard />} />
+            <Route
+              path="/AdminDashboard"
+              element={
+                <RoleBasedRoute allowedRoles={["Admin"]}>
+                  <AdminDashboard />
+                </RoleBasedRoute>
+              }
+            />
             <Route
               path="/AdminEditProfile/:id"
-              element={<AdminEditProfile />}
+              element={
+                <RoleBasedRoute allowedRoles={["Admin"]}>
+                  <AdminEditProfile />
+                </RoleBasedRoute>
+              }
             />
-            <Route path="/AdminUsers" element={<AdminUser />} />
-            <Route path="/AdminEditUser/:id" element={<AdminEditUser />} />
-            <Route path="/adminStudents" element={<AdminStudent />} />
-            <Route path="/adminAddStudent" element={<AdminAddStudent />} />
-            <Route path="/adminViewStudent" element={<AdminViewStudent />} />
+            <Route
+              path="/AdminUsers"
+              element={
+                <RoleBasedRoute allowedRoles={["Admin"]}>
+                  <AdminUser />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/AdminEditUser/:id"
+              element={
+                <RoleBasedRoute allowedRoles={["Admin"]}>
+                  <AdminEditUser />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/adminStudents"
+              element={
+                <RoleBasedRoute allowedRoles={["Admin"]}>
+                  <AdminStudent />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/adminAddStudent"
+              element={
+                <RoleBasedRoute allowedRoles={["Admin"]}>
+                  <AdminAddStudent />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/adminViewStudent"
+              element={
+                <RoleBasedRoute allowedRoles={["Admin"]}>
+                  <AdminViewStudent />
+                </RoleBasedRoute>
+              }
+            />
             <Route
               path="/adminStudentAssessment"
-              element={<AdminAssessment />}
+              element={
+                <RoleBasedRoute allowedRoles={["Admin"]}>
+                  <AdminAssessment />
+                </RoleBasedRoute>
+              }
             />
             <Route
               path="/adminStudentProgress"
-              element={<AdminStudentProgress />}
+              element={
+                <RoleBasedRoute allowedRoles={["Admin"]}>
+                  <AdminStudentProgress />
+                </RoleBasedRoute>
+              }
             />
             <Route
               path="/adminEditStudent/:id"
-              element={<AdminEditStudent />}
+              element={
+                <RoleBasedRoute allowedRoles={["Admin"]}>
+                  <AdminEditStudent />
+                </RoleBasedRoute>
+              }
             />
-            <Route path="/adminViewParent/:id" element={<AdminViewParent />} />
-            <Route path="/adminEditParent/:id" element={<AdminEditParent />} />
-            <Route path="/adminAddUser" element={<AdminAddUser />} />
+            <Route
+              path="/adminViewParent/:id"
+              element={
+                <RoleBasedRoute allowedRoles={["Admin"]}>
+                  <AdminViewParent />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/adminEditParent/:id"
+              element={
+                <RoleBasedRoute allowedRoles={["Admin"]}>
+                  <AdminEditParent />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/adminAddUser"
+              element={
+                <RoleBasedRoute allowedRoles={["Admin"]}>
+                  <AdminAddUser />
+                </RoleBasedRoute>
+              }
+            />
             <Route
               path="/adminViewTeacher/:id"
-              element={<AdminViewTeacher />}
+              element={
+                <RoleBasedRoute allowedRoles={["Admin"]}>
+                  <AdminViewTeacher />
+                </RoleBasedRoute>
+              }
             />
             <Route
               path="/adminEditTeacher/:id"
-              element={<AdminEditTeacher />}
+              element={
+                <RoleBasedRoute allowedRoles={["Admin"]}>
+                  <AdminEditTeacher />
+                </RoleBasedRoute>
+              }
             />
-            <Route path="/adminProfile" element={<AdminProfile />} />
+            <Route
+              path="/adminProfile"
+              element={
+                <RoleBasedRoute allowedRoles={["Admin"]}>
+                  <AdminProfile />
+                </RoleBasedRoute>
+              }
+            />
           </Routes>
         </NextUIProvider>
       </UserContextProvider>
