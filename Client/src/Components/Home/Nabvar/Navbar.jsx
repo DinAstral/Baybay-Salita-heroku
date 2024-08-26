@@ -31,22 +31,46 @@ function Navbar() {
       <img src={logo} alt="" className="logo" />
       <ul className={mobileMenu ? "" : "hide-mobile-menu"}>
         <li>
-          <LinkScroll to="hero" smooth={true} offset={-100} duration={100}>
+          <LinkScroll
+            to="hero"
+            smooth={true}
+            offset={-100}
+            duration={100}
+            className="cursor-pointer"
+          >
             Home
           </LinkScroll>
         </li>
         <li>
-          <LinkScroll to="services" smooth={true} offset={-290} duration={100}>
+          <LinkScroll
+            to="services"
+            smooth={true}
+            offset={-290}
+            duration={100}
+            className="cursor-pointer"
+          >
             Services
           </LinkScroll>
         </li>
         <li>
-          <LinkScroll to="about" smooth={true} offset={-150} duration={100}>
+          <LinkScroll
+            to="about"
+            smooth={true}
+            offset={-150}
+            duration={100}
+            className="cursor-pointer"
+          >
             About
           </LinkScroll>
         </li>
         <li>
-          <LinkScroll to="contact" smooth={true} offset={-300} duration={100}>
+          <LinkScroll
+            to="contact"
+            smooth={true}
+            offset={-300}
+            duration={100}
+            className="cursor-pointer"
+          >
             Contact
           </LinkScroll>
         </li>
@@ -54,7 +78,7 @@ function Navbar() {
           <>
             <li>
               <Link
-                to={`/${user.role.toLowerCase()}Dashboard`}
+                to={`/${user.role.toLowerCase()}KidTab`}
                 className="btn-home"
               >
                 Dashboard

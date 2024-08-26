@@ -1,4 +1,3 @@
-import "bootstrap/dist/css/bootstrap.min.css";
 import { NextUIProvider } from "@nextui-org/react";
 import { Route, Routes, useNavigate } from "react-router-dom"; // Import BrowserRouter, Route, and Routes
 import axios from "axios";
@@ -40,6 +39,11 @@ import ViewStudent from "./Pages/TeacherDashboard/ViewStudent";
 import { UserContextProvider } from "../context/userContext";
 import RoleBasedRoute from "./Components/RoleBasedRoute";
 import UnauthorizedPage from "./Pages/UnauthorizedPage";
+import InformationKid from "./Pages/ParentDashboard/InformationKid";
+import ParentFeedbackTeacher from "./Pages/ParentDashboard/ParentFeedbackTeacher";
+import ParentViewStudentProgress from "./Pages/ParentDashboard/ParentViewStudentProgress";
+import ParentProfile from "./Pages/ParentDashboard/ParentProfile";
+import ProfileUpdate from "./Pages/ParentDashboard/ProfileUpdate";
 
 axios.defaults.baseURL = "http://localhost:8000";
 axios.defaults.withCredentials = true;
@@ -152,7 +156,47 @@ const App = () => {
               }
             />
 
-            {/* Parent DAshboard Routes */}
+            {/* Parent Dashboard Routes */}
+            <Route
+              path="/parentKidTab"
+              element={
+                <RoleBasedRoute allowedRoles={["Parent"]}>
+                  <InformationKid />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/parentFeedbackTeacher"
+              element={
+                <RoleBasedRoute allowedRoles={["Parent"]}>
+                  <ParentFeedbackTeacher />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/parentStudentProgress"
+              element={
+                <RoleBasedRoute allowedRoles={["Parent"]}>
+                  <ParentViewStudentProgress />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/parentProfile"
+              element={
+                <RoleBasedRoute allowedRoles={["Parent"]}>
+                  <ParentProfile />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/parentUpdateProfile/:id"
+              element={
+                <RoleBasedRoute allowedRoles={["Parent"]}>
+                  <ProfileUpdate />
+                </RoleBasedRoute>
+              }
+            />
 
             {/* Admin Dashboard Routes */}
             <Route

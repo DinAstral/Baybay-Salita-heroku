@@ -32,6 +32,12 @@ const {
 } = require("../controllers/actControllers");
 
 const {
+  getParentUsers,
+  getParentUser,
+  getStudentUser,
+} = require("../controllers/parentController");
+
+const {
   registerParent,
   registerTeacher,
   uploadFile,
@@ -93,6 +99,9 @@ router.delete("/getStudent/:id", deleteStudent);
 router.patch("/getStudent/:id", updateStudent);
 
 //Parent Routes
+router.get("/getParent", getParentUsers);
+router.get("/getParent/:UserID", getParentUser);
+router.get("/getStudentParent/:LRN", getStudentUser);
 router.patch("/updateParent/:id", updateParent);
 
 //Teacher Routes

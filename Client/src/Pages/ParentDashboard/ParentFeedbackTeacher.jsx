@@ -1,17 +1,15 @@
-import React from 'react'
-import ParentSidebar from '../../Components/ParentDashboardComponent/ParentSidebar'
-import BodyFeedbackParentTeacher from '../../Components/ParentDashboardComponent/BodyFeedbackParentTeacher'
-
+import ParentSidebar from "../../Components/ParentDashboardComponent/ParentSidebar";
+import BodyFeedbackParentTeacher from "../../Components/ParentDashboardComponent/BodyFeedbackParentTeacher";
 
 const ParentFeedbackTeacher = () => {
   return (
-    <div className='dashboard'>
+    <div className="dashboard">
       <ParentSidebar />
       <div className="dashboard-content">
         <BodyFeedbackParentTeacher />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ParentFeedbackTeacher
+export default ParentFeedbackTeacher;
