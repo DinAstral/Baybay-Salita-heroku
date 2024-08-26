@@ -1,67 +1,106 @@
-import React from 'react';
-import ContentHeader from '../ContentDasboard/ContentHeader';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Tooltip from 'react-bootstrap/Tooltip';
-import { Table, Button } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useNavigate, useNavigationType } from 'react-router-dom';
-import { faCircleInfo, faSearch, faPrint } from '@fortawesome/free-solid-svg-icons';
-import '../ContentDasboard/Content.css';
-import TeacherContentHeader from '../ContentDasboard/TeacherContentHeader';
+import React, { useState } from "react";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
+import { Table, Button as BootstrapButton } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useNavigate } from "react-router-dom";
+import {
+  faCircleInfo,
+  faSearch,
+  faPrint,
+} from "@fortawesome/free-solid-svg-icons";
+import "../ContentDasboard/Content.css";
+import TeacherContentHeader from "../ContentDasboard/TeacherContentHeader";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+} from "@nextui-org/react";
 
 const lists = [
   {
     ActivityCode: "nbQGlB",
-    LRN: '111022233442',
-    FirstName: 'Marc Alan',
-    LastName: 'Din',
-    Type: 'Word',
-    Quiz1: 'View Record',
-    Quiz2: 'View Record',
-    Quiz3: 'View Record',
-    Quiz4: 'View Record',
-    Quiz5: 'View Record',
+    LRN: "111022233442",
+    FirstName: "Marc Alan",
+    LastName: "Din",
+    Type: "Word",
+    Quiz1: "View Record",
+    Quiz2: "View Record",
+    Quiz3: "View Record",
+    Quiz4: "View Record",
+    Quiz5: "View Record",
   },
   {
     ActivityCode: "nbQGlB",
-    LRN: '111022233442',
-    FirstName: 'Marc Alan',
-    LastName: 'Din',
-    Type: 'Word',
-    Quiz1: 'View Record',
-    Quiz2: 'View Record',
-    Quiz3: 'View Record',
-    Quiz4: 'View Record',
-    Quiz5: 'View Record',
+    LRN: "111022233442",
+    FirstName: "Marc Alan",
+    LastName: "Din",
+    Type: "Word",
+    Quiz1: "View Record",
+    Quiz2: "View Record",
+    Quiz3: "View Record",
+    Quiz4: "View Record",
+    Quiz5: "View Record",
   },
   {
     ActivityCode: "nbQGlB",
-    LRN: '111022233442',
-    FirstName: 'Marc Alan',
-    LastName: 'Din',
-    Type: 'Word',
-    Quiz1: 'View Record',
-    Quiz2: 'View Record',
-    Quiz3: 'View Record',
-    Quiz4: 'View Record',
-    Quiz5: 'View Record',
+    LRN: "111022233442",
+    FirstName: "Marc Alan",
+    LastName: "Din",
+    Type: "Word",
+    Quiz1: "View Record",
+    Quiz2: "View Record",
+    Quiz3: "View Record",
+    Quiz4: "View Record",
+    Quiz5: "View Record",
   },
   {
     ActivityCode: "nbQGlB",
-    LRN: '111022233442',
-    FirstName: 'Marc Alan',
-    LastName: 'Din',
-    Type: 'Word',
-    Quiz1: 'View Record',
-    Quiz2: 'View Record',
-    Quiz3: 'View Record',
-    Quiz4: 'View Record',
-    Quiz5: 'View Record',
+    LRN: "111022233442",
+    FirstName: "Marc Alan",
+    LastName: "Din",
+    Type: "Word",
+    Quiz1: "View Record",
+    Quiz2: "View Record",
+    Quiz3: "View Record",
+    Quiz4: "View Record",
+    Quiz5: "View Record",
   },
 ];
 
-const BodyViewScore = () => {
+const FeedbackModal = ({ show, onHide }) => {
+  return (
+    <Modal isOpen={show} onOpenChange={onHide}>
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className="flex flex-col gap-1">Feedback</ModalHeader>
+            <ModalBody>
+              <p>
+                Please provide your feedback here. You can also include any
+                comments or suggestions for the student's progress.
+              </p>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="danger" variant="light" onPress={onClose}>
+                Close
+              </Button>
+              <Button color="primary" onPress={onClose}>
+                Submit
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
+  );
+};
 
+const BodyViewScore = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const renderTooltip = (props) => (
@@ -76,30 +115,46 @@ const BodyViewScore = () => {
     </Tooltip>
   );
 
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
   return (
-    <div className='content'>
+    <div className="content">
       <TeacherContentHeader />
       <div className="content-body">
         <div className="content-title-header">
           <div>
-          Manage Student Progress
-          <OverlayTrigger
-         placement="bottom"
-         delay={{ show: 250, hide: 400 }}
-         overlay={renderTooltip}
-        >
-        <FontAwesomeIcon icon={faCircleInfo} size='1x' className="help-icon" />
-        </OverlayTrigger>
-        </div>
-        <div className='generate-report'>
-        <OverlayTrigger
-         placement="bottom"
-         delay={{ show: 250, hide: 400 }}
-         overlay={generateReport}
-        > 
-        <FontAwesomeIcon icon={faPrint} size='1x' className="print-icon" />
-        </OverlayTrigger>
-        </div>
+            Manage Student Progress
+            <OverlayTrigger
+              placement="bottom"
+              delay={{ show: 250, hide: 400 }}
+              overlay={renderTooltip}
+            >
+              <FontAwesomeIcon
+                icon={faCircleInfo}
+                size="1x"
+                className="help-icon"
+              />
+            </OverlayTrigger>
+          </div>
+          <div className="generate-report">
+            <OverlayTrigger
+              placement="bottom"
+              delay={{ show: 250, hide: 400 }}
+              overlay={generateReport}
+            >
+              <FontAwesomeIcon
+                icon={faPrint}
+                size="1x"
+                className="print-icon"
+              />
+            </OverlayTrigger>
+          </div>
         </div>
         <div className="content-container">
           <div className="row">
@@ -107,21 +162,31 @@ const BodyViewScore = () => {
               <div className="card mt-1 border-0">
                 <div className="list-header-drop-score">
                   <div className="search-box-table">
-                    <FontAwesomeIcon icon={faSearch} size='1x' inverse className="con-icon"/>
-                    <input type="text" placeholder='Enter student name'/>
+                    <FontAwesomeIcon
+                      icon={faSearch}
+                      size="1x"
+                      inverse
+                      className="con-icon"
+                    />
+                    <input type="text" placeholder="Enter student name" />
                   </div>
-                  <div className='back-button-profile'>
-                    <div className='btn-back' onClick={() => navigate('/viewAssessment')}>Back</div>
+                  <div className="back-button-profile">
+                    <div
+                      className="btn-back"
+                      onClick={() => navigate("/viewAssessment")}
+                    >
+                      Back
+                    </div>
                   </div>
                 </div>
                 <div className="card-body scrollable-table scrollable-container">
                   <Table striped bordered hover responsive>
                     <thead>
-                      <tr className="bg-primary text-dark font-weight-bold">  
+                      <tr className="bg-primary text-dark font-weight-bold">
                         <th>Activity Code</th>
                         <th>LRN</th>
                         <th>First Name</th>
-                        <th>Last Name</th>  
+                        <th>Last Name</th>
                         <th>Type of Activity</th>
                         <th>Record 1</th>
                         <th>Record 2</th>
@@ -150,8 +215,15 @@ const BodyViewScore = () => {
                           <td></td>
                           <td className="text-center">
                             <div className="table-buttons">
-                              <Button variant="info" onClick={() => handleCheckClick()}>Check</Button>
-                              <Button variant="primary" onClick={() => handleCheckClick()}>Feedback</Button>
+                              <BootstrapButton variant="info">
+                                Check
+                              </BootstrapButton>
+                              <BootstrapButton
+                                variant="primary"
+                                onClick={handleModalOpen}
+                              >
+                                Feedback
+                              </BootstrapButton>
                             </div>
                           </td>
                         </tr>
@@ -163,9 +235,10 @@ const BodyViewScore = () => {
             </div>
           </div>
         </div>
+        <FeedbackModal show={isModalOpen} onHide={handleModalClose} />
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default BodyViewScore;

@@ -158,7 +158,7 @@ const App = () => {
 
             {/* Parent Dashboard Routes */}
             <Route
-              path="/parentKidTab"
+              path="/parentDashboard"
               element={
                 <RoleBasedRoute allowedRoles={["Parent"]}>
                   <InformationKid />

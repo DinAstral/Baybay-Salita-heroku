@@ -3,6 +3,10 @@ const { Schema } = mongoose;
 
 const FeedbackSchema = new Schema(
   {
+    UserID: {
+      type: String,
+      unique: true,
+    },
     FeedbackID: {
       type: String,
       unique: true,

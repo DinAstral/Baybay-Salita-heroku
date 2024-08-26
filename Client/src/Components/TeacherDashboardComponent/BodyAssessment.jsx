@@ -1,17 +1,25 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useDownloadExcel } from 'react-export-table-to-excel';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Tooltip from 'react-bootstrap/Tooltip';
-import ReactPaginate from 'react-paginate';
-import { Table, Modal, Button, Form, Row, Col } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleInfo, faPrint } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';
-import { Link, useParams } from 'react-router-dom';
-import '../ContentDasboard/Content.css';
-import toast from 'react-hot-toast';
-import TeacherContentHeader from '../ContentDasboard/TeacherContentHeader';
-
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Button,
+  Tooltip,
+  Pagination,
+} from "@nextui-org/react";
+import { useDownloadExcel } from "react-export-table-to-excel";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import { Modal, Form, Row, Col } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleInfo, faPrint } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
+import { Link, useParams } from "react-router-dom";
+import "../ContentDasboard/Content.css";
+import toast from "react-hot-toast";
+import TeacherContentHeader from "../ContentDasboard/TeacherContentHeader";
 
 const PrintRecord = ({ show, onHide, print, role }) => {
   return (
@@ -28,13 +36,18 @@ const PrintRecord = ({ show, onHide, print, role }) => {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>You are now going to generate a excel file of this data. Do you want to continue?</p>
+        <p>
+          You are now going to generate a excel file of this data. Do you want
+          to continue?
+        </p>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="danger" onClick={onHide}>
           Cancel
         </Button>
-          <Button variant="success" onClick={print}>Print</Button>
+        <Button variant="success" onClick={print}>
+          Print
+        </Button>
       </Modal.Footer>
     </Modal>
   );
@@ -61,7 +74,7 @@ const CheckAssessment = ({ show, onHide, student }) => (
         Cancel
       </Button>
       <Link to="/viewScore">
-      <Button variant="info">Check</Button>
+        <Button variant="info">Check</Button>
       </Link>
     </Modal.Footer>
   </Modal>
@@ -165,27 +178,27 @@ const CreateSuccess = ({ show, onHide }) => {
 };
 
 function CreateAssessment({ show, handleClose }) {
-  const [activityType, setActivityType] = useState('');
+  const [activityType, setActivityType] = useState("");
   const [modalShow, setModalShow] = useState(false);
   const [data, setData] = useState({
-    ActivityNumber: '',
-    Period: '',
-    Type: '',
-    Word1: '',
-    Word2: '',
-    Word3: '',
-    Word4: '',
-    Word5: '',
-    Picture1: '',
-    Picture2: '',
-    Picture3: '',
-    Picture4: '',
-    Picture5: '',
-    Audio1: '',
-    Audio2:'' ,
-    Audio3: '',
-    Audio4: '',
-    Audio5: '',
+    ActivityNumber: "",
+    Period: "",
+    Type: "",
+    Word1: "",
+    Word2: "",
+    Word3: "",
+    Word4: "",
+    Word5: "",
+    Picture1: "",
+    Picture2: "",
+    Picture3: "",
+    Picture4: "",
+    Picture5: "",
+    Audio1: "",
+    Audio2: "",
+    Audio3: "",
+    Audio4: "",
+    Audio5: "",
   });
 
   const handleActivityTypeChange = (event) => {
@@ -194,36 +207,44 @@ function CreateAssessment({ show, handleClose }) {
 
   const CreateAct = async (e) => {
     e.preventDefault();
-    const { ActivityNumber, Period, Type, Word1, Word2, Word3, Word4, Word5 } = data;
+    const { ActivityNumber, Period, Type, Word1, Word2, Word3, Word4, Word5 } =
+      data;
     try {
-      const response = await axios.post('/createAssessment', {
-        ActivityNumber, Period, Type, Word1, Word2, Word3, Word4, Word5
+      const response = await axios.post("/createAssessment", {
+        ActivityNumber,
+        Period,
+        Type,
+        Word1,
+        Word2,
+        Word3,
+        Word4,
+        Word5,
       });
       if (response.data.error) {
         toast.error(response.data.error);
       } else {
         setData({
-          ActivityNumber: '',
-          Period: '',
-          Type: '',
-          Word1: '',
-          Word2: '',
-          Word3: '',
-          Word4: '',
-          Word5: '',
-          Picture1: '',
-          Picture2: '',
-          Picture3: '',
-          Picture4: '',
-          Picture5: '',
+          ActivityNumber: "",
+          Period: "",
+          Type: "",
+          Word1: "",
+          Word2: "",
+          Word3: "",
+          Word4: "",
+          Word5: "",
+          Picture1: "",
+          Picture2: "",
+          Picture3: "",
+          Picture4: "",
+          Picture5: "",
         });
-        toast.success('Created Activity Successfully.');
+        toast.success("Created Activity Successfully.");
         setModalShow(true);
         handleClose();
       }
     } catch (error) {
       console.log(error);
-      toast.error('Failed to create an Activity.');
+      toast.error("Failed to create an Activity.");
     }
   };
 
@@ -240,121 +261,212 @@ function CreateAssessment({ show, handleClose }) {
           <Modal.Title>Create New Activity</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-        <Form onSubmit={CreateAct}>
-          <Form.Group className="mb-3" controlId="activityNumber">
-            <Form.Label>Activity Number</Form.Label>
-            <Form.Control type="text" placeholder="Enter activity number" value={data.ActivityNumber} onChange={(e) => setData({ ...data, ActivityNumber: e.target.value })} />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="gradePeriod">
-            <Form.Label>Grading Period</Form.Label>
-            <Form.Select aria-label="Select grading period" value={data.Period} onChange={(e) => setData({ ...data, Period: e.target.value })}>
-              <option value="">Select Grading Period:</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-            </Form.Select>
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="activityType">
-            <Form.Label>Activity Type</Form.Label>
-            <Form.Select aria-label="Select activity type" value={data.Type} onChange={(e) => { setData({ ...data, Type: e.target.value }); handleActivityTypeChange(e); }}>
-              <option value="">Select Type of Activity:</option>
-              <option value="Word Assessment/Pagbabaybay">Word Assessment/Pagbabaybay</option>
-              <option value="Reading Assessment">Reading Assessment</option>
-            </Form.Select>
-          </Form.Group>
-          <Form.Group className="mb-1" controlId="activityDetails">
-            <Form.Label>Activity Details: </Form.Label>
-           Please enter your desire words that you want to assess your students.
-          </Form.Group>
-          {activityType === 'Word Assessment/Pagbabaybay' && (
-            <Row>
-              <Col xs={6}>
-                <Form.Group className="mb-3" controlId="word1">
-                  <Form.Label>Pagbabaybay 1</Form.Label>
-                  <Form.Control type="text" placeholder="Enter word 1" value={data.Word1} onChange={(e) => setData({ ...data, Word1: e.target.value })} />
-                  <Form.Control type="file" />
-                  <Form.Control type="file" />
-                </Form.Group>
-              </Col>
-              <Col xs={6}>
-                <Form.Group className="mb-3" controlId="word2">
-                  <Form.Label>Word 2</Form.Label>
-                  <Form.Control type="text" placeholder="Enter word 2" value={data.Word2} onChange={(e) => setData({ ...data, Word2: e.target.value })} />
-                  <Form.Control type="file" />
-                  <Form.Control type="file" />
-                </Form.Group>
-              </Col>
-              <Col xs={6}>
-                <Form.Group className="mb-3" controlId="word3">
-                  <Form.Label>Word 3</Form.Label>
-                  <Form.Control type="text" placeholder="Enter word 3" value={data.Word3} onChange={(e) => setData({ ...data, Word3: e.target.value })} />
-                  <Form.Control type="file" />
-                  <Form.Control type="file" />
-                </Form.Group>
-              </Col>
-              <Col xs={6}>
-                <Form.Group className="mb-3" controlId="word4">
-                  <Form.Label>Word 4</Form.Label>
-                  <Form.Control type="text" placeholder="Enter word 4" value={data.Word4} onChange={(e) => setData({ ...data, Word4: e.target.value })} />
-                  <Form.Control type="file" />
-                  <Form.Control type="file" />
-                </Form.Group>
-              </Col>
-              <Col xs={6}>
-                <Form.Group className="mb-3" controlId="word5">
-                  <Form.Label>Word 5</Form.Label>
-                  <Form.Control type="text" placeholder="Enter word 5" value={data.Word5} onChange={(e) => setData({ ...data, Word5: e.target.value })} />
-                  <Form.Control type="file" />
-                  <Form.Control type="file" />
-                </Form.Group>
-              </Col>
-            </Row>
-          )}
-          {activityType === 'Reading Assessment' && (
-            <Row>
-              <Col xs={6}>
-                <Form.Group className="mb-3" controlId="readingPassage1">
-                  <Form.Label>Reading Passage 1</Form.Label>
-                  <Form.Control type="textfield" placeholder="Enter word 5" value={data.Word1} onChange={(e) => setData({ ...data, Word1: e.target.value })} />
-                  <Form.Control type="file" />
-                  <Form.Control type="file" />
-                </Form.Group>
-              </Col>
-              <Col xs={6}>
-                <Form.Group className="mb-3" controlId="readingPassage2">
-                  <Form.Label>Reading Passage 2</Form.Label>
-                  <Form.Control type="textfield" placeholder="Enter word 5" value={data.Word2} onChange={(e) => setData({ ...data, Word2: e.target.value })} />
-                  <Form.Control type="file" />
-                  <Form.Control type="file" />
-                </Form.Group>
-              </Col>
-              <Col xs={6}>
-                <Form.Group className="mb-3" controlId="readingPassage3">
-                  <Form.Label>Reading Passage 3</Form.Label>
-                  <Form.Control type="textfield" placeholder="Enter word 5" value={data.Word3} onChange={(e) => setData({ ...data, Word3: e.target.value })} />
-                  <Form.Control type="file" />
-                  <Form.Control type="file" />
-                </Form.Group>
-              </Col>
-              <Col xs={6}>
-                <Form.Group className="mb-3" controlId="readingPassage4">
-                  <Form.Label>Reading Passage 4</Form.Label>
-                  <Form.Control type="textfield" placeholder="Enter word 5" value={data.Word4} onChange={(e) => setData({ ...data, Word4: e.target.value })} />
-                  <Form.Control type="file" />
-                  <Form.Control type="file" />
-                </Form.Group>
-              </Col>
-              <Col xs={6}>
-                <Form.Group className="mb-3" controlId="readingPassage5">
-                  <Form.Label>Reading Passage 5</Form.Label>
-                  <Form.Control type="textfield" placeholder="Enter word 5" value={data.Word5} onChange={(e) => setData({ ...data, Word5: e.target.value })} />
-                  <Form.Control type="file" />
-                  <Form.Control type="file" />
-                </Form.Group>
-              </Col>
-            </Row>
-          )}
+          <Form onSubmit={CreateAct}>
+            <Form.Group className="mb-3" controlId="activityNumber">
+              <Form.Label>Activity Number</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter activity number"
+                value={data.ActivityNumber}
+                onChange={(e) =>
+                  setData({ ...data, ActivityNumber: e.target.value })
+                }
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="gradePeriod">
+              <Form.Label>Grading Period</Form.Label>
+              <Form.Select
+                aria-label="Select grading period"
+                value={data.Period}
+                onChange={(e) => setData({ ...data, Period: e.target.value })}
+              >
+                <option value="">Select Grading Period:</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+              </Form.Select>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="activityType">
+              <Form.Label>Activity Type</Form.Label>
+              <Form.Select
+                aria-label="Select activity type"
+                value={data.Type}
+                onChange={(e) => {
+                  setData({ ...data, Type: e.target.value });
+                  handleActivityTypeChange(e);
+                }}
+              >
+                <option value="">Select Type of Activity:</option>
+                <option value="Word Assessment/Pagbabaybay">
+                  Word Assessment/Pagbabaybay
+                </option>
+                <option value="Reading Assessment">Reading Assessment</option>
+              </Form.Select>
+            </Form.Group>
+            <Form.Group className="mb-1" controlId="activityDetails">
+              <Form.Label>Activity Details: </Form.Label>
+              Please enter your desire words that you want to assess your
+              students.
+            </Form.Group>
+            {activityType === "Word Assessment/Pagbabaybay" && (
+              <Row>
+                <Col xs={6}>
+                  <Form.Group className="mb-3" controlId="word1">
+                    <Form.Label>Pagbabaybay 1</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter word 1"
+                      value={data.Word1}
+                      onChange={(e) =>
+                        setData({ ...data, Word1: e.target.value })
+                      }
+                    />
+                    <Form.Control type="file" />
+                    <Form.Control type="file" />
+                  </Form.Group>
+                </Col>
+                <Col xs={6}>
+                  <Form.Group className="mb-3" controlId="word2">
+                    <Form.Label>Word 2</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter word 2"
+                      value={data.Word2}
+                      onChange={(e) =>
+                        setData({ ...data, Word2: e.target.value })
+                      }
+                    />
+                    <Form.Control type="file" />
+                    <Form.Control type="file" />
+                  </Form.Group>
+                </Col>
+                <Col xs={6}>
+                  <Form.Group className="mb-3" controlId="word3">
+                    <Form.Label>Word 3</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter word 3"
+                      value={data.Word3}
+                      onChange={(e) =>
+                        setData({ ...data, Word3: e.target.value })
+                      }
+                    />
+                    <Form.Control type="file" />
+                    <Form.Control type="file" />
+                  </Form.Group>
+                </Col>
+                <Col xs={6}>
+                  <Form.Group className="mb-3" controlId="word4">
+                    <Form.Label>Word 4</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter word 4"
+                      value={data.Word4}
+                      onChange={(e) =>
+                        setData({ ...data, Word4: e.target.value })
+                      }
+                    />
+                    <Form.Control type="file" />
+                    <Form.Control type="file" />
+                  </Form.Group>
+                </Col>
+                <Col xs={6}>
+                  <Form.Group className="mb-3" controlId="word5">
+                    <Form.Label>Word 5</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter word 5"
+                      value={data.Word5}
+                      onChange={(e) =>
+                        setData({ ...data, Word5: e.target.value })
+                      }
+                    />
+                    <Form.Control type="file" />
+                    <Form.Control type="file" />
+                  </Form.Group>
+                </Col>
+              </Row>
+            )}
+            {activityType === "Reading Assessment" && (
+              <Row>
+                <Col xs={6}>
+                  <Form.Group className="mb-3" controlId="readingPassage1">
+                    <Form.Label>Reading Passage 1</Form.Label>
+                    <Form.Control
+                      type="textfield"
+                      placeholder="Enter word 5"
+                      value={data.Word1}
+                      onChange={(e) =>
+                        setData({ ...data, Word1: e.target.value })
+                      }
+                    />
+                    <Form.Control type="file" />
+                    <Form.Control type="file" />
+                  </Form.Group>
+                </Col>
+                <Col xs={6}>
+                  <Form.Group className="mb-3" controlId="readingPassage2">
+                    <Form.Label>Reading Passage 2</Form.Label>
+                    <Form.Control
+                      type="textfield"
+                      placeholder="Enter word 5"
+                      value={data.Word2}
+                      onChange={(e) =>
+                        setData({ ...data, Word2: e.target.value })
+                      }
+                    />
+                    <Form.Control type="file" />
+                    <Form.Control type="file" />
+                  </Form.Group>
+                </Col>
+                <Col xs={6}>
+                  <Form.Group className="mb-3" controlId="readingPassage3">
+                    <Form.Label>Reading Passage 3</Form.Label>
+                    <Form.Control
+                      type="textfield"
+                      placeholder="Enter word 5"
+                      value={data.Word3}
+                      onChange={(e) =>
+                        setData({ ...data, Word3: e.target.value })
+                      }
+                    />
+                    <Form.Control type="file" />
+                    <Form.Control type="file" />
+                  </Form.Group>
+                </Col>
+                <Col xs={6}>
+                  <Form.Group className="mb-3" controlId="readingPassage4">
+                    <Form.Label>Reading Passage 4</Form.Label>
+                    <Form.Control
+                      type="textfield"
+                      placeholder="Enter word 5"
+                      value={data.Word4}
+                      onChange={(e) =>
+                        setData({ ...data, Word4: e.target.value })
+                      }
+                    />
+                    <Form.Control type="file" />
+                    <Form.Control type="file" />
+                  </Form.Group>
+                </Col>
+                <Col xs={6}>
+                  <Form.Group className="mb-3" controlId="readingPassage5">
+                    <Form.Label>Reading Passage 5</Form.Label>
+                    <Form.Control
+                      type="textfield"
+                      placeholder="Enter word 5"
+                      value={data.Word5}
+                      onChange={(e) =>
+                        setData({ ...data, Word5: e.target.value })
+                      }
+                    />
+                    <Form.Control type="file" />
+                    <Form.Control type="file" />
+                  </Form.Group>
+                </Col>
+              </Row>
+            )}
             <Modal.Footer>
               <Button variant="secondary" onClick={handleClose}>
                 Close
@@ -403,23 +515,23 @@ const UpdateSuccess = ({ show, onHide }) => {
 };
 
 function UpdateAssessment({ show, handleClose, activity }) {
-  const [activityType, setActivityType] = useState('');
+  const [activityType, setActivityType] = useState("");
   const [modalShow, setModalShow] = useState(false);
   const { id } = useParams();
   const [data, setData] = useState({
-    ActivityNumber: '',
-    Period: '',
-    Type: '',
-    Word1: '',
-    Word2: '',
-    Word3: '',
-    Word4: '',
-    Word5: '',
-    WordFile1: '',
-    WordFile2: '',
-    WordFile3: '',
-    WordFile4: '',
-    WordFile5: '',
+    ActivityNumber: "",
+    Period: "",
+    Type: "",
+    Word1: "",
+    Word2: "",
+    Word3: "",
+    Word4: "",
+    Word5: "",
+    WordFile1: "",
+    WordFile2: "",
+    WordFile3: "",
+    WordFile4: "",
+    WordFile5: "",
   });
 
   useEffect(() => {
@@ -435,35 +547,43 @@ function UpdateAssessment({ show, handleClose, activity }) {
 
   const updateActivity = async (e) => {
     e.preventDefault();
-    const { ActivityNumber, Period, Type, Word1, Word2, Word3, Word4, Word5 } = data;
+    const { ActivityNumber, Period, Type, Word1, Word2, Word3, Word4, Word5 } =
+      data;
     try {
       const response = await axios.post(`/updateAssessment/${id}`, {
-        ActivityNumber, Period, Type, Word1, Word2, Word3, Word4, Word5
+        ActivityNumber,
+        Period,
+        Type,
+        Word1,
+        Word2,
+        Word3,
+        Word4,
+        Word5,
       });
       if (response.data.error) {
         toast.error(response.data.error);
       } else {
         setData({
-          ActivityNumber: '',
-          Period: '',
-          Type: '',
-          Word1: '',
-          Word2: '',
-          Word3: '',
-          Word4: '',
-          Word5: '',
-          WordFile1: '',
-          WordFile2: '',
-          WordFile3: '',
-          WordFile4: '',
-          WordFile5: '',
+          ActivityNumber: "",
+          Period: "",
+          Type: "",
+          Word1: "",
+          Word2: "",
+          Word3: "",
+          Word4: "",
+          Word5: "",
+          WordFile1: "",
+          WordFile2: "",
+          WordFile3: "",
+          WordFile4: "",
+          WordFile5: "",
         });
-        toast.success('Updated Activity Successfully.');
+        toast.success("Updated Activity Successfully.");
         setModalShow(true);
         handleClose();
       }
     } catch (error) {
-      toast.error('Failed to update an Activity.');
+      toast.error("Failed to update an Activity.");
     }
   };
 
@@ -483,11 +603,22 @@ function UpdateAssessment({ show, handleClose, activity }) {
           <Form onSubmit={updateActivity}>
             <Form.Group className="mb-3" controlId="activityNumber">
               <Form.Label>Activity Number</Form.Label>
-              <Form.Control type="text" placeholder="Enter activity number" value={data.ActivityNumber} onChange={(e) => setData({ ...data, ActivityNumber: e.target.value })} />
+              <Form.Control
+                type="text"
+                placeholder="Enter activity number"
+                value={data.ActivityNumber}
+                onChange={(e) =>
+                  setData({ ...data, ActivityNumber: e.target.value })
+                }
+              />
             </Form.Group>
             <Form.Group className="mb-3" controlId="gradePeriod">
               <Form.Label>Grading Period</Form.Label>
-              <Form.Select aria-label="Select grading period" value={data.Period} onChange={(e) => setData({ ...data, Period: e.target.value })}>
+              <Form.Select
+                aria-label="Select grading period"
+                value={data.Period}
+                onChange={(e) => setData({ ...data, Period: e.target.value })}
+              >
                 <option value="">Select Grading Period:</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -497,22 +628,39 @@ function UpdateAssessment({ show, handleClose, activity }) {
             </Form.Group>
             <Form.Group className="mb-3" controlId="activityType">
               <Form.Label>Activity Type</Form.Label>
-              <Form.Select aria-label="Select activity type" value={data.Type} onChange={(e) => { setData({ ...data, Type: e.target.value }); handleActivityTypeChange(e); }}>
+              <Form.Select
+                aria-label="Select activity type"
+                value={data.Type}
+                onChange={(e) => {
+                  setData({ ...data, Type: e.target.value });
+                  handleActivityTypeChange(e);
+                }}
+              >
                 <option value="">Select Type of Activity:</option>
-                <option value="Word Assessment/Pagbabaybay">Word Assessment/Pagbabaybay</option>
+                <option value="Word Assessment/Pagbabaybay">
+                  Word Assessment/Pagbabaybay
+                </option>
                 <option value="Reading Assessment">Reading Assessment</option>
               </Form.Select>
             </Form.Group>
             <Form.Group className="mb-1" controlId="activityDetails">
               <Form.Label>Activity Details: </Form.Label>
-             Please enter your desire words that you want to assess your students.
+              Please enter your desire words that you want to assess your
+              students.
             </Form.Group>
-            {activityType === 'Word Assessment/Pagbabaybay' && (
+            {activityType === "Word Assessment/Pagbabaybay" && (
               <Row>
                 <Col xs={6}>
                   <Form.Group className="mb-3" controlId="word1">
                     <Form.Label>Pagbabaybay 1</Form.Label>
-                    <Form.Control type="text" placeholder="Enter word 1" value={data.Word1} onChange={(e) => setData({ ...data, Word1: e.target.value })} />
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter word 1"
+                      value={data.Word1}
+                      onChange={(e) =>
+                        setData({ ...data, Word1: e.target.value })
+                      }
+                    />
                     <Form.Control type="file" />
                     <Form.Control type="file" />
                   </Form.Group>
@@ -520,7 +668,14 @@ function UpdateAssessment({ show, handleClose, activity }) {
                 <Col xs={6}>
                   <Form.Group className="mb-3" controlId="word2">
                     <Form.Label>Word 2</Form.Label>
-                    <Form.Control type="text" placeholder="Enter word 2" value={data.Word2} onChange={(e) => setData({ ...data, Word2: e.target.value })} />
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter word 2"
+                      value={data.Word2}
+                      onChange={(e) =>
+                        setData({ ...data, Word2: e.target.value })
+                      }
+                    />
                     <Form.Control type="file" />
                     <Form.Control type="file" />
                   </Form.Group>
@@ -528,32 +683,60 @@ function UpdateAssessment({ show, handleClose, activity }) {
                 <Col xs={6}>
                   <Form.Group className="mb-3" controlId="word3">
                     <Form.Label>Word 3</Form.Label>
-                    <Form.Control type="text" placeholder="Enter word 3" value={data.Word3} onChange={(e) => setData({ ...data, Word3: e.target.value })} />
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter word 3"
+                      value={data.Word3}
+                      onChange={(e) =>
+                        setData({ ...data, Word3: e.target.value })
+                      }
+                    />
                     <Form.Control type="file" />
                   </Form.Group>
                 </Col>
                 <Col xs={6}>
                   <Form.Group className="mb-3" controlId="word4">
                     <Form.Label>Word 4</Form.Label>
-                    <Form.Control type="text" placeholder="Enter word 4" value={data.Word4} onChange={(e) => setData({ ...data, Word4: e.target.value })} />
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter word 4"
+                      value={data.Word4}
+                      onChange={(e) =>
+                        setData({ ...data, Word4: e.target.value })
+                      }
+                    />
                     <Form.Control type="file" />
                   </Form.Group>
                 </Col>
                 <Col xs={6}>
                   <Form.Group className="mb-3" controlId="word5">
                     <Form.Label>Word 5</Form.Label>
-                    <Form.Control type="text" placeholder="Enter word 5" value={data.Word5} onChange={(e) => setData({ ...data, Word5: e.target.value })} />
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter word 5"
+                      value={data.Word5}
+                      onChange={(e) =>
+                        setData({ ...data, Word5: e.target.value })
+                      }
+                    />
                     <Form.Control type="file" />
                   </Form.Group>
                 </Col>
               </Row>
             )}
-            {activityType === 'Reading Assessment' && (
+            {activityType === "Reading Assessment" && (
               <Row>
                 <Col xs={6}>
                   <Form.Group className="mb-3" controlId="readingPassage1">
                     <Form.Label>Reading Passage 1</Form.Label>
-                    <Form.Control type="textfield" placeholder="Enter word 5" value={data.Word5} onChange={(e) => setData({ ...data, Word5: e.target.value })} />
+                    <Form.Control
+                      type="textfield"
+                      placeholder="Enter word 5"
+                      value={data.Word5}
+                      onChange={(e) =>
+                        setData({ ...data, Word5: e.target.value })
+                      }
+                    />
                     <Form.Control type="file" />
                   </Form.Group>
                 </Col>
@@ -594,45 +777,38 @@ function UpdateAssessment({ show, handleClose, activity }) {
           </Form>
         </Modal.Body>
       </Modal>
-      <UpdateSuccess
-        show={modalShow}
-        onHide={() => setModalShow(false)}
-      />
+      <UpdateSuccess show={modalShow} onHide={() => setModalShow(false)} />
     </>
   );
 }
-
-
 
 const BodyAssessment = () => {
   const [show, setShow] = useState(false);
   const [modalShowPrint, setModalShowPrint] = useState(false);
   const [showUpdate, setShowUpdate] = useState(false);
   const [modalShowCheck, setModalShowCheck] = useState(false);
-
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [activities, setActivities] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [usersPerPage] = useState(10);
   const [filteredActivities, setFilteredActivities] = useState([]);
-  const [selectedPeriod, setSelectedPeriod] = useState('');
+  const [selectedPeriod, setSelectedPeriod] = useState("");
   const [modalShowSubmit, setModalShowSubmit] = useState(false);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  
   const tableRef = useRef(null);
 
   const { onDownload } = useDownloadExcel({
     currentTableRef: tableRef.current,
-    filename: 'Student_Assessment_Report_table',
-    sheet: 'Assessment'
-})
+    filename: "Student_Assessment_Report_table",
+    sheet: "Assessment",
+  });
 
   useEffect(() => {
     axios
-      .get('/getAssessments')
+      .get("/getAssessments")
       .then((response) => {
         setActivities(response.data);
         setFilteredActivities(response.data);
@@ -661,42 +837,42 @@ const BodyAssessment = () => {
   const handlePeriodChange = (e) => {
     const period = e.target.value;
     setSelectedPeriod(period);
-    if (period === '') {
+    if (period === "") {
       setFilteredActivities(activities);
     } else {
-      const filtered = activities.filter(activity => activity.Period === period);
+      const filtered = activities.filter(
+        (activity) => activity.Period === period
+      );
       setFilteredActivities(filtered);
     }
   };
 
   const renderTooltip = (props) => (
-    <Tooltip id="button-tooltip" {...props}>
-      This function will view the assessment of your students in each section.
-    </Tooltip>
+    <Tooltip
+      content="This function will view the assessment of your students in each section."
+      {...props}
+    />
   );
 
   const generateReport = (props) => (
-    <Tooltip id="button-tooltip" {...props}>
-      Generate report/Print table
-    </Tooltip>
+    <Tooltip content="Generate report/Print table" {...props} />
   );
 
-   {/* Page Interactions */}
-   const handlePageClick = (event) => {
-    setCurrentPage(event.selected);
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   const offset = currentPage * usersPerPage;
   const currentUsers = filteredActivities.slice(offset, offset + usersPerPage);
 
   return (
-    <div className='content'>
+    <div className="content">
       <TeacherContentHeader />
       <div className="content-body">
         <PrintRecord
           show={modalShowPrint}
           onHide={() => setModalShowPrint(false)}
-          print= {onDownload}
+          print={onDownload}
         />
         <CheckAssessment
           show={modalShowCheck}
@@ -709,31 +885,45 @@ const BodyAssessment = () => {
         />
         <div className="content-title-header">
           <div>
-          Manage Student Assessment
-          <OverlayTrigger
-         placement="bottom"
-         delay={{ show: 250, hide: 400 }}
-         overlay={renderTooltip}
-        >
-        <FontAwesomeIcon icon={faCircleInfo} size='1x' className="help-icon" />
-        </OverlayTrigger>
-        </div>
-        <div className='generate-report'>
-        <OverlayTrigger
-         placement="bottom"
-         delay={{ show: 250, hide: 400 }}
-         overlay={generateReport}
-        > 
-        <FontAwesomeIcon icon={faPrint} size='1x' className="print-icon" onClick={handlePrintClick}/>
-        </OverlayTrigger>
-        </div>
+            Manage Student Assessment
+            <OverlayTrigger
+              placement="bottom"
+              delay={{ show: 250, hide: 400 }}
+              overlay={renderTooltip}
+            >
+              <FontAwesomeIcon
+                icon={faCircleInfo}
+                size="1x"
+                className="help-icon"
+              />
+            </OverlayTrigger>
+          </div>
+          <div className="generate-report">
+            <OverlayTrigger
+              placement="bottom"
+              delay={{ show: 250, hide: 400 }}
+              overlay={generateReport}
+            >
+              <FontAwesomeIcon
+                icon={faPrint}
+                size="1x"
+                className="print-icon"
+                onClick={handlePrintClick}
+              />
+            </OverlayTrigger>
+          </div>
         </div>
         <div className="content-container">
           <div className="row">
             <div className="col">
               <div className="card mt-1 border-0">
                 <div className="list-header-drop-score">
-                  <select name="" id="" onChange={handlePeriodChange} value={selectedPeriod}>
+                  <select
+                    name=""
+                    id=""
+                    onChange={handlePeriodChange}
+                    value={selectedPeriod}
+                  >
                     <option value="">Select Grading Period</option>
                     <option value="1">Grading Period 1</option>
                     <option value="2">Grading Period 2</option>
@@ -741,61 +931,79 @@ const BodyAssessment = () => {
                     <option value="4">Grading Period 4</option>
                   </select>
                   <div className="">
-                    <button className='btn-side' onClick={handleShow}>Create Activity</button>
+                    <Button auto onClick={handleShow}>
+                      Create Activity
+                    </Button>
                   </div>
                 </div>
                 <div className="card-body scrollable-table scrollable-container">
-                  <Table striped bordered hover responsive ref={tableRef}>
-                    <thead>
-                      <tr className="bg-primary text-dark font-weight-bold">
-                        <th>Activity Code</th>
-                        <th>Activity Number</th>
-                        <th>Grading Period</th>
-                        <th>Type</th>
-                        <th>Status</th>
-                        <th>Word 1</th>
-                        <th>Word 2</th>
-                        <th>Word 3</th>
-                        <th>Word 4</th>
-                        <th>Word 5</th>
-                        <th className="text-center">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+                  <Table
+                    aria-label="Assessment Table"
+                    ref={tableRef}
+                    striped
+                    bordered
+                    shadow={false}
+                  >
+                    <TableHeader>
+                      <TableColumn>Activity Code</TableColumn>
+                      <TableColumn>Activity Number</TableColumn>
+                      <TableColumn>Grading Period</TableColumn>
+                      <TableColumn>Type</TableColumn>
+                      <TableColumn>Status</TableColumn>
+                      <TableColumn>Word 1</TableColumn>
+                      <TableColumn>Word 2</TableColumn>
+                      <TableColumn>Word 3</TableColumn>
+                      <TableColumn>Word 4</TableColumn>
+                      <TableColumn>Word 5</TableColumn>
+                      <TableColumn>Actions</TableColumn>
+                    </TableHeader>
+                    <TableBody>
                       {currentUsers.map((activity) => (
-                        <tr key={activity._id}>
-                          <td>{activity.ActivityCode}</td>
-                          <td>{activity.ActivityNumber}</td>
-                          <td>{activity.Period}</td>
-                          <td>{activity.Type}</td>
-                          <td>{activity.Status}</td>
-                          <td>{activity.Word1}</td>
-                          <td>{activity.Word2}</td>
-                          <td>{activity.Word3}</td>
-                          <td>{activity.Word4}</td>
-                          <td>{activity.Word5}</td>
-                          <td className="text-center">
+                        <TableRow key={activity._id}>
+                          <TableCell>{activity.ActivityCode}</TableCell>
+                          <TableCell>{activity.ActivityNumber}</TableCell>
+                          <TableCell>{activity.Period}</TableCell>
+                          <TableCell>{activity.Type}</TableCell>
+                          <TableCell>{activity.Status}</TableCell>
+                          <TableCell>{activity.Word1}</TableCell>
+                          <TableCell>{activity.Word2}</TableCell>
+                          <TableCell>{activity.Word3}</TableCell>
+                          <TableCell>{activity.Word4}</TableCell>
+                          <TableCell>{activity.Word5}</TableCell>
+                          <TableCell>
                             <div className="table-buttons">
-                              <Button variant="info" onClick={() => handleCheckClick()}>Check</Button>
-                              <Button variant="primary" onClick={() => handleEditClick(activity)}>Update</Button>
-                              <Button variant="danger" onClick={handleShowSubmit}>Stop</Button>
+                              <Button
+                                auto
+                                color="primary"
+                                onClick={() => handleCheckClick(activity)}
+                              >
+                                Check
+                              </Button>
+                              <Button
+                                auto
+                                color="secondary"
+                                onClick={() => handleEditClick(activity)}
+                              >
+                                Update
+                              </Button>
+                              <Button
+                                auto
+                                color="error"
+                                onClick={handleShowSubmit}
+                              >
+                                Stop
+                              </Button>
                             </div>
-                          </td>
-                        </tr>
+                          </TableCell>
+                        </TableRow>
                       ))}
-                    </tbody>
+                    </TableBody>
                   </Table>
-                  <ReactPaginate
-                    previousLabel={'Previous'}
-                    nextLabel={'Next'}
-                    breakLabel={'...'}
-                    breakClassName={'break-me'}
-                    pageCount={Math.ceil(filteredActivities.length / usersPerPage)}
-                    marginPagesDisplayed={2}
-                    pageRangeDisplayed={10}
-                    onPageChange={handlePageClick}
-                    containerClassName={'pagination'}
-                    activeClassName={'active'}
+                  <Pagination
+                    total={Math.ceil(filteredActivities.length / usersPerPage)}
+                    page={currentPage + 1}
+                    onChange={handlePageChange}
+                    shadow
                   />
                 </div>
               </div>
@@ -804,13 +1012,13 @@ const BodyAssessment = () => {
         </div>
       </div>
       <CreateAssessment show={show} handleClose={handleClose} />
-      <UpdateAssessment 
-          show={showUpdate}
-          handleClose={() => setShowUpdate(false)}
-          activity={selectedActivity} 
+      <UpdateAssessment
+        show={showUpdate}
+        handleClose={() => setShowUpdate(false)}
+        activity={selectedActivity}
       />
     </div>
   );
-}
+};
 
 export default BodyAssessment;

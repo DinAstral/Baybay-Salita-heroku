@@ -78,7 +78,7 @@ function Navbar() {
           <>
             <li>
               <Link
-                to={`/${user.role.toLowerCase()}KidTab`}
+                to={`/${user.role.toLowerCase()}Dashboard`}
                 className="btn-home"
               >
                 Dashboard
