@@ -1,4 +1,5 @@
 const User = require("../models/users");
+const Admin = require("../models/admin");
 const Teacher = require("../models/teachers");
 const Parent = require("../models/parents");
 const { hashPassword, comparePassword } = require("../helpers/auth");
@@ -33,6 +34,16 @@ function validatePassword(password) {
   }
 
   return null; // No error
+}
+
+function generateRandomCodeAdmin(length) {
+  const characters = "0123456789";
+  let result = "adminID_";
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
 }
 
 function generateRandomCodeParent(length) {
@@ -324,7 +335,7 @@ const registerTeacher = async (req, res) => {
 
     const hashedPassword = await hashPassword(password); // Hash the password
 
-    // Create Parent and User records
+    // Create teacher and User records
     const teacher = new Teacher({
       UserID: TeacherID,
       FirstName,
@@ -352,7 +363,7 @@ const registerTeacher = async (req, res) => {
       verified: false,
     });
 
-    // Save both teacher and user records
+    // Save both admin and user records
     await teacher.save();
     await user
       .save()
@@ -524,6 +535,137 @@ const registerParent = async (req, res) => {
   }
 };
 
+const registerAdmin = async (req, res) => {
+  const adminID = generateRandomCodeAdmin(6);
+
+  function isNumber(input) {
+    return !isNaN(input);
+  }
+
+  function validatePassword(password) {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasDigit = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    if (password.length < minLength) {
+      return "Password must be at least 8 characters long.";
+    }
+    if (!hasUpperCase) {
+      return "Password must contain at least one uppercase letter.";
+    }
+    if (!hasLowerCase) {
+      return "Password must contain at least one lowercase letter.";
+    }
+    if (!hasDigit) {
+      return "Password must contain at least one digit.";
+    }
+    if (!hasSpecialChar) {
+      return "Password must contain at least one special character.";
+    }
+    return null; // No error
+  }
+
+  try {
+    const {
+      FirstName,
+      LastName,
+      Birthday,
+      Address,
+      Status,
+      Gender,
+      ContactNumber,
+      email,
+      password,
+    } = req.body;
+
+    if (!FirstName) {
+      return res.json({ error: "First Name is required" });
+    }
+    if (!LastName) {
+      return res.json({ error: "Last Name is required" });
+    }
+    if (!Birthday) {
+      return res.json({ error: "Birthday is required" });
+    }
+    if (!Gender) {
+      return res.json({ error: "Gender is required" });
+    }
+    if (!Address) {
+      return res.json({ error: "Address is required" });
+    }
+    if (!Status) {
+      return res.json({ error: "Status is required" });
+    }
+    if (!ContactNumber) {
+      return res.json({ error: "Contact Number is required" });
+    }
+    if (!isNumber(ContactNumber)) {
+      return res.json({ error: "Invalid Contact Number inputted" });
+    }
+    if (!email) {
+      return res.json({ error: "Email is required" });
+    }
+
+    const exist = await User.findOne({ email });
+    if (exist) {
+      return res.json({ error: "Email is already taken" });
+    }
+
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      return res.json({ error: passwordError });
+    }
+
+    const hashedPassword = await hashPassword(password); // Hash the password
+
+    // Create Parent and User records
+    const admin = new Admin({
+      UserID: adminID,
+      FirstName,
+      LastName,
+      Birthday,
+      Gender,
+      Address,
+      Status,
+      ContactNumber,
+      email,
+      password: hashedPassword,
+      role: "Admin",
+      verified: false,
+    });
+
+    const user = new User({
+      UserID: adminID,
+      FirstName,
+      LastName,
+      email,
+      role: "Admin",
+      password: hashedPassword,
+      verified: false,
+    });
+
+    // Save both teacher and user records
+    await admin.save();
+    await user
+      .save()
+      .then((result) => {
+        sendVerificationEmail(result, res);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.json({
+          status: "FAILED",
+          message: "An Error occurred while saving your account!",
+        });
+      });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -658,6 +800,7 @@ const logout = (req, res) => {
 };
 
 module.exports = {
+  registerAdmin,
   registerParent,
   registerTeacher,
   uploadFile,

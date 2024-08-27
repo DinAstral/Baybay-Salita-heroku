@@ -38,6 +38,7 @@ const {
 } = require("../controllers/parentController");
 
 const {
+  registerAdmin,
   registerParent,
   registerTeacher,
   uploadFile,
@@ -48,10 +49,14 @@ const {
   logout,
 } = require("../controllers/RegistrationController"); //registration functions
 
+const {
+  mobileLogin,
+} = require("../controllers/mobileController");
+
 // Configure CORS middleware
 router.use(
   cors({
-    origin: "http://localhost:5173", // Update this with your client's URL
+    origin: "http://192.168.254.161:3000", // Update this with your client's URL
     methods: ["GET", "POST", "DELETE", "PATCH"], // Add the allowed HTTP methods
     credentials: true, // Allow credentials (cookies, authorization headers)
   })
@@ -71,6 +76,9 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
+
+//Mobile route
+router.post("/mobileLogin", mobileLogin); //okay
 
 //Login Routes get data
 router.get("/", test); //okay

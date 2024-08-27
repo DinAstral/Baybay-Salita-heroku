@@ -15,13 +15,11 @@ const AdminSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(null);
-  const { setUser } = useContext(UserContext); // Destructure setUser from UserContext
+  const { clearCookie } = useContext(UserContext); // Access clearCookie from UserContext
 
-  const clearCookie = () => {
-    // Clear the token cookie by setting it with an expired date
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    setUser(null); // Clear user state
-    navigate("/");
+  const handleLogout = () => {
+    clearCookie(); // Clear the cookie and user state
+    navigate("/"); // Redirect to the Home page
   };
 
   useEffect(() => {
@@ -75,7 +73,7 @@ const AdminSidebar = () => {
       </div>
       <div className="menu-logout">
         <div className="menu-logout-btn">
-          <button className="btn-side" onClick={clearCookie}>
+          <button className="btn-side" onClick={handleLogout}>
             Logout
           </button>
         </div>

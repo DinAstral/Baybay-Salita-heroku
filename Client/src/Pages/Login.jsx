@@ -50,7 +50,7 @@ const Login = () => {
         });
         if (responseData.role === "Parent") {
           toast.success("Login Successful.");
-          navigate("/parentKidTab");
+          navigate("/parentDashboard");
         } else if (responseData.role === "Teacher") {
           toast.success("Login Successful.");
           navigate("/teacherDashboard");

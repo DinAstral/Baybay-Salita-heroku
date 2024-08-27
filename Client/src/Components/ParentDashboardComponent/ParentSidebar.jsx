@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./../ContentDasboard/Sidebar.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -6,16 +6,24 @@ import {
   faComment,
   faEye,
 } from "@fortawesome/free-solid-svg-icons";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { UserContext } from "../../../context/userContext"; // Import UserContext
 import logo from "../../assets/BaybaySalita_Logo.png";
 
 const ParentSidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(null);
+  const { clearCookie } = useContext(UserContext); // Access clearCookie from UserContext
+
+  const handleLogout = () => {
+    clearCookie(); // Clear the cookie and user state
+    navigate("/"); // Redirect to the Home page
+  };
 
   useEffect(() => {
     const menuItem = [
-      "/parentKidTab",
+      "/parentDashboard",
       "/parentFeedbackTeacher",
       "/parentFeedbackTeacher",
     ];
@@ -33,7 +41,7 @@ const ParentSidebar = () => {
           {
             icon: faBookOpenReader,
             text: "Information of Kid",
-            link: "/parentKidTab",
+            link: "/parentDashboard",
           },
           {
             icon: faEye,
@@ -65,9 +73,9 @@ const ParentSidebar = () => {
 
       <div className="menu-logout">
         <div className="menu-logout-btn">
-          <Link to="/">
-            <button className="btn-side">Logout</button>
-          </Link>
+        <button className="btn-side" onClick={handleLogout}>
+            Logout
+          </button>
         </div>
       </div>
     </div>
