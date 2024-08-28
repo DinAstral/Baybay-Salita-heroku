@@ -1,4 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableColumn,
+  TableRow,
+  TableCell,
+} from "@nextui-org/table";
 import { useDownloadExcel } from "react-export-table-to-excel";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
@@ -10,7 +18,7 @@ import {
   faCircleInfo,
   faPrint,
 } from "@fortawesome/free-solid-svg-icons";
-import { Table, Modal, Button } from "react-bootstrap";
+import { Modal, Button } from "react-bootstrap";
 import axios from "axios";
 import "../ContentDasboard/Content.css";
 import { Link } from "react-router-dom";
@@ -332,7 +340,6 @@ const BodyAdminUsers = () => {
       .then((response) => {
         setUsers(response.data);
         setFilteredRoles(response.data);
-        setData(response.data);
       })
       .catch((err) => console.log(err));
   };
@@ -541,22 +548,27 @@ const BodyAdminUsers = () => {
                 </div>
                 <div className="card-body scrollable-table scrollable-container">
                   {!selectedRole || selectedRole === "default" ? (
-                    <Table striped bordered hover responsive ref={tableRef}>
-                      <thead>
-                        <tr className="bg-primary text-dark font-weight-bold">
-                          <th>UserID</th>
-                          <th>Email</th>
-                          <th>Role</th>
-                          <th className="text-center">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
+                    <Table
+                      ref={tableRef}
+                      removeWrapper
+                      color="primary"
+                      selectionMode="single"
+                    >
+                      <TableHeader>
+                        <TableColumn>UserID</TableColumn>
+                        <TableColumn>Email</TableColumn>
+                        <TableColumn>Role</TableColumn>
+                        <TableColumn className="text-center">
+                          Actions
+                        </TableColumn>
+                      </TableHeader>
+                      <TableBody>
                         {currentUsers.map((user) => (
-                          <tr key={user._id}>
-                            <td>{user.UserID}</td>
-                            <td>{user.email}</td>
-                            <td>{user.role}</td>
-                            <td className="text-center">
+                          <TableRow key={user._id}>
+                            <TableCell>{user.UserID}</TableCell>
+                            <TableCell>{user.email}</TableCell>
+                            <TableCell>{user.role}</TableCell>
+                            <TableCell className="text-center">
                               <div className="table-buttons">
                                 <Button
                                   variant="primary"
@@ -571,42 +583,47 @@ const BodyAdminUsers = () => {
                                   Delete
                                 </Button>
                               </div>
-                            </td>
-                          </tr>
+                            </TableCell>
+                          </TableRow>
                         ))}
-                      </tbody>
+                      </TableBody>
                     </Table>
                   ) : (
                     <>
                       {selectedRole === "Parent" && (
-                        <Table striped bordered hover responsive ref={tableRef}>
-                          <thead>
-                            <tr className="bg-primary text-dark font-weight-bold">
-                              <th>UserID</th>
-                              <th>First Name</th>
-                              <th>Last Name</th>
-                              <th>Age</th>
-                              <th>Status</th>
-                              <th>Gender</th>
-                              <th>Contact Number</th>
-                              <th>Email</th>
-                              <th>Role</th>
-                              <th className="text-center">Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody>
+                        <Table
+                          ref={tableRef}
+                          removeWrapper
+                          color="primary"
+                          selectionMode="single"
+                        >
+                          <TableHeader>
+                            <TableColumn>UserID</TableColumn>
+                            <TableColumn>First Name</TableColumn>
+                            <TableColumn>Last Name</TableColumn>
+                            <TableColumn>Age</TableColumn>
+                            <TableColumn>Status</TableColumn>
+                            <TableColumn>Gender</TableColumn>
+                            <TableColumn>Contact Number</TableColumn>
+                            <TableColumn>Email</TableColumn>
+                            <TableColumn>Role</TableColumn>
+                            <TableColumn className="text-center">
+                              Actions
+                            </TableColumn>
+                          </TableHeader>
+                          <TableBody>
                             {currentUsers.map((user) => (
-                              <tr key={user._id}>
-                                <td>{user.UserID}</td>
-                                <td>{user.FirstName}</td>
-                                <td>{user.LastName}</td>
-                                <td>{user.Age}</td>
-                                <td>{user.Status}</td>
-                                <td>{user.Gender}</td>
-                                <td>{user.ContactNumber}</td>
-                                <td>{user.email}</td>
-                                <td>{user.role}</td>
-                                <td className="text-center">
+                              <TableRow key={user._id}>
+                                <TableCell>{user.UserID}</TableCell>
+                                <TableCell>{user.FirstName}</TableCell>
+                                <TableCell>{user.LastName}</TableCell>
+                                <TableCell>{user.Age}</TableCell>
+                                <TableCell>{user.Status}</TableCell>
+                                <TableCell>{user.Gender}</TableCell>
+                                <TableCell>{user.ContactNumber}</TableCell>
+                                <TableCell>{user.email}</TableCell>
+                                <TableCell>{user.role}</TableCell>
+                                <TableCell className="text-center">
                                   <div className="table-buttons">
                                     <Button
                                       variant="info"
@@ -627,43 +644,48 @@ const BodyAdminUsers = () => {
                                       Delete
                                     </Button>
                                   </div>
-                                </td>
-                              </tr>
+                                </TableCell>
+                              </TableRow>
                             ))}
-                          </tbody>
+                          </TableBody>
                         </Table>
                       )}
                       {selectedRole === "Teacher" && (
-                        <Table striped bordered hover responsive ref={tableRef}>
-                          <thead>
-                            <tr className="bg-primary text-dark font-weight-bold">
-                              <th>TeacherID Number</th>
-                              <th>First Name</th>
-                              <th>Last Name</th>
-                              <th>Age</th>
-                              <th>Department</th>
-                              <th>Section</th>
-                              <th>Gender</th>
-                              <th>Contact Number</th>
-                              <th>Email</th>
-                              <th>Role</th>
-                              <th className="text-center">Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody>
+                        <Table
+                          ref={tableRef}
+                          removeWrapper
+                          color="primary"
+                          selectionMode="single"
+                        >
+                          <TableHeader>
+                            <TableColumn>TeacherID Number</TableColumn>
+                            <TableColumn>First Name</TableColumn>
+                            <TableColumn>Last Name</TableColumn>
+                            <TableColumn>Age</TableColumn>
+                            <TableColumn>Department</TableColumn>
+                            <TableColumn>Section</TableColumn>
+                            <TableColumn>Gender</TableColumn>
+                            <TableColumn>Contact Number</TableColumn>
+                            <TableColumn>Email</TableColumn>
+                            <TableColumn>Role</TableColumn>
+                            <TableColumn className="text-center">
+                              Actions
+                            </TableColumn>
+                          </TableHeader>
+                          <TableBody>
                             {currentUsers.map((user) => (
-                              <tr key={user._id}>
-                                <td>{user.UserID}</td>
-                                <td>{user.FirstName}</td>
-                                <td>{user.LastName}</td>
-                                <td>{user.Age}</td>
-                                <td>{user.Department}</td>
-                                <td>{user.Section}</td>
-                                <td>{user.Gender}</td>
-                                <td>{user.ContactNumber}</td>
-                                <td>{user.email}</td>
-                                <td>{user.role}</td>
-                                <td className="text-center">
+                              <TableRow key={user._id}>
+                                <TableCell>{user.UserID}</TableCell>
+                                <TableCell>{user.FirstName}</TableCell>
+                                <TableCell>{user.LastName}</TableCell>
+                                <TableCell>{user.Age}</TableCell>
+                                <TableCell>{user.Department}</TableCell>
+                                <TableCell>{user.Section}</TableCell>
+                                <TableCell>{user.Gender}</TableCell>
+                                <TableCell>{user.ContactNumber}</TableCell>
+                                <TableCell>{user.email}</TableCell>
+                                <TableCell>{user.role}</TableCell>
+                                <TableCell className="text-center">
                                   <div className="table-buttons">
                                     <Button
                                       variant="info"
@@ -684,10 +706,10 @@ const BodyAdminUsers = () => {
                                       Delete
                                     </Button>
                                   </div>
-                                </td>
-                              </tr>
+                                </TableCell>
+                              </TableRow>
                             ))}
-                          </tbody>
+                          </TableBody>
                         </Table>
                       )}
                     </>
