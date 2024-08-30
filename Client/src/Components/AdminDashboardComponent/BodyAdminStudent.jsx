@@ -1,17 +1,20 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useDownloadExcel } from 'react-export-table-to-excel';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Tooltip from 'react-bootstrap/Tooltip';
-import ReactPaginate from 'react-paginate';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faCircleInfo, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { Table, Modal, Button } from 'react-bootstrap';
-import { Link, useParams } from 'react-router-dom';
-import axios from 'axios';
-import '../ContentDasboard/Content.css';
-import toast from 'react-hot-toast';
-import AdminContentHeader from '../ContentDasboard/AdminContentHeader';
-
+import React, { useEffect, useState, useRef } from "react";
+import { useDownloadExcel } from "react-export-table-to-excel";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
+import ReactPaginate from "react-paginate";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faSearch,
+  faCircleInfo,
+  faPrint,
+} from "@fortawesome/free-solid-svg-icons";
+import { Table, Modal, Button } from "react-bootstrap";
+import { Link, useParams } from "react-router-dom";
+import axios from "axios";
+import "../ContentDasboard/Content.css";
+import toast from "react-hot-toast";
+import ContentHeader from "../ContentDasboard/ContentHeader";
 
 const PrintRecord = ({ show, onHide, print, role }) => {
   return (
@@ -28,19 +31,22 @@ const PrintRecord = ({ show, onHide, print, role }) => {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>You are now going to generate a excel file of this data. Do you want to continue?</p>
+        <p>
+          You are now going to generate a excel file of this data. Do you want
+          to continue?
+        </p>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="danger" onClick={onHide}>
           Cancel
         </Button>
-          <Button variant="success" onClick={print}>Print</Button>
+        <Button variant="success" onClick={print}>
+          Print
+        </Button>
       </Modal.Footer>
     </Modal>
   );
 };
-
-
 
 const AddProfile = ({ show, onHide }) => {
   return (
@@ -219,24 +225,23 @@ const BodyAdminStudent = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [usersPerPage] = useState(10);
   const [filteredRoles, setFilteredRoles] = useState([]);
-  const [selectedRole, setSelectedRole] = useState('');
+  const [selectedRole, setSelectedRole] = useState("");
 
   const tableRef = useRef(null);
 
   const { onDownload } = useDownloadExcel({
     currentTableRef: tableRef.current,
-    filename: 'Student_List_Report_table',
-    sheet: 'Students'
-})
+    filename: "Student_List_Report_table",
+    sheet: "Students",
+  });
 
   useEffect(() => {
     axios
-      .get('/getStudents') // Corrected route
+      .get("/getStudents") // Corrected route
       .then((response) => {
         setStudents(response.data);
         setFilteredRoles(response.data);
-      }
-    )
+      })
       .catch((err) => console.log(err));
   }, []);
 
@@ -275,7 +280,7 @@ const BodyAdminStudent = () => {
   };
 
   const handleDeleteSuccess = (deletedStudentId) => {
-    setStudents(students.filter(student => student._id !== deletedStudentId));
+    setStudents(students.filter((student) => student._id !== deletedStudentId));
     setModalShowDelete(false);
   };
 
@@ -289,27 +294,26 @@ const BodyAdminStudent = () => {
   const handleSectionChange = (e) => {
     const section = e.target.value;
     setSelectedRole(section);
-    if (section === '') {
+    if (section === "") {
       setFilteredRoles(students);
     } else {
-      const filtered = students.filter(student => student.Section === section);
+      const filtered = students.filter(
+        (student) => student.Section === section
+      );
       setFilteredRoles(filtered);
     }
   };
 
   return (
     <div className="content">
-      <AdminContentHeader />
+      <ContentHeader />
       <div className="content-body">
         <PrintRecord
           show={modalShowPrint}
           onHide={() => setModalShowPrint(false)}
-          print= {onDownload}
+          print={onDownload}
         />
-        <AddProfile
-          show={modalShow}
-          onHide={() => setModalShow(false)}
-        />
+        <AddProfile show={modalShow} onHide={() => setModalShow(false)} />
         <ViewProfile
           show={modalShowView}
           onHide={() => setModalShowView(false)}
@@ -327,48 +331,72 @@ const BodyAdminStudent = () => {
         />
         <div className="content-title-header">
           <div>
-          Admin Manage Student
-          <OverlayTrigger
-         placement="bottom"
-         delay={{ show: 250, hide: 400 }}
-         overlay={renderTooltip}
-        >
-        <FontAwesomeIcon icon={faCircleInfo} size='1x' className="help-icon" />
-        </OverlayTrigger>
-        </div>
-        <div className='generate-report'>
-        <OverlayTrigger
-         placement="bottom"
-         delay={{ show: 250, hide: 400 }}
-         overlay={generateReport}
-        > 
-        <FontAwesomeIcon icon={faPrint} size='1x' className="print-icon" onClick={handlePrintClick}/>
-        </OverlayTrigger>
-        </div>
+            Admin Manage Student
+            <OverlayTrigger
+              placement="bottom"
+              delay={{ show: 250, hide: 400 }}
+              overlay={renderTooltip}
+            >
+              <FontAwesomeIcon
+                icon={faCircleInfo}
+                size="1x"
+                className="help-icon"
+              />
+            </OverlayTrigger>
+          </div>
+          <div className="generate-report">
+            <OverlayTrigger
+              placement="bottom"
+              delay={{ show: 250, hide: 400 }}
+              overlay={generateReport}
+            >
+              <FontAwesomeIcon
+                icon={faPrint}
+                size="1x"
+                className="print-icon"
+                onClick={handlePrintClick}
+              />
+            </OverlayTrigger>
+          </div>
         </div>
         <div className="content-container">
           <div className="row">
             <div className="col">
               <div className="card mt-1 border-0">
                 <div className="list-header-drop-score">
-                 <select name="" id="" onChange={handleSectionChange} value={selectedRole}>
-                  <option value="">Select Section</option>
-                  <option value="Camia">Camia</option>
-                  <option value="Daffodil">Daffodil</option>
-                  <option value="Daisy">Daisy</option>
-                  <option value="Gumamela">Gumamela</option>
-                  <option value="Lily">Lily</option>
-                  <option value="Rosal">Rosal</option>
-                  <option value="Rose">Rose</option>
-                  <option value="Santan">Santan</option>
-                  <option value="Speacial">Speacial</option>
+                  <select
+                    name=""
+                    id=""
+                    onChange={handleSectionChange}
+                    value={selectedRole}
+                  >
+                    <option value="">Select Section</option>
+                    <option value="Camia">Camia</option>
+                    <option value="Daffodil">Daffodil</option>
+                    <option value="Daisy">Daisy</option>
+                    <option value="Gumamela">Gumamela</option>
+                    <option value="Lily">Lily</option>
+                    <option value="Rosal">Rosal</option>
+                    <option value="Rose">Rose</option>
+                    <option value="Santan">Santan</option>
+                    <option value="Speacial">Speacial</option>
                   </select>
-                <div className="search-box-table">
-                    <FontAwesomeIcon icon={faSearch} size='1x' inverse className="con-icon"/>
-                    <input type="text" placeholder='Enter Student Name'/>
+                  <div className="search-box-table">
+                    <FontAwesomeIcon
+                      icon={faSearch}
+                      size="1x"
+                      inverse
+                      className="con-icon"
+                    />
+                    <input type="text" placeholder="Enter Student Name" />
                   </div>
-                  <div className='back-button-profile'>
-                    <button className='btn-back' onClick={() => handleAddClick()}>Add Student</button>
+                  <div className="back-button-profile">
+                    <button
+                      className="btn-back"
+                      onClick={() => handleAddClick()}
+                    >
+                      Add Student
+                    </button>
                   </div>
                 </div>
                 <div className="card-body scrollable-table scrollable-container">
@@ -396,14 +424,31 @@ const BodyAdminStudent = () => {
                           <td className="text-center">{student.Age}</td>
                           <td className="text-center">{student.Section}</td>
                           <td className="text-center">{student.Birthday}</td>
-                          <td className="text-center">{student.MotherTongue}</td>
+                          <td className="text-center">
+                            {student.MotherTongue}
+                          </td>
                           <td className="text-center">{student.Nationality}</td>
                           <td className="text-center">{student.Gender}</td>
                           <td className="text-center">
                             <div className="table-buttons">
-                              <Button variant="info" onClick={() => handleViewClick()}>View</Button>
-                              <Button variant="primary" onClick={() => handleEditClick(student)}>Update</Button>
-                              <Button variant="danger" onClick={() => handleDeleteClick(student)}>Delete</Button>
+                              <Button
+                                variant="info"
+                                onClick={() => handleViewClick()}
+                              >
+                                View
+                              </Button>
+                              <Button
+                                variant="primary"
+                                onClick={() => handleEditClick(student)}
+                              >
+                                Update
+                              </Button>
+                              <Button
+                                variant="danger"
+                                onClick={() => handleDeleteClick(student)}
+                              >
+                                Delete
+                              </Button>
                             </div>
                           </td>
                         </tr>
@@ -411,16 +456,16 @@ const BodyAdminStudent = () => {
                     </tbody>
                   </Table>
                   <ReactPaginate
-                    previousLabel={'Previous'}
-                    nextLabel={'Next'}
-                    breakLabel={'...'}
-                    breakClassName={'break-me'}
+                    previousLabel={"Previous"}
+                    nextLabel={"Next"}
+                    breakLabel={"..."}
+                    breakClassName={"break-me"}
                     pageCount={Math.ceil(filteredRoles.length / usersPerPage)}
                     marginPagesDisplayed={2}
                     pageRangeDisplayed={10}
                     onPageChange={handlePageClick}
-                    containerClassName={'pagination'}
-                    activeClassName={'active'}
+                    containerClassName={"pagination"}
+                    activeClassName={"active"}
                   />
                 </div>
               </div>

@@ -7,7 +7,7 @@ import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import "../ContentDasboard/Content.css";
 import axios from "axios";
 import toast from "react-hot-toast";
-import AdminContentHeader from "../ContentDasboard/AdminContentHeader";
+import ContentHeader from "../ContentDasboard/ContentHeader";
 
 const BodyUpdateTeacherProfile = () => {
   const navigate = useNavigate();
@@ -96,7 +96,7 @@ const BodyUpdateTeacherProfile = () => {
 
   return (
     <div className="content">
-      <AdminContentHeader />
+      <ContentHeader />
       <div className="content-body">
         <div className="content-title-header">
           <div>

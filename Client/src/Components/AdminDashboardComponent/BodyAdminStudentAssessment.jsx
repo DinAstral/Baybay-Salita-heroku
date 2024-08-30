@@ -1,17 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useDownloadExcel } from 'react-export-table-to-excel';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Tooltip from 'react-bootstrap/Tooltip';
-import ReactPaginate from 'react-paginate';
-import { Table, Modal, Button} from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleInfo, faPrint } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
-import '../ContentDasboard/Content.css';
-import toast from 'react-hot-toast';
-import AdminContentHeader from '../ContentDasboard/AdminContentHeader';
-
+import React, { useState, useEffect, useRef } from "react";
+import { useDownloadExcel } from "react-export-table-to-excel";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
+import ReactPaginate from "react-paginate";
+import { Table, Modal, Button } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleInfo, faPrint } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
+import { Link } from "react-router-dom";
+import "../ContentDasboard/Content.css";
+import toast from "react-hot-toast";
+import ContentHeader from "../ContentDasboard/ContentHeader";
 
 const PrintRecord = ({ show, onHide, print, role }) => {
   return (
@@ -28,18 +27,22 @@ const PrintRecord = ({ show, onHide, print, role }) => {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>You are now going to generate a excel file of this data. Do you want to continue?</p>
+        <p>
+          You are now going to generate a excel file of this data. Do you want
+          to continue?
+        </p>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="danger" onClick={onHide}>
           Cancel
         </Button>
-          <Button variant="success" onClick={print}>Print</Button>
+        <Button variant="success" onClick={print}>
+          Print
+        </Button>
       </Modal.Footer>
     </Modal>
   );
 };
-
 
 const CheckAssessment = ({ show, onHide, student }) => {
   return (
@@ -61,7 +64,7 @@ const CheckAssessment = ({ show, onHide, student }) => {
       <Modal.Footer>
         <Button variant="danger" onClick={onHide}>
           Cancel
-        </Button>       
+        </Button>
         <Link to="/adminStudentProgress">
           <Button variant="info">Check</Button>
         </Link>
@@ -69,7 +72,6 @@ const CheckAssessment = ({ show, onHide, student }) => {
     </Modal>
   );
 };
-
 
 const BodyAdminStudentAssessment = () => {
   const [modalShowCheck, setModalShowCheck] = useState(false);
@@ -80,20 +82,20 @@ const BodyAdminStudentAssessment = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [usersPerPage] = useState(10);
   const [filteredActivities, setFilteredActivities] = useState([]);
-  const [selectedPeriod, setSelectedPeriod] = useState('');
+  const [selectedPeriod, setSelectedPeriod] = useState("");
   const handleClose = () => setShow(false);
 
   const tableRef = useRef(null);
 
   const { onDownload } = useDownloadExcel({
     currentTableRef: tableRef.current,
-    filename: 'Student_Assessment_Report_table',
-    sheet: 'Assessment'
-})
+    filename: "Student_Assessment_Report_table",
+    sheet: "Assessment",
+  });
 
   useEffect(() => {
     axios
-      .get('/getAssessments')
+      .get("/getAssessments")
       .then((response) => {
         setActivities(response.data);
         setFilteredActivities(response.data);
@@ -113,21 +115,25 @@ const BodyAdminStudentAssessment = () => {
   const handlePeriodChange = (e) => {
     const period = e.target.value;
     setSelectedPeriod(period);
-    if (period === '') {
+    if (period === "") {
       setFilteredActivities(activities);
     } else {
-      const filtered = activities.filter(activity => activity.Period === period);
+      const filtered = activities.filter(
+        (activity) => activity.Period === period
+      );
       setFilteredActivities(filtered);
     }
   };
 
-    {/* Page Interactions */}
-    const handlePageClick = (event) => {
-      setCurrentPage(event.selected);
-    };
-  
-    const offset = currentPage * usersPerPage;
-    const currentUsers = filteredActivities.slice(offset, offset + usersPerPage);
+  {
+    /* Page Interactions */
+  }
+  const handlePageClick = (event) => {
+    setCurrentPage(event.selected);
+  };
+
+  const offset = currentPage * usersPerPage;
+  const currentUsers = filteredActivities.slice(offset, offset + usersPerPage);
 
   const renderTooltip = (props) => (
     <Tooltip id="button-tooltip" {...props}>
@@ -141,15 +147,14 @@ const BodyAdminStudentAssessment = () => {
     </Tooltip>
   );
 
-
   return (
-    <div className='content'>
-      <AdminContentHeader />
+    <div className="content">
+      <ContentHeader />
       <div className="content-body">
         <PrintRecord
           show={modalShowPrint}
           onHide={() => setModalShowPrint(false)}
-          print= {onDownload}
+          print={onDownload}
         />
         <CheckAssessment
           show={modalShowCheck}
@@ -158,31 +163,45 @@ const BodyAdminStudentAssessment = () => {
         />
         <div className="content-title-header">
           <div>
-          Admin Manage Assessment
-          <OverlayTrigger
-         placement="bottom"
-         delay={{ show: 250, hide: 400 }}
-         overlay={renderTooltip}
-        >
-        <FontAwesomeIcon icon={faCircleInfo} size='1x' className="help-icon" />
-        </OverlayTrigger>
-        </div>
-        <div className='generate-report'>
-        <OverlayTrigger
-         placement="bottom"
-         delay={{ show: 250, hide: 400 }}
-         overlay={generateReport}
-        > 
-        <FontAwesomeIcon icon={faPrint} size='1x' className="print-icon" onClick={handlePrintClick}/>
-        </OverlayTrigger>
-        </div>
+            Admin Manage Assessment
+            <OverlayTrigger
+              placement="bottom"
+              delay={{ show: 250, hide: 400 }}
+              overlay={renderTooltip}
+            >
+              <FontAwesomeIcon
+                icon={faCircleInfo}
+                size="1x"
+                className="help-icon"
+              />
+            </OverlayTrigger>
+          </div>
+          <div className="generate-report">
+            <OverlayTrigger
+              placement="bottom"
+              delay={{ show: 250, hide: 400 }}
+              overlay={generateReport}
+            >
+              <FontAwesomeIcon
+                icon={faPrint}
+                size="1x"
+                className="print-icon"
+                onClick={handlePrintClick}
+              />
+            </OverlayTrigger>
+          </div>
         </div>
         <div className="content-container">
           <div className="row">
             <div className="col">
               <div className="card mt-1 border-0">
                 <div className="list-header-drop-score">
-                  <select name="" id="" onChange={handlePeriodChange} value={selectedPeriod}>
+                  <select
+                    name=""
+                    id=""
+                    onChange={handlePeriodChange}
+                    value={selectedPeriod}
+                  >
                     <option value="">Select Grading Period</option>
                     <option value="1">Grading Period 1</option>
                     <option value="2">Grading Period 2</option>
@@ -210,8 +229,12 @@ const BodyAdminStudentAssessment = () => {
                     <tbody>
                       {currentUsers.map((activity) => (
                         <tr key={activity.ActivityCode}>
-                          <td className="text-center">{activity.ActivityCode}</td>
-                          <td className="text-center">{activity.ActivityNumber}</td>
+                          <td className="text-center">
+                            {activity.ActivityCode}
+                          </td>
+                          <td className="text-center">
+                            {activity.ActivityNumber}
+                          </td>
                           <td className="text-center">{activity.Period}</td>
                           <td className="text-center">{activity.Type}</td>
                           <td className="text-center">{activity.Status}</td>
@@ -222,7 +245,12 @@ const BodyAdminStudentAssessment = () => {
                           <td className="text-center">{activity.Word5}</td>
                           <td className="text-center">
                             <div className="table-buttons">
-                              <Button variant="info" onClick={() => handleCheckClick()}>Check</Button>
+                              <Button
+                                variant="info"
+                                onClick={() => handleCheckClick()}
+                              >
+                                Check
+                              </Button>
                               <Button variant="danger">Delete</Button>
                             </div>
                           </td>
@@ -231,16 +259,18 @@ const BodyAdminStudentAssessment = () => {
                     </tbody>
                   </Table>
                   <ReactPaginate
-                    previousLabel={'Previous'}
-                    nextLabel={'Next'}
-                    breakLabel={'...'}
-                    breakClassName={'break-me'}
-                    pageCount={Math.ceil(filteredActivities.length / usersPerPage)}
+                    previousLabel={"Previous"}
+                    nextLabel={"Next"}
+                    breakLabel={"..."}
+                    breakClassName={"break-me"}
+                    pageCount={Math.ceil(
+                      filteredActivities.length / usersPerPage
+                    )}
                     marginPagesDisplayed={2}
                     pageRangeDisplayed={10}
                     onPageChange={handlePageClick}
-                    containerClassName={'pagination'}
-                    activeClassName={'active'}
+                    containerClassName={"pagination"}
+                    activeClassName={"active"}
                   />
                 </div>
               </div>
@@ -250,6 +280,6 @@ const BodyAdminStudentAssessment = () => {
       </div>
     </div>
   );
-}
+};
 
 export default BodyAdminStudentAssessment;

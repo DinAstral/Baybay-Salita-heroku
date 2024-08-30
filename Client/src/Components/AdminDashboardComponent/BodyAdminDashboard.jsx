@@ -10,7 +10,6 @@ import {
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import "../ContentDasboard/Content.css";
-import AdminContentHeader from "../ContentDasboard/AdminContentHeader";
 import {
   Table,
   TableHeader,
@@ -27,6 +26,7 @@ import { columns, users } from "./data";
 import { Card, CardHeader, CardBody, Image } from "@nextui-org/react";
 
 import { LineChart } from "@mui/x-charts/LineChart";
+import ContentHeader from "../ContentDasboard/ContentHeader";
 
 const statusColorMap = {
   active: "success",
@@ -119,7 +119,7 @@ const BodyAdminDashboard = () => {
 
   return (
     <div className="content">
-      <AdminContentHeader />
+      <ContentHeader />
       <div className="content-body">
         <div className="content-title-header">
           <div>

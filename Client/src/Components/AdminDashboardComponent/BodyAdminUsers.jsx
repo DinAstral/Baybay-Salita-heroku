@@ -1,4 +1,19 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
+import "../ContentDasboard/Content.css";
+import ContentHeader from "../ContentDasboard/ContentHeader";
+import PrintRecord from "../Modals/PrintRecord";
+import AddUser from "../Modals/AdminModal/AddUserModal";
+import EditUser from "../Modals/AdminModal/EditUser";
+import ViewParent from "../Modals/AdminModal/ViewPaRENT";
+import ViewTeacher from "../Modals/AdminModal/ViewTeacher";
+import UpdateParent from "../Modals/AdminModal/UpdateParent";
+import UpdateTeacher from "../Modals/AdminModal/UpdateTEacher";
+import DeleteUser from "../Modals/AdminModal/DeleteUser";
+import { useDownloadExcel } from "react-export-table-to-excel";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
+import ReactPaginate from "react-paginate";
+import axios from "axios";
 import {
   Table,
   TableHeader,
@@ -6,310 +21,17 @@ import {
   TableColumn,
   TableRow,
   TableCell,
-} from "@nextui-org/table";
-import { useDownloadExcel } from "react-export-table-to-excel";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
-import toast from "react-hot-toast";
-import ReactPaginate from "react-paginate";
+  Button,
+} from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSearch,
   faCircleInfo,
   faPrint,
 } from "@fortawesome/free-solid-svg-icons";
-import { Modal, Button } from "react-bootstrap";
-import axios from "axios";
-import "../ContentDasboard/Content.css";
-import { Link } from "react-router-dom";
-import AdminContentHeader from "../ContentDasboard/AdminContentHeader";
-
-const PrintRecord = ({ show, onHide, print, role }) => {
-  return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      size="sm-down"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Print User Information
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>
-          You are now going to generate a excel file of this data. Do you want
-          to continue?
-        </p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="danger" onClick={onHide}>
-          Cancel
-        </Button>
-        <Button variant="success" onClick={print}>
-          Print
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-
-const AddUser = ({ show, onHide }) => {
-  return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      size="sm-down"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Add User Information
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>Do you want to add a user?</p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="danger" onClick={onHide}>
-          Cancel
-        </Button>
-        <Link to={`/adminAddUser`}>
-          <Button variant="success">Add</Button>
-        </Link>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-
-const EditUser = ({ show, onHide, user }) => {
-  return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      size="sm-down"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Add User Information
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>
-          You are now going to update the selected user. Do you wish to
-          continue?
-        </p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="danger" onClick={onHide}>
-          Cancel
-        </Button>
-        <Link to={`/AdminEditUser/${user?._id}`}>
-          <Button variant="primary">Update</Button>
-        </Link>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-
-const ViewParent = ({ show, onHide, user }) => {
-  return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      size="sm-down"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          View Super Teacher Information
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>Do you want to View the profile of Parent selected?</p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="danger" onClick={onHide}>
-          Cancel
-        </Button>
-        <Link to={`/adminViewParent/${user?._id}`}>
-          <Button variant="info">View</Button>
-        </Link>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-
-const EditParent = ({ show, onHide, user }) => {
-  return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      size="sm-down"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Edit Parent Information
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>Are you sure you want to edit this parent's information?</p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="danger" onClick={onHide}>
-          Cancel
-        </Button>
-        <Link to={`/adminEditParent/${user?._id}`}>
-          <Button variant="primary">Update</Button>
-        </Link>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-
-const ViewTeacher = ({ show, onHide, user }) => {
-  return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      size="sm-down"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          View Super Teacher Information
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>Do you want to View the profile of Teacher selected?</p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="danger" onClick={onHide}>
-          Cancel
-        </Button>
-        <Link to={`/adminViewTeacher/${user?._id}`}>
-          <Button variant="info">View</Button>
-        </Link>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-
-const EditTeacher = ({ show, onHide, user }) => {
-  return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      size="sm-down"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Update Teacher Information
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>Are you sure you want to edit this Teacher's information?</p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="danger" onClick={onHide}>
-          Cancel
-        </Button>
-        <Link to={`/adminEditTeacher/${user?._id}`}>
-          <Button variant="primary">Update</Button>
-        </Link>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-
-const DeleteSuccess = ({ show, onHide }) => (
-  <Modal
-    show={show}
-    onHide={onHide}
-    size="sm-down"
-    aria-labelledby="contained-modal-title-vcenter"
-    centered
-  >
-    <Modal.Header closeButton>
-      <Modal.Title id="contained-modal-title-vcenter">
-        Delete User Successful
-      </Modal.Title>
-    </Modal.Header>
-    <Modal.Body>
-      <p>You have deleted the User information.</p>
-    </Modal.Body>
-    <Modal.Footer>
-      <Button variant="primary" onClick={onHide}>
-        Close
-      </Button>
-    </Modal.Footer>
-  </Modal>
-);
-
-const DeleteUser = ({ show, onHide, user, onDeleteSuccess }) => {
-  const [modalDeleteSuccess, setModalDeleteSuccess] = useState(false);
-
-  const deleteUser = async () => {
-    try {
-      await axios.delete(`/deleteUser/${user.email}`);
-      setModalDeleteSuccess(true);
-      onDeleteSuccess();
-    } catch (err) {
-      console.error("Error deleting user:", err);
-      toast.error("Failed to delete user. Please try again later.");
-    }
-  };
-
-  return (
-    <>
-      <Modal
-        show={show}
-        onHide={onHide}
-        size="sm-down"
-        aria-labelledby="contained-modal-title-vcenter"
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title id="contained-modal-title-vcenter">
-            Delete User Information
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Are you sure you want to delete this User's information?</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="success" onClick={onHide}>
-            Cancel
-          </Button>
-          <Button variant="danger" onClick={deleteUser}>
-            Delete
-          </Button>
-        </Modal.Footer>
-      </Modal>
-      <DeleteSuccess
-        show={modalDeleteSuccess}
-        onHide={() => {
-          setModalDeleteSuccess(false);
-          onHide();
-        }}
-      />
-    </>
-  );
-};
 
 const BodyAdminUsers = () => {
-  const [modalShow, setModalShow] = useState(false);
+  const [modalShowUser, setModalShowUser] = useState(false);
   const [modalShowPrint, setModalShowPrint] = useState(false);
   const [modalShowAdd, setModalShowAdd] = useState(false);
   const [modalShowEditTeacher, setModalShowEditTeacher] = useState(false);
@@ -365,7 +87,7 @@ const BodyAdminUsers = () => {
   };
 
   const handleEditClick = (user) => {
-    setModalShow(true);
+    setModalShowUser(true);
     setSelectedUser(user);
   };
 
@@ -433,12 +155,12 @@ const BodyAdminUsers = () => {
 
   return (
     <div className="content">
-      <AdminContentHeader />
+      <ContentHeader />
       <div className="content-body">
         <AddUser show={modalShowAdd} onHide={() => setModalShowAdd(false)} />
         <EditUser
-          show={modalShow}
-          onHide={() => setModalShow(false)}
+          show={modalShowUser}
+          onHide={() => setModalShowUser(false)}
           user={selectedUser}
         />
         <PrintRecord
@@ -452,7 +174,7 @@ const BodyAdminUsers = () => {
           user={selectedUser}
           onHide={() => setModalShowViewTeacher(false)}
         />
-        <EditTeacher
+        <UpdateTeacher
           show={modalShowEditTeacher}
           user={selectedUser}
           onHide={() => setModalShowEditTeacher(false)}
@@ -463,7 +185,7 @@ const BodyAdminUsers = () => {
           user={selectedUser}
           onHide={() => setModalShowViewParent(false)}
         />
-        <EditParent
+        <UpdateParent
           show={modalShowEditParent}
           user={selectedUser}
           onHide={() => setModalShowEditParent(false)}
@@ -571,13 +293,13 @@ const BodyAdminUsers = () => {
                             <TableCell className="text-center">
                               <div className="table-buttons">
                                 <Button
-                                  variant="primary"
+                                  color="primary"
                                   onClick={() => handleEditClick(user)}
                                 >
                                   Update
                                 </Button>
                                 <Button
-                                  variant="danger"
+                                  color="danger"
                                   onClick={() => handleDeleteClick(user)}
                                 >
                                   Delete
@@ -626,19 +348,19 @@ const BodyAdminUsers = () => {
                                 <TableCell className="text-center">
                                   <div className="table-buttons">
                                     <Button
-                                      variant="info"
+                                      color="default"
                                       onClick={() => handleViewParent(user)}
                                     >
                                       View
                                     </Button>
                                     <Button
-                                      variant="primary"
+                                      color="primary"
                                       onClick={() => handleEditParent(user)}
                                     >
                                       Update
                                     </Button>
                                     <Button
-                                      variant="danger"
+                                      color="danger"
                                       onClick={() => handleDeleteClick(user)}
                                     >
                                       Delete
@@ -688,19 +410,19 @@ const BodyAdminUsers = () => {
                                 <TableCell className="text-center">
                                   <div className="table-buttons">
                                     <Button
-                                      variant="info"
+                                      color="default"
                                       onClick={() => handleViewTeacher(user)}
                                     >
                                       View
                                     </Button>
                                     <Button
-                                      variant="primary"
+                                      color="primary"
                                       onClick={() => handleEditTeacher(user)}
                                     >
                                       Update
                                     </Button>
                                     <Button
-                                      variant="danger"
+                                      color="danger"
                                       onClick={() => handleDeleteClick(user)}
                                     >
                                       Delete
