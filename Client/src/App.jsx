@@ -1,3 +1,4 @@
+import "bootstrap/dist/css/bootstrap.css";
 import { NextUIProvider } from "@nextui-org/react";
 import { Route, Routes, useNavigate } from "react-router-dom"; // Import BrowserRouter, Route, and Routes
 import axios from "axios";
@@ -45,7 +46,7 @@ import ParentViewStudentProgress from "./Pages/ParentDashboard/ParentViewStudent
 import ParentProfile from "./Pages/ParentDashboard/ParentProfile";
 import ProfileUpdate from "./Pages/ParentDashboard/ProfileUpdate";
 
-axios.defaults.baseURL = "http://192.168.56.1:8000";
+axios.defaults.baseURL = "http://192.168.254.161:8000";
 axios.defaults.withCredentials = true;
 
 const App = () => {

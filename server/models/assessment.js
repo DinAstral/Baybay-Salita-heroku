@@ -12,11 +12,18 @@ const assessSchema = new Schema(
     },
     Period: String,
     Type: String,
-    Status: String,
-    Word1: String,
-    Picture1: String,
-    Audio1: String,
+    word1: String,
+    word1Audio: String,
+    word2: String,
+    word2Audio: String,
+    word3: String,
+    word3Audio: String,
+    word4: String,
+    word4Audio: String,
+    word5: String,
+    word5Audio: String,
   },
+
   { timestamps: true }
 );
 

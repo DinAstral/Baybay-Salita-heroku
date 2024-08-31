@@ -13,6 +13,7 @@ mongoose
   .catch((err) => console.log("Database not connected", err)); // Fix typo and include err parameter
 
 // Middleware
+app.use(express.json({ limit: "10mb" }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
