@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useDownloadExcel } from "react-export-table-to-excel";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
@@ -9,209 +9,26 @@ import {
   faCircleInfo,
   faPrint,
 } from "@fortawesome/free-solid-svg-icons";
-import { Table, Modal, Button } from "react-bootstrap";
-import { Link, useParams } from "react-router-dom";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableColumn,
+  TableRow,
+  TableCell,
+  Button,
+  Select,
+  SelectItem,
+  Input,
+} from "@nextui-org/react";
 import axios from "axios";
 import "../ContentDasboard/Content.css";
-import toast from "react-hot-toast";
 import ContentHeader from "../ContentDasboard/ContentHeader";
-
-const PrintRecord = ({ show, onHide, print, role }) => {
-  return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      size="sm-down"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Print User Information
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>
-          You are now going to generate a excel file of this data. Do you want
-          to continue?
-        </p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="danger" onClick={onHide}>
-          Cancel
-        </Button>
-        <Button variant="success" onClick={print}>
-          Print
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-
-const AddProfile = ({ show, onHide }) => {
-  return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      size="sm-down"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Add Student Information
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>Do you want to add Student information?</p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="danger" onClick={onHide}>
-          Cancel
-        </Button>
-        <Link to={`/adminAddStudent`}>
-          <Button variant="success">Add</Button>
-        </Link>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-
-const ViewProfile = ({ show, onHide }) => {
-  return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      size="sm-down"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          View Student Information
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>Do you want to view the profile of the student selected?</p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="danger" onClick={onHide}>
-          Cancel
-        </Button>
-        <Link to={`/adminViewStudent`}>
-          <Button variant="info">View</Button>
-        </Link>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-
-const EditProfile = ({ show, onHide, student }) => {
-  return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      size="sm-down"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Update Student Information
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>Are you sure you want to edit this Student's information?</p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="danger" onClick={onHide}>
-          Cancel
-        </Button>
-        <Link to={`/adminEditStudent/${student?._id}`}>
-          <Button variant="primary">Update</Button>
-        </Link>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-
-const DeleteStudentSuccess = ({ show, onHide }) => {
-  return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      size="sm-down"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Delete Student Successful
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>You have deleted the student information.</p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="primary" onClick={onHide}>
-          Close
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-
-const DeleteStudent = ({ show, onHide, student, onDeleteSuccess }) => {
-  const [modalDeleteSuccess, setModalDeleteSuccess] = useState(false);
-
-  const deleteStudent = async () => {
-    try {
-      await axios.delete(`/getStudent/${student._id}`); // Ensure this route matches your backend
-      setModalDeleteSuccess(true);
-      onDeleteSuccess(student._id); // Callback to remove student from list
-    } catch (err) {
-      console.error("Error deleting student:", err);
-      toast.error("Failed to delete student. Please try again later.");
-    }
-  };
-
-  return (
-    <>
-      <Modal
-        show={show}
-        onHide={onHide}
-        size="sm-down"
-        aria-labelledby="contained-modal-title-vcenter"
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title id="contained-modal-title-vcenter">
-            Delete Student Information
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Are you sure you want to delete this student's information?</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="success" onClick={onHide}>
-            Cancel
-          </Button>
-          <Button variant="danger" onClick={deleteStudent}>
-            Delete
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      <DeleteStudentSuccess
-        show={modalDeleteSuccess}
-        onHide={() => {
-          setModalDeleteSuccess(false);
-          onHide();
-        }}
-      />
-    </>
-  );
-};
+import PrintRecord from "../Modals/PrintRecord";
+import ViewStudent from "../Modals/AdminModal/ViewStudent";
+import AddStudent from "../Modals/AdminModal/AddStudent";
+import UpdateStudent from "../Modals/AdminModal/UpdateStudent";
+import DeleteStudent from "../Modals/AdminModal/DeleteStudent";
 
 const BodyAdminStudent = () => {
   const [modalShow, setModalShow] = useState(false);
@@ -313,12 +130,12 @@ const BodyAdminStudent = () => {
           onHide={() => setModalShowPrint(false)}
           print={onDownload}
         />
-        <AddProfile show={modalShow} onHide={() => setModalShow(false)} />
-        <ViewProfile
+        <AddStudent show={modalShow} onHide={() => setModalShow(false)} />
+        <ViewStudent
           show={modalShowView}
           onHide={() => setModalShowView(false)}
         />
-        <EditProfile
+        <UpdateStudent
           show={modalShowEdit}
           student={selectedStudent}
           onHide={() => setModalShowEdit(false)}
@@ -364,31 +181,41 @@ const BodyAdminStudent = () => {
             <div className="col">
               <div className="card mt-1 border-0">
                 <div className="list-header-drop-score">
-                  <select
-                    name=""
-                    id=""
+                  <Select
+                    className="w-[20%]"
+                    label="Section"
+                    variant="bordered"
+                    defaultSelectedKeys={["Select Section"]}
+                    disabledKeys={["Select Section"]}
                     onChange={handleSectionChange}
                     value={selectedRole}
                   >
-                    <option value="">Select Section</option>
-                    <option value="Camia">Camia</option>
-                    <option value="Daffodil">Daffodil</option>
-                    <option value="Daisy">Daisy</option>
-                    <option value="Gumamela">Gumamela</option>
-                    <option value="Lily">Lily</option>
-                    <option value="Rosal">Rosal</option>
-                    <option value="Rose">Rose</option>
-                    <option value="Santan">Santan</option>
-                    <option value="Speacial">Speacial</option>
-                  </select>
-                  <div className="search-box-table">
-                    <FontAwesomeIcon
-                      icon={faSearch}
-                      size="1x"
-                      inverse
-                      className="con-icon"
+                    <SelectItem key="">Select Section</SelectItem>
+                    <SelectItem key="Aster">Aster</SelectItem>
+                    <SelectItem key="Camia">Camia</SelectItem>
+                    <SelectItem key="Dahlia">Dahlia</SelectItem>
+                    <SelectItem key="Iris">Iris</SelectItem>
+                    <SelectItem key="Jasmin">Jasmin</SelectItem>
+                    <SelectItem key="Orchid">Orchid</SelectItem>
+                    <SelectItem key="Rose">Rose</SelectItem>
+                    <SelectItem key="Tulip">Tulip</SelectItem>
+                    <SelectItem key="SSC">SSC</SelectItem>
+                  </Select>
+                  <div className="w-[40%] pt-2 p-2 flex">
+                    <Input
+                      type="text"
+                      placeholder="Search Student Name"
+                      variant="bordered"
+                      startContent={
+                        <FontAwesomeIcon
+                          icon={faSearch}
+                          size="1x"
+                          inverse
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
+                      className=""
                     />
-                    <input type="text" placeholder="Enter Student Name" />
                   </div>
                   <div className="back-button-profile">
                     <button
@@ -400,60 +227,61 @@ const BodyAdminStudent = () => {
                   </div>
                 </div>
                 <div className="card-body scrollable-table scrollable-container">
-                  <Table striped bordered hover responsive ref={tableRef}>
-                    <thead>
-                      <tr className="bg-primary text-dark font-weight-bold">
-                        <th className="text-center">LRN</th>
-                        <th className="text-center">First Name</th>
-                        <th className="text-center">Last Name</th>
-                        <th className="text-center">Age</th>
-                        <th className="text-center">Section</th>
-                        <th className="text-center">Birthday</th>
-                        <th className="text-center">Mother Tongue</th>
-                        <th className="text-center">Nationality</th>
-                        <th className="text-center">Gender</th>
-                        <th className="text-center">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+                  <Table
+                    ref={tableRef}
+                    removeWrapper
+                    color="primary"
+                    selectionMode="single"
+                  >
+                    <TableHeader>
+                      <TableColumn>LRN</TableColumn>
+                      <TableColumn>First Name</TableColumn>
+                      <TableColumn>Last Name</TableColumn>
+                      <TableColumn>Age</TableColumn>
+                      <TableColumn>Section</TableColumn>
+                      <TableColumn>Birthday</TableColumn>
+                      <TableColumn>Mother Tongue</TableColumn>
+                      <TableColumn>Nationality</TableColumn>
+                      <TableColumn>Gender</TableColumn>
+                      <TableColumn className="text-center">Actions</TableColumn>
+                    </TableHeader>
+                    <TableBody>
                       {currentUsers.map((student) => (
-                        <tr key={student.LRN}>
-                          <td className="text-center">{student.LRN}</td>
-                          <td className="text-center">{student.FirstName}</td>
-                          <td className="text-center">{student.LastName}</td>
-                          <td className="text-center">{student.Age}</td>
-                          <td className="text-center">{student.Section}</td>
-                          <td className="text-center">{student.Birthday}</td>
-                          <td className="text-center">
-                            {student.MotherTongue}
-                          </td>
-                          <td className="text-center">{student.Nationality}</td>
-                          <td className="text-center">{student.Gender}</td>
-                          <td className="text-center">
+                        <TableRow key={student.LRN}>
+                          <TableCell>{student.LRN}</TableCell>
+                          <TableCell>{student.FirstName}</TableCell>
+                          <TableCell>{student.LastName}</TableCell>
+                          <TableCell>{student.Age}</TableCell>
+                          <TableCell>{student.Section}</TableCell>
+                          <TableCell>{student.Birthday}</TableCell>
+                          <TableCell>{student.MotherTongue}</TableCell>
+                          <TableCell>{student.Nationality}</TableCell>
+                          <TableCell>{student.Gender}</TableCell>
+                          <TableCell className="text-center">
                             <div className="table-buttons">
                               <Button
-                                variant="info"
+                                color="default"
                                 onClick={() => handleViewClick()}
                               >
                                 View
                               </Button>
                               <Button
-                                variant="primary"
+                                color="primary"
                                 onClick={() => handleEditClick(student)}
                               >
                                 Update
                               </Button>
                               <Button
-                                variant="danger"
+                                color="danger"
                                 onClick={() => handleDeleteClick(student)}
                               >
                                 Delete
                               </Button>
                             </div>
-                          </td>
-                        </tr>
+                          </TableCell>
+                        </TableRow>
                       ))}
-                    </tbody>
+                    </TableBody>
                   </Table>
                   <ReactPaginate
                     previousLabel={"Previous"}
