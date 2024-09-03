@@ -12,13 +12,21 @@ export function UserContextProvider({ children }) {
   useEffect(() => {
     const fetchUser = async () => {
       const token = localStorage.getItem("token");
+      const storedUser = JSON.parse(localStorage.getItem("user")); // Load user data from localStorage
+
       if (token) {
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-        try {
-          const { data } = await axios.get("/profile");
-          setUser(data);
-        } catch (error) {
-          console.error("Error fetching user data:", error);
+
+        if (storedUser) {
+          setUser(storedUser); // Set the user data from localStorage
+        } else {
+          try {
+            const { data } = await axios.get("/profile");
+            setUser(data);
+            localStorage.setItem("user", JSON.stringify(data)); // Save user data to localStorage
+          } catch (error) {
+            console.error("Error fetching user data:", error);
+          }
         }
       }
       setLoading(false);
@@ -31,6 +39,7 @@ export function UserContextProvider({ children }) {
     try {
       await axios.post("/logout");
       localStorage.removeItem("token");
+      localStorage.removeItem("user"); // Remove user data from localStorage
       toast.success("Logout Successfully");
       setUser(null);
     } catch (error) {

@@ -58,7 +58,7 @@ const { mobileLogin } = require("../controllers/mobileController");
 // Configure CORS middleware
 router.use(
   cors({
-    origin: "https://testing-baybay-salita.netlify.app", // Update this with your client's URL
+    origin: "http://192.168.56.1:3000", // Update this with your client's URL
     methods: ["GET", "POST", "DELETE", "PATCH"], // Add the allowed HTTP methods
     credentials: true, // Allow credentials (cookies, authorization headers)
   })
@@ -83,7 +83,7 @@ router.post("/importWord", importWord);
 //Assessment Route  getPerformance
 router.get("/getImportWord", getImportWords);
 router.post("/submitAssessment", submitAssessment);
-router.post("/getPerformance", getPerformance);
+router.get("/getPerformance", getPerformance);
 
 //Admin Routes
 router.post("/addUser", addUser);

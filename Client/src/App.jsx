@@ -47,7 +47,7 @@ import ParentProfile from "./Pages/ParentDashboard/ParentProfile";
 import ProfileUpdate from "./Pages/ParentDashboard/ProfileUpdate";
 import AdminViewPerformance from "./Pages/AdminDashboard/AdminViewPerformance";
 
-axios.defaults.baseURL = "https://react-heruku-baybaysalita.onrender.com"; //Server URL
+axios.defaults.baseURL = "http://192.168.56.1:8000"; //Server URL
 axios.defaults.withCredentials = true;
 
 const App = () => {

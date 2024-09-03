@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { useDownloadExcel } from "react-export-table-to-excel";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
@@ -46,37 +46,49 @@ const BodyAdminPerformance = () => {
   });
 
   useEffect(() => {
-    axios
-      .get("/getPerformance")
-      .then((response) => {
-        setPerformance(response.data);
-        setFilteredRoles(response.data);
-      })
-      .catch((err) => console.log(err));
+    const fetchData = async () => {
+      try {
+        const { data } = await axios.get("/getPerformance");
+        setPerformance(data);
+        setFilteredRoles(data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const renderTooltip = (props) => (
-    <Tooltip id="button-tooltip" {...props}>
-      This function will view Information of your students on each section.
-    </Tooltip>
+  const handlePageClick = useCallback((event) => {
+    setCurrentPage(event.selected);
+  }, []);
+
+  const handleSectionChange = useCallback(
+    (e) => {
+      const section = e.target.value;
+      setSelectedRole(section);
+
+      if (section === "") {
+        setFilteredRoles(performances);
+      } else {
+        setFilteredRoles(
+          performances.filter((performance) => performance.Section === section)
+        );
+      }
+    },
+    [performances]
   );
 
-  const generateReport = (props) => (
-    <Tooltip id="button-tooltip" {...props}>
-      Generate report/Print table
-    </Tooltip>
-  );
-
-  const handlePrintClick = () => {
+  const handlePrintClick = useCallback(() => {
     setModalShowPrint(true);
-  };
+  }, []);
 
-  const handleDeleteClick = (performance) => {
+  const handleDeleteClick = useCallback((performance) => {
     setSelectedPerformance(performance);
     setModalShowDelete(true);
-  };
+  }, []);
 
-  const handleDeleteSuccess = (deletedPerformanceId) => {
+  const handleDeleteSuccess = useCallback((deletedPerformanceId) => {
     setPerformance((prevPerformances) =>
       prevPerformances.filter(
         (performance) => performance._id !== deletedPerformanceId
@@ -88,27 +100,34 @@ const BodyAdminPerformance = () => {
       )
     );
     setModalShowDelete(false);
-  };
+  }, []);
 
-  const handlePageClick = (event) => {
-    setCurrentPage(event.selected);
-  };
+  const currentUsers = useMemo(() => {
+    const offset = currentPage * usersPerPage;
+    return filteredRoles.slice(offset, offset + usersPerPage);
+  }, [filteredRoles, currentPage, usersPerPage]);
 
-  const offset = currentPage * usersPerPage;
-  const currentUsers = filteredRoles.slice(offset, offset + usersPerPage);
+  const pageCount = useMemo(() => {
+    return Math.ceil(filteredRoles.length / usersPerPage);
+  }, [filteredRoles.length, usersPerPage]);
 
-  const handleSectionChange = (e) => {
-    const section = e.target.value;
-    setSelectedRole(section);
-    if (section === "") {
-      setFilteredRoles(performances);
-    } else {
-      const filtered = performances.filter(
-        (performance) => performance.Section === section
-      );
-      setFilteredRoles(filtered);
-    }
-  };
+  const renderTooltip = useCallback(
+    (props) => (
+      <Tooltip id="button-tooltip" {...props}>
+        This function will view Information of your students on each section.
+      </Tooltip>
+    ),
+    []
+  );
+
+  const generateReport = useCallback(
+    (props) => (
+      <Tooltip id="button-tooltip" {...props}>
+        Generate report/Print table
+      </Tooltip>
+    ),
+    []
+  );
 
   return (
     <div className="content">
@@ -285,7 +304,7 @@ const BodyAdminPerformance = () => {
                     nextLabel={"Next"}
                     breakLabel={"..."}
                     breakClassName={"break-me"}
-                    pageCount={Math.ceil(filteredRoles.length / usersPerPage)}
+                    pageCount={pageCount}
                     marginPagesDisplayed={2}
                     pageRangeDisplayed={5}
                     onPageChange={handlePageClick}

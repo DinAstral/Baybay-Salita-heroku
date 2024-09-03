@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { UserContext } from "../../context/userContext";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
@@ -13,6 +14,7 @@ import {
 import Image1 from "../../src/assets/BaybaySalita_Logo.png";
 
 const Login = () => {
+  const { setUser } = useContext(UserContext);
   const [isVisible, setIsVisible] = useState(false);
   const navigate = useNavigate();
   const [data, setData] = useState({
@@ -39,13 +41,17 @@ const Login = () => {
       if (responseData.error) {
         toast.error(responseData.error);
       } else {
-        // Store the token in localStorage
+        // Store the token and user data in localStorage
         localStorage.setItem("token", responseData.token);
+        localStorage.setItem("user", JSON.stringify(responseData.user));
+
+        setUser(responseData.user); // Update user in context
 
         setData({
           email: "",
           password: "",
         });
+
         if (responseData.role === "Parent") {
           toast.success("Login Successful.");
           navigate("/parentDashboard");
@@ -56,7 +62,7 @@ const Login = () => {
           toast.success("Login Successful.");
           navigate("/AdminDashboard");
         } else {
-          toast.error("No User Registered");
+          toast.error(responseData.error || "Login failed.");
         }
       }
     } catch (error) {

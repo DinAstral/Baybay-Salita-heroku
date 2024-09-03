@@ -669,20 +669,23 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
-
-    if (!email) {
+    if (!email && !password) {
+      return res.json({
+        error: "Email and Password are required.",
+      });
+    } else if (!email) {
       return res.json({
         error: "Email is Required.",
-      });
-    }
-    //check if user exist
-    else if (!user) {
-      return res.json({
-        error: "No User Found",
       });
     } else if (!password) {
       return res.json({
         error: "Password is Required",
+      });
+    }
+
+    if (!user) {
+      return res.json({
+        error: "User not found.",
       });
     }
 
@@ -692,19 +695,13 @@ const loginUser = async (req, res) => {
       jwt.sign(
         {
           email: user.email,
-          id: user._id,
-          role: user.role,
-          FirstName: user.FirstName,
-          LastName: user.LastName,
-          UserID: user.UserID,
-          verified: user.verified,
         },
         process.env.JWT_SECRET,
         {},
         (err, token) => {
           if (err) {
             console.error(err);
-            return res.status(500).json({ error: "Failed to generate token" });
+            return res.json({ error: "Failed to generate token" });
           }
           // Set cookie with token
           res
@@ -720,7 +717,7 @@ const loginUser = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: "Server error" });
+    return res.json({ error: "Server error" });
   }
 };
 
