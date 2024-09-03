@@ -58,7 +58,7 @@ const { mobileLogin } = require("../controllers/mobileController");
 // Configure CORS middleware
 router.use(
   cors({
-    origin: "http://192.168.56.1:3000", // Update this with your client's URL
+    origin: process.env.REACT_APP_CLIENT_BASE_URL || "http://192.168.56.1:3000", // Update this with your client's URL
     methods: ["GET", "POST", "DELETE", "PATCH"], // Add the allowed HTTP methods
     credentials: true, // Allow credentials (cookies, authorization headers)
   })
