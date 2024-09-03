@@ -5,7 +5,7 @@ const { hashPassword, comparePassword } = require("../helpers/auth");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 function generateRandomCodeParent(length) {
   const characters = "0123456789";

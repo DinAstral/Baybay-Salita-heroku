@@ -6,7 +6,7 @@ const { hashPassword, comparePassword } = require("../helpers/auth");
 const jwt = require("jsonwebtoken");
 const UserOTPVerification = require("../models/UserOTPVerification");
 const nodemailer = require("nodemailer");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const multer = require("multer");
 const path = require("path");
 
