@@ -28,7 +28,7 @@ const AdminSidebar = () => {
       "/AdminUsers",
       "/adminStudents",
       "/adminStudentAssessment",
-      "/performance",
+      "/adminViewPerformance",
     ];
     const index = menuItem.findIndex((item) => item === location.pathname);
     setActiveIndex(index);
@@ -53,7 +53,11 @@ const AdminSidebar = () => {
             text: "Manage Assessment",
             link: "/adminStudentAssessment",
           },
-          { icon: faEye, text: "View Performance", link: "/performance" },
+          {
+            icon: faEye,
+            text: "View Performance",
+            link: "/adminViewPerformance",
+          },
         ].map((item, index) => (
           <Link
             key={index}

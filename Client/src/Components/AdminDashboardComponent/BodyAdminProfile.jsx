@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import profileImage from "./../../assets/profile.png";
-import { Modal, Button } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -12,37 +11,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { UserContext } from "../../../context/userContext";
 import ContentHeader from "../ContentDasboard/ContentHeader";
-
-const EditUser = ({ show, onHide, profile }) => {
-  return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      size="sm-down"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Update User Information
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>
-          You are now going to update your profile. Do you wish to continue?
-        </p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="danger" onClick={onHide}>
-          Cancel
-        </Button>
-        <Link to={`/AdminEditProfile/${profile}`}>
-          <Button variant="primary">Update</Button>
-        </Link>
-      </Modal.Footer>
-    </Modal>
-  );
-};
+import UpdateProfile from "../Modals/AdminModal/UpdateProfile";
 
 const BodyAdminProfile = () => {
   const location = useLocation();
@@ -75,7 +44,7 @@ const BodyAdminProfile = () => {
     <div className="content">
       <ContentHeader />
       <div className="content-body">
-        <EditUser
+        <UpdateProfile
           show={modalShow}
           onHide={() => setModalShow(false)}
           profile={user ? `${user.id}` : ""}

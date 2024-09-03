@@ -389,8 +389,6 @@ const uploadFile = async (req, res) => {
       return res.json({ error: "No file uploaded" });
     }
 
-    // Here you would typically save the file information to the database or perform other actions.
-    // Since we're associating this with a teacher, we'll assume the teacher's ID is passed via req.body
     const { TeacherID } = req.body;
 
     if (!TeacherID) {

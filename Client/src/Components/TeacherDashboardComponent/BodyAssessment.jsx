@@ -8,7 +8,6 @@ import {
   TableCell,
   Button,
   Tooltip,
-  Pagination,
 } from "@nextui-org/react";
 import { useDownloadExcel } from "react-export-table-to-excel";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
@@ -21,7 +20,7 @@ import "../ContentDasboard/Content.css";
 import toast from "react-hot-toast";
 import TeacherContentHeader from "../ContentDasboard/TeacherContentHeader";
 import PrintRecord from "../Modals/PrintRecord";
-import CreateAssessment from "../Modals/TeacherModal/CreateAssessment";
+import CreateAssessment from "../Modals/CreateAssessment";
 
 const CheckAssessment = ({ show, onHide, student }) => (
   <Modal

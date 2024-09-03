@@ -467,47 +467,6 @@ const getTeacherUser = async (req, res) => {
   }
 };
 
-const submitAssessment = async (req, res) => {
-  try {
-    console.log(
-      req.files["word1Image"],
-      req.files["word1Audio"],
-      req.files["word2Image"],
-      req.files["word2Audio"],
-      req.files["word3Image"],
-      req.files["word3Audio"],
-      req.files["word4Image"],
-      req.files["word4Audio"],
-      req.files["word5Image"],
-      req.files["word5Audio"]
-    );
-    const assessmentData = AssessmentModel.create({
-      word1: req.files["word1Image"][0].path,
-      word1Audio: req.files["word1Audio"][0].path,
-      word2: req.files["wordImage2"][0].path,
-      word2Audio: req.files["word2Audio"][0].path,
-      word3: req.files["word3Image"][0].path,
-      word3Audio: req.files["word3Audio"][0].path,
-      word4: req.files["word4Image"][0].path,
-      word4Audio: req.files["word4Audio"][0].path,
-      word5: req.files["word5Image"][0].path,
-      word5Audio: req.files["word5Audio"][0].path,
-    });
-
-    if (assessmentData) {
-      return res.json({
-        message: "Assessment Successfully Uploaded",
-      });
-    }
-
-    return res.json({
-      error: "Upload unsuccessful. Please try again later!",
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 module.exports = {
   addTeacherDetails,
   createAssessment,
@@ -517,5 +476,4 @@ module.exports = {
   updateTeacher,
   getTeacherUsers,
   getTeacherUser,
-  submitAssessment,
 };

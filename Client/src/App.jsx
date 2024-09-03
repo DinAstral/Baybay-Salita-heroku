@@ -1,4 +1,4 @@
-import "bootstrap/dist/css/bootstrap.css";
+//import "bootstrap/dist/css/bootstrap.css";
 import { NextUIProvider } from "@nextui-org/react";
 import { Route, Routes, useNavigate } from "react-router-dom"; // Import BrowserRouter, Route, and Routes
 import axios from "axios";
@@ -45,8 +45,9 @@ import ParentFeedbackTeacher from "./Pages/ParentDashboard/ParentFeedbackTeacher
 import ParentViewStudentProgress from "./Pages/ParentDashboard/ParentViewStudentProgress";
 import ParentProfile from "./Pages/ParentDashboard/ParentProfile";
 import ProfileUpdate from "./Pages/ParentDashboard/ProfileUpdate";
+import AdminViewPerformance from "./Pages/AdminDashboard/AdminViewPerformance";
 
-axios.defaults.baseURL = "http://192.168.254.161:8000";
+axios.defaults.baseURL = "http://192.168.56.1:8000";
 axios.defaults.withCredentials = true;
 
 const App = () => {
@@ -269,6 +270,14 @@ const App = () => {
               element={
                 <RoleBasedRoute allowedRoles={["Admin"]}>
                   <AdminStudentProgress />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/adminViewPerformance"
+              element={
+                <RoleBasedRoute allowedRoles={["Admin"]}>
+                  <AdminViewPerformance />
                 </RoleBasedRoute>
               }
             />

@@ -323,10 +323,8 @@ const BodyAdminUsers = () => {
                             <TableColumn>UserID</TableColumn>
                             <TableColumn>First Name</TableColumn>
                             <TableColumn>Last Name</TableColumn>
-                            <TableColumn>Age</TableColumn>
-                            <TableColumn>Status</TableColumn>
-                            <TableColumn>Gender</TableColumn>
-                            <TableColumn>Contact Number</TableColumn>
+                            <TableColumn>Name of Student</TableColumn>
+                            <TableColumn>LRN of Student</TableColumn>
                             <TableColumn>Email</TableColumn>
                             <TableColumn>Role</TableColumn>
                             <TableColumn className="text-center">
@@ -339,10 +337,8 @@ const BodyAdminUsers = () => {
                                 <TableCell>{user.UserID}</TableCell>
                                 <TableCell>{user.FirstName}</TableCell>
                                 <TableCell>{user.LastName}</TableCell>
-                                <TableCell>{user.Age}</TableCell>
-                                <TableCell>{user.Status}</TableCell>
-                                <TableCell>{user.Gender}</TableCell>
-                                <TableCell>{user.ContactNumber}</TableCell>
+                                <TableCell>{user.StudentName}</TableCell>
+                                <TableCell>{user.LRN}</TableCell>
                                 <TableCell>{user.email}</TableCell>
                                 <TableCell>{user.role}</TableCell>
                                 <TableCell className="text-center">
@@ -383,11 +379,8 @@ const BodyAdminUsers = () => {
                             <TableColumn>TeacherID Number</TableColumn>
                             <TableColumn>First Name</TableColumn>
                             <TableColumn>Last Name</TableColumn>
-                            <TableColumn>Age</TableColumn>
                             <TableColumn>Department</TableColumn>
                             <TableColumn>Section</TableColumn>
-                            <TableColumn>Gender</TableColumn>
-                            <TableColumn>Contact Number</TableColumn>
                             <TableColumn>Email</TableColumn>
                             <TableColumn>Role</TableColumn>
                             <TableColumn className="text-center">
@@ -400,11 +393,8 @@ const BodyAdminUsers = () => {
                                 <TableCell>{user.UserID}</TableCell>
                                 <TableCell>{user.FirstName}</TableCell>
                                 <TableCell>{user.LastName}</TableCell>
-                                <TableCell>{user.Age}</TableCell>
                                 <TableCell>{user.Department}</TableCell>
                                 <TableCell>{user.Section}</TableCell>
-                                <TableCell>{user.Gender}</TableCell>
-                                <TableCell>{user.ContactNumber}</TableCell>
                                 <TableCell>{user.email}</TableCell>
                                 <TableCell>{user.role}</TableCell>
                                 <TableCell className="text-center">

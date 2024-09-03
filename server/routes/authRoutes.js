@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const cors = require("cors");
 
-const { audioUpload, imageUpload } = require("../middleware/upload");
 const {
   test,
   getUsers,
@@ -28,7 +27,6 @@ const {
   updateActivity,
   getTeacherUsers,
   getTeacherUser,
-  submitAssessment,
 } = require("../controllers/actControllers");
 
 const {
@@ -41,7 +39,6 @@ const {
   registerAdmin,
   registerParent,
   registerTeacher,
-  uploadFile,
   verifyOTP,
   loginUser,
   forgotPassword,
@@ -49,12 +46,19 @@ const {
   logout,
 } = require("../controllers/RegistrationController"); //registration functions
 
+const {
+  importWord,
+  submitAssessment,
+  getImportWords,
+  getPerformance,
+} = require("../controllers/assessmentController");
+
 const { mobileLogin } = require("../controllers/mobileController");
 
 // Configure CORS middleware
 router.use(
   cors({
-    origin: "http://192.168.254.161:3000", // Update this with your client's URL
+    origin: "http://192.168.56.1:3000", // Update this with your client's URL
     methods: ["GET", "POST", "DELETE", "PATCH"], // Add the allowed HTTP methods
     credentials: true, // Allow credentials (cookies, authorization headers)
   })
@@ -67,12 +71,19 @@ router.post("/mobileLogin", mobileLogin); //okay
 router.get("/", test); //okay
 router.post("/registerParent", registerParent); //okay
 router.post("/registerTeacher", registerTeacher); //okay
-router.post("/uploadFile", audioUpload.single("file"), uploadFile); //okay
 router.post("/verify", verifyOTP); //okay
 router.post("/login", loginUser); //okay
 router.post("/forgotPass", forgotPassword); //okay
 router.post("/reset-password/:id/:token", resetPassword); //okay
 router.post("/logout", logout);
+getImportWords;
+//Upload Routes
+router.post("/importWord", importWord);
+
+//Assessment Route  getPerformance
+router.get("/getImportWord", getImportWords);
+router.post("/submitAssessment", submitAssessment);
+router.post("/getPerformance", getPerformance);
 
 //Admin Routes
 router.post("/addUser", addUser);
@@ -103,23 +114,5 @@ router.get("/getAssessment/id", getActivity);
 router.patch("/updateAssessment/id", updateActivity);
 router.get("/getTeacher", getTeacherUsers);
 router.get("/getTeacher/:UserID", getTeacherUser);
-router.post(
-  "/submitAssessment",
-  imageUpload.fields([
-    { name: "word1Image", maxCount: 1 },
-    { name: "word2Image", maxCount: 1 },
-    { name: "word3Image", maxCount: 1 },
-    { name: "word4Image", maxCount: 1 },
-    { name: "word5Image", maxCount: 1 },
-  ]),
-  audioUpload.fields([
-    { name: "word1Audio", maxCount: 1 },
-    { name: "word2Audio", maxCount: 1 },
-    { name: "word3Audio", maxCount: 1 },
-    { name: "word4Audio", maxCount: 1 },
-    { name: "word5Audio", maxCount: 1 },
-  ]),
-  submitAssessment
-);
 
 module.exports = router;

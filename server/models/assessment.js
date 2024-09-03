@@ -7,21 +7,15 @@ const assessSchema = new Schema(
       type: String,
       unique: true,
     },
-    ActivityNumber: {
+    Period: {
       type: String,
     },
-    Period: String,
     Type: String,
-    word1: String,
-    word1Audio: String,
-    word2: String,
-    word2Audio: String,
-    word3: String,
-    word3Audio: String,
-    word4: String,
-    word4Audio: String,
-    word5: String,
-    word5Audio: String,
+    Item1: String,
+    Item2: String,
+    Item3: String,
+    Item4: String,
+    Item5: String,
   },
 
   { timestamps: true }
