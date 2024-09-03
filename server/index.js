@@ -20,5 +20,5 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/", require("./routes/authRoutes"));
 
-const port = 8000;
+const port = process.env.PORT;
 app.listen(port, () => console.log(`Server is running on port ${port}`)); // Use backticks for string interpolation
