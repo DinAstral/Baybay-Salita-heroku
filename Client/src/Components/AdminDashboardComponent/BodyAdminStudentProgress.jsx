@@ -182,6 +182,12 @@ const BodyAdminStudentProgress = () => {
                               >
                                 Feedback
                               </Button>
+                              <Button
+                                variant="primary"
+                                onClick={() => handleCheckClick()}
+                              >
+                                Delete
+                              </Button>
                             </div>
                           </td>
                         </tr>
