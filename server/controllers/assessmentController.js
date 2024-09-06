@@ -14,17 +14,15 @@ function generateRandomCodeItem(length) {
   }
   return result;
 }
-
 function generateRandomCodeUser(length) {
   const characters = "0123456789";
-  let result = "User_";
+  let result = "UserInput_";
   const charactersLength = characters.length;
   for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
 }
-
 function generateRandomCode(length) {
   const characters = "0123456789";
   let result = "assessment_";
@@ -182,49 +180,35 @@ const deleteAssessment = async (req, res) => {
 };
 
 const userInputAudio = async (req, res) => {
-  const UserInputID = generateRandomCodeUser(6);
-
+  const userInputID = generateRandomCodeUser(6);
   UserUpload(req, res, async function (err) {
     if (err) {
       // Handle Multer errors
       if (err instanceof multer.MulterError) {
-        return res.status(400).json({ error: `Multer Error: ${err.message}` });
-      } else {
-        return res.status(400).json({ error: `Error: ${err.message}` });
+        return res.json({ error: `${err.message}` });
+      } else if (err) {
+        return res.json({ error: `${err.message}` });
       }
     }
 
     try {
-      // Debugging: Log the entire req.files object
-      console.log("Uploaded files:", req.files);
-
-      if (!req.files || !req.files["User"] || req.files["User"].length === 0) {
-        return res.status(400).json({ error: "No files were uploaded." });
-      }
-
-      const audioFile = req.files["User"][0];
-      const audioPath = audioFile.path;
-
-      // Debugging: Log the audio file information
-      console.log("Audio file info:", audioFile);
-
       const insert = await Performance.create({
-        UserInputId: UserInputID,
-        Audio1: audioPath,
-        // Add other fields as needed
+        UserInputId: userInputID,
+        Audio1: req.files["User"][0].path,
       });
 
       if (insert) {
+        console.log(req.files); // Log the uploaded files
         return res.json({
           message: "Assessment Successfully Uploaded",
         });
       }
 
-      return res.status(500).json({
+      return res.json({
         error: "Upload unsuccessful. Please try again later!",
       });
     } catch (error) {
-      console.error("Error during upload process:", error);
+      console.log(error);
       return res
         .status(500)
         .json({ error: "An error occurred during the upload process." });
