@@ -4,7 +4,7 @@ import ContentHeader from "../ContentDasboard/ContentHeader";
 import PrintRecord from "../Modals/PrintRecord";
 import AddUser from "../Modals/AdminModal/AddUserModal";
 import EditUser from "../Modals/AdminModal/EditUser";
-import ViewParent from "../Modals/AdminModal/ViewPaRENT";
+import ViewParent from "../Modals/AdminModal/ViewParent";
 import ViewTeacher from "../Modals/AdminModal/ViewTeacher";
 import UpdateParent from "../Modals/AdminModal/UpdateParent";
 import UpdateTeacher from "../Modals/AdminModal/UpdateTEacher";

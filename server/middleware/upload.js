@@ -7,7 +7,7 @@ const uploadUserStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     let folder = "";
     if (file.fieldname === "User") {
-      folder = "uploads/Images/UserInput";
+      folder = "uploads/UserInput";
     }
     cb(null, folder);
   },
