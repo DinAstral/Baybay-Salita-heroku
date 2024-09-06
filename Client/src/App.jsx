@@ -27,7 +27,7 @@ import AdminAddStudent from "./Pages/AdminDashboard/AdminAddStudent";
 import TeacherRegister from "./Pages/TeacherRegister";
 import ParentRegister from "./Pages/ParentRegister";
 import Main from "./Pages/Home/Main";
-import ResetPassword from "./Pages/REsetPassword";
+import ResetPassword from "./Pages/ResetPassword";
 import Dashboard from "./Pages/TeacherDashboard/Dashboard";
 import TeacherProfile from "./Pages/TeacherDashboard/TeacherProfile";
 import UpdateProfileTeacher from "./Pages/TeacherDashboard/UpdateProfileTeacher";

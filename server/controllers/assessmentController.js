@@ -180,35 +180,61 @@ const deleteAssessment = async (req, res) => {
 };
 
 const userInputAudio = async (req, res) => {
-  const userInputID = generateRandomCodeUser(6);
   UserUpload(req, res, async function (err) {
     if (err) {
       // Handle Multer errors
       if (err instanceof multer.MulterError) {
-        return res.json({ error: `${err.message}` });
-      } else if (err) {
-        return res.json({ error: `${err.message}` });
+        return res.status(400).json({ error: `Multer Error: ${err.message}` });
+      } else {
+        return res.status(400).json({ error: `Error: ${err.message}` });
       }
     }
 
+    // Debugging: Log the entire req.files object
+    console.log("Uploaded files:", req.files);
+
+    // Check if req.files and req.files["User"] are defined
+    if (!req.files) {
+      return res
+        .status(400)
+        .json({ error: "No files were uploaded. req.files is undefined." });
+    }
+
+    if (!req.files["User"]) {
+      return res
+        .status(400)
+        .json({ error: "No files found under the field 'User'." });
+    }
+
+    if (req.files["User"].length === 0) {
+      return res
+        .status(400)
+        .json({ error: "No files were uploaded under the field 'User'." });
+    }
+
     try {
+      const audioFile = req.files["User"][0];
+      const audioPath = audioFile.path;
+
+      // Debugging: Log the audio file information
+      console.log("Audio file info:", audioFile);
+
       const insert = await Performance.create({
-        UserInputId: userInputID,
-        Audio1: req.files["User"][0].path,
+        Audio1: audioPath,
+        // Add other fields as needed
       });
 
       if (insert) {
-        console.log(req.files); // Log the uploaded files
         return res.json({
           message: "Assessment Successfully Uploaded",
         });
       }
 
-      return res.json({
+      return res.status(500).json({
         error: "Upload unsuccessful. Please try again later!",
       });
     } catch (error) {
-      console.log(error);
+      console.error("Error during upload process:", error);
       return res
         .status(500)
         .json({ error: "An error occurred during the upload process." });
