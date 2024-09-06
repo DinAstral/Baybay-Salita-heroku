@@ -259,7 +259,7 @@ const BodyAdminPerformance = () => {
                     color="primary"
                     selectionMode="single"
                   >
-                    <TableHeader>
+                    <TableHeader emptyContent={"No rows to display."}>
                       <TableColumn>LRN</TableColumn>
                       <TableColumn>Section</TableColumn>
                       <TableColumn>Activity Code</TableColumn>
@@ -287,6 +287,12 @@ const BodyAdminPerformance = () => {
                           <TableCell>{performance.Audio5}</TableCell>
                           <TableCell className="text-center">
                             <div className="table-buttons">
+                              <Button
+                                color="default"
+                                onClick={() => handleDeleteClick(performance)}
+                              >
+                                View
+                              </Button>
                               <Button
                                 color="danger"
                                 onClick={() => handleDeleteClick(performance)}

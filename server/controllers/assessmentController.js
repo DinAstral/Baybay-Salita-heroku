@@ -3,7 +3,7 @@ const Performance = require("../models/performance");
 const AssessmentModel = require("../models/assessment");
 const mongoose = require("mongoose");
 const multer = require("multer");
-const { wordUpload } = require("../middleware/upload");
+const { wordUpload, UserUpload } = require("../middleware/upload");
 
 function generateRandomCodeItem(length) {
   const characters = "0123456789";
@@ -134,9 +134,82 @@ const getPerformance = (req, res) => {
     .catch((err) => res.json(err));
 };
 
+// Delete the data of the Assessment based on the _id
+const deleteAssessment = async (req, res) => {
+  const { id } = req.params;
+
+  // Check if the ID is valid
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({
+      message: "Invalid activity ID format",
+    });
+  }
+
+  try {
+    // Find the activity by ID and delete it
+    const activity = await AssessmentModel.findByIdAndDelete(id);
+
+    // If no activity is found, return 404
+    if (!activity) {
+      return res.status(404).json({
+        message: "No activity found",
+      });
+    }
+
+    // If successful, return the deleted activity
+    return res.status(200).json({
+      message: "Activity deleted successfully",
+      data: activity,
+    });
+  } catch (error) {
+    // Catch any errors and return a 500 status
+    return res.status(500).json({
+      message: "Error deleting activity",
+      error: error.message,
+    });
+  }
+};
+
+const userInputAudio = async (req, res) => {
+  UserUpload(req, res, async function (err) {
+    if (err) {
+      // Handle Multer errors
+      if (err instanceof multer.MulterError) {
+        return res.json({ error: `${err.message}` });
+      } else if (err) {
+        return res.json({ error: `${err.message}` });
+      }
+    }
+
+    try {
+      const insert = await Performance.create({
+        Audio1: req.files["User"][0].path,
+      });
+
+      if (insert) {
+        console.log(req.files); // Log the uploaded files
+        return res.json({
+          message: "Assessment Successfully Uploaded",
+        });
+      }
+
+      return res.json({
+        error: "Upload unsuccessful. Please try again later!",
+      });
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(500)
+        .json({ error: "An error occurred during the upload process." });
+    }
+  });
+};
+
 module.exports = {
   importWord,
   submitAssessment,
   getImportWords,
   getPerformance,
+  deleteAssessment,
+  userInputAudio,
 };

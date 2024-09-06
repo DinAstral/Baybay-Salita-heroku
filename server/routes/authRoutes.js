@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const cors = require("cors");
+const multer = require("multer");
 
 const {
   test,
@@ -51,14 +52,23 @@ const {
   submitAssessment,
   getImportWords,
   getPerformance,
+  deleteAssessment,
+  userInputAudio,
 } = require("../controllers/assessmentController");
 
 const { mobileLogin } = require("../controllers/mobileController");
 
+const { compareAudio } = require("../controllers/CompareController");
+
+// Setup multer for file uploads
+const userInputUpload = multer({
+  dest: "uploads/UserInput/", // Temporary directory to store uploaded files
+});
+
 // Configure CORS middleware
 router.use(
   cors({
-    origin: process.env.REACT_APP_CLIENT_BASE_URL || "http://192.168.56.1:3000", // Update this with your client's URL
+    origin: "http://192.168.56.1:3000", // Update this with your client's URL
     methods: ["GET", "POST", "DELETE", "PATCH"], // Add the allowed HTTP methods
     credentials: true, // Allow credentials (cookies, authorization headers)
   })
@@ -77,13 +87,16 @@ router.post("/forgotPass", forgotPassword); //okay
 router.post("/reset-password/:id/:token", resetPassword); //okay
 router.post("/logout", logout);
 getImportWords;
+
 //Upload Routes
 router.post("/importWord", importWord);
+router.post("/userInput", userInputAudio);
 
 //Assessment Route  getPerformance
 router.get("/getImportWord", getImportWords);
 router.post("/submitAssessment", submitAssessment);
 router.get("/getPerformance", getPerformance);
+router.delete("/deleteAssessment/:id", deleteAssessment);
 
 //Admin Routes
 router.post("/addUser", addUser);
@@ -91,7 +104,7 @@ router.get("/users", getUsers); //okay
 router.get("/getUser/:id", getUser); //okay
 router.patch("/updateUser/:id", updateUser);
 router.delete("/deleteUser/:email", deleteUser);
-router.get("/profile", getProfile); //okay
+router.get("/profile", getProfile); //okay app.post("/compare-audio", upload.single("audio")
 
 //Student Routes
 router.post("/addStudent", addStudent);

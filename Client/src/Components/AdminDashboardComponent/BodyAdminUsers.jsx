@@ -276,7 +276,7 @@ const BodyAdminUsers = () => {
                       color="primary"
                       selectionMode="single"
                     >
-                      <TableHeader>
+                      <TableHeader emptyContent={"No rows to display."}>
                         <TableColumn>UserID</TableColumn>
                         <TableColumn>Email</TableColumn>
                         <TableColumn>Role</TableColumn>
@@ -319,7 +319,7 @@ const BodyAdminUsers = () => {
                           color="primary"
                           selectionMode="single"
                         >
-                          <TableHeader>
+                          <TableHeader emptyContent={"No rows to display."}>
                             <TableColumn>UserID</TableColumn>
                             <TableColumn>First Name</TableColumn>
                             <TableColumn>Last Name</TableColumn>
@@ -375,7 +375,7 @@ const BodyAdminUsers = () => {
                           color="primary"
                           selectionMode="single"
                         >
-                          <TableHeader>
+                          <TableHeader emptyContent={"No rows to display."}>
                             <TableColumn>TeacherID Number</TableColumn>
                             <TableColumn>First Name</TableColumn>
                             <TableColumn>Last Name</TableColumn>

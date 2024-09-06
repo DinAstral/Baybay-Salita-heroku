@@ -47,9 +47,9 @@ import ParentViewStudentProgress from "./Pages/ParentDashboard/ParentViewStudent
 import ParentProfile from "./Pages/ParentDashboard/ParentProfile";
 import ProfileUpdate from "./Pages/ParentDashboard/ProfileUpdate";
 import AdminViewPerformance from "./Pages/AdminDashboard/AdminViewPerformance";
+import TestPage from "./Pages/testpage";
 
-axios.defaults.baseURL =
-  process.env.REACT_APP_API_BASE_URL || "http://192.168.56.1:8000"; //Server URL
+axios.defaults.baseURL = "http://192.168.56.1:8000"; //Server URL http://192.168.56.1:3000 https://react-heruku-baybaysalita.onrender.com
 axios.defaults.withCredentials = true;
 
 const App = () => {
@@ -65,12 +65,13 @@ const App = () => {
 
           <Routes>
             {/* Main Home Page*/}
-            <Route path="/" element={<Main />} />
+            <Route path="/home" element={<Main />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<RegisterSelect />} />
             <Route path="/registerTeacher" element={<TeacherRegister />} />
             <Route path="/registerParent" element={<ParentRegister />} />
             <Route path="/forgotPassword" element={<ForgotPassword />} />
+            <Route path="/" element={<TestPage />} />
             <Route
               path="/reset-password/:id/:token"
               element={<ResetPassword />}
