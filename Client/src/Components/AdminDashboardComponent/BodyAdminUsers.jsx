@@ -7,7 +7,7 @@ import EditUser from "../Modals/AdminModal/EditUser";
 import ViewParent from "../Modals/AdminModal/ViewParent";
 import ViewTeacher from "../Modals/AdminModal/ViewTeacher";
 import UpdateParent from "../Modals/AdminModal/UpdateParent";
-import UpdateTeacher from "../Modals/AdminModal/UpdateTEacher";
+import UpdateTeacher from "../Modals/AdminModal/UpdateTeacher";
 import DeleteUser from "../Modals/AdminModal/DeleteUser";
 import { useDownloadExcel } from "react-export-table-to-excel";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";

@@ -4,14 +4,14 @@ const { Schema } = mongoose;
 const performanceSchema = new Schema(
   {
     UserInputId: String,
-    LRN: String,
-    Section: String,
-    ActivityCode: {
-      type: String,
-      unique: true,
-    },
-    Period: String,
-    Type: String,
+    //  LRN: String,
+    //  Section: String,
+    // ActivityCode: {
+    // type: String,
+    //  unique: true,
+    // },
+    //Period: String,
+    //Type: String,
     Itemcode1: String,
     Audio1: String,
     Itemcode2: String,
