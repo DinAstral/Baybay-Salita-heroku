@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const cors = require("cors");
-const multer = require("multer");
 
 const {
   test,
@@ -60,15 +59,10 @@ const { mobileLogin } = require("../controllers/mobileController");
 
 const { compareAudio } = require("../controllers/CompareController");
 
-// Setup multer for file uploads
-const userInputUpload = multer({
-  dest: "uploads/UserInput/", // Temporary directory to store uploaded files
-});
-
 // Configure CORS middleware
 router.use(
   cors({
-    origin: "http://192.168.56.1:3000", // Update this with your client's URL
+    origin: "https://testing-baybay-salita.netlify.app", // Update this with your client's URL
     methods: ["GET", "POST", "DELETE", "PATCH"], // Add the allowed HTTP methods
     credentials: true, // Allow credentials (cookies, authorization headers)
   })

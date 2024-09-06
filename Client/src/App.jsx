@@ -49,7 +49,7 @@ import ProfileUpdate from "./Pages/ParentDashboard/ProfileUpdate";
 import AdminViewPerformance from "./Pages/AdminDashboard/AdminViewPerformance";
 import TestPage from "./Pages/testpage";
 
-axios.defaults.baseURL = "http://192.168.56.1:8000"; //Server URL http://192.168.56.1:3000 https://react-heruku-baybaysalita.onrender.com
+axios.defaults.baseURL = "https://react-heruku-baybaysalita.onrender.com"; //Server URL http://192.168.56.1:3000 https://react-heruku-baybaysalita.onrender.com
 axios.defaults.withCredentials = true;
 
 const App = () => {
