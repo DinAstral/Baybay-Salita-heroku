@@ -175,15 +175,22 @@ const userInputAudio = async (req, res) => {
     if (err) {
       // Handle Multer errors
       if (err instanceof multer.MulterError) {
-        return res.json({ error: `${err.message}` });
+        return res.status(400).json({ error: `Multer Error: ${err.message}` });
       } else if (err) {
-        return res.json({ error: `${err.message}` });
+        return res.status(400).json({ error: `Error: ${err.message}` });
       }
     }
 
     try {
+      if (!req.files || !req.files["User"] || req.files["User"].length === 0) {
+        return res.status(400).json({ error: "No files were uploaded." });
+      }
+
+      const audioPath = req.files["User"][0].path;
+
       const insert = await Performance.create({
-        Audio1: req.files["User"][0].path,
+        Audio1: audioPath,
+        // Add other fields as needed
       });
 
       if (insert) {
@@ -193,7 +200,7 @@ const userInputAudio = async (req, res) => {
         });
       }
 
-      return res.json({
+      return res.status(500).json({
         error: "Upload unsuccessful. Please try again later!",
       });
     } catch (error) {
