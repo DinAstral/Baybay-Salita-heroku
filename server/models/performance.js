@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 
 const performanceSchema = new Schema(
   {
+    UserInputId: String,
     LRN: String,
     Section: String,
     ActivityCode: {
