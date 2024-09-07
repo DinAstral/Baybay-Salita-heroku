@@ -104,12 +104,15 @@ const importWord = async (req, res) => {
         return res.json({ error: "Word is required" });
       }
 
+      const imageFileName = req.files["Image"][0].originalname;
+      const audioFileName = req.files["Audio"][0].originalname;
+
       const insert = await Material.create({
         ItemCode: itemID,
         Type,
         Word,
-        Image: req.files["Image"][0].path,
-        Audio: req.files["Audio"][0].path,
+        Image: imageFileName,
+        Audio: audioFileName,
       });
 
       if (insert) {
@@ -130,6 +133,7 @@ const importWord = async (req, res) => {
     }
   });
 };
+
 
 const getImportWords = (req, res) => {
   Material.find()
@@ -214,13 +218,13 @@ const userInputAudio = async (req, res) => {
 
     try {
       const audioFile = req.files["User"][0];
-      const audioPath = audioFile.path;
+      const originalFileName = audioFile.originalname;
 
       // Debugging: Log the audio file information
       console.log("Audio file info:", audioFile);
 
       const insert = await Performance.create({
-        Audio1: audioPath,
+        Audio1: originalFileName,
         // Add other fields as needed
       });
 
