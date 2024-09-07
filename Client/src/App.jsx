@@ -65,13 +65,13 @@ const App = () => {
 
           <Routes>
             {/* Main Home Page*/}
-            <Route path="/home" element={<Main />} />
+            <Route path="/" element={<Main />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<RegisterSelect />} />
             <Route path="/registerTeacher" element={<TeacherRegister />} />
             <Route path="/registerParent" element={<ParentRegister />} />
             <Route path="/forgotPassword" element={<ForgotPassword />} />
-            <Route path="/" element={<TestPage />} />
+            <Route path="/test" element={<TestPage />} />
             <Route
               path="/reset-password/:id/:token"
               element={<ResetPassword />}
