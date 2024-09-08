@@ -220,7 +220,7 @@ const getImportWords = (req, res) => {
 
 module.exports = {
   importWord,
-  deleteFile,
+  //deleteFile,
   downloadFile,
   submitAssessment,
   getImportWords,
