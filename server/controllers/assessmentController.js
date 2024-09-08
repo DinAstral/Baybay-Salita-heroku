@@ -80,67 +80,6 @@ const submitAssessment = async (req, res) => {
   }
 };
 
-const importWord = async (req, res) => {
-  const itemID = generateRandomCodeItem(6);
-
-  wordUpload(req, res, async function (err) {
-    if (err) {
-      // Handle Multer errors
-      if (err instanceof multer.MulterError) {
-        return res.json({ error: `${err.message}` });
-      } else if (err) {
-        return res.json({ error: `${err.message}` });
-      }
-    }
-
-    try {
-      const { Type, Word } = req.body;
-
-      if (!Type) {
-        return res.json({ error: "Type is required" });
-      }
-
-      if (!Word) {
-        return res.json({ error: "Word is required" });
-      }
-
-      const imageFileName = req.files["Image"][0].originalname;
-      const audioFileName = req.files["Audio"][0].originalname;
-
-      const insert = await Material.create({
-        ItemCode: itemID,
-        Type,
-        Word,
-        Image: imageFileName,
-        Audio: audioFileName,
-      });
-
-      if (insert) {
-        console.log(req.files); // Log the uploaded files
-        return res.json({
-          message: "Assessment Successfully Uploaded",
-        });
-      }
-
-      return res.json({
-        error: "Upload unsuccessful. Please try again later!",
-      });
-    } catch (error) {
-      console.log(error);
-      return res
-        .status(500)
-        .json({ error: "An error occurred during the upload process." });
-    }
-  });
-};
-
-
-const getImportWords = (req, res) => {
-  Material.find()
-    .then((users) => res.json(users))
-    .catch((err) => res.json(err));
-};
-
 const getPerformance = (req, res) => {
   Performance.find()
     .then((users) => res.json(users))
@@ -183,55 +122,66 @@ const deleteAssessment = async (req, res) => {
   }
 };
 
+// Upload Word with GridFS (importWord)
+const importWord = async (req, res) => {
+  const itemID = generateRandomCodeItem(6);
+
+  wordUpload.fields(req, res, async function (err) {
+    if (err instanceof multer.MulterError) {
+      return res.status(400).json({ error: `Multer Error: ${err.message}` });
+    } else if (err) {
+      return res.status(400).json({ error: `Error: ${err.message}` });
+    }
+    try {
+      const { Type, Word } = req.body;
+      if (!Type || !Word) {
+        return res.json({ error: "Type and Word are required" });
+      }
+      const imageFileId = req.files["Image"][0].id;
+      const audioFileId = req.files["Audio"][0].id;
+
+      const material = new Material({
+        ItemCode: itemID,
+        Type,
+        Word,
+        Image: imageFileId, // Store the GridFS file ID
+        Audio: audioFileId, // Store the GridFS file ID
+      });
+      await material.save();
+
+      res.json({ message: "Word and files successfully uploaded" });
+    } catch (error) {
+      res.status(500).json({ error: "Server error" });
+    }
+  });
+};
+
+// Function for handling user input audio uploads
 const userInputAudio = async (req, res) => {
   UserUpload(req, res, async function (err) {
-    if (err) {
-      // Handle Multer errors
-      if (err instanceof multer.MulterError) {
-        return res.status(400).json({ error: `Multer Error: ${err.message}` });
-      } else {
-        return res.status(400).json({ error: `Error: ${err.message}` });
-      }
-    }
-
-    // Debugging: Log the entire req.files object
-    console.log("Uploaded files:", req.files);
-
-    // Check if req.files and req.files["User"] are defined
-    if (!req.files) {
-      return res
-        .status(400)
-        .json({ error: "No files were uploaded. req.files is undefined." });
-    }
-
-    if (!req.files["User"]) {
-      return res
-        .status(400)
-        .json({ error: "No files found under the field 'User'." });
-    }
-
-    if (req.files["User"].length === 0) {
-      return res
-        .status(400)
-        .json({ error: "No files were uploaded under the field 'User'." });
+    if (err instanceof multer.MulterError) {
+      return res.status(400).json({ error: `Multer Error: ${err.message}` });
+    } else if (err) {
+      return res.status(400).json({ error: `Error: ${err.message}` });
     }
 
     try {
-      const audioFile = req.files["User"][0];
-      const originalFileName = audioFile.originalname;
+      // Check if the file is uploaded
+      if (!req.file) {
+        return res.status(400).json({ error: "No file was uploaded." });
+      }
 
-      // Debugging: Log the audio file information
-      console.log("Audio file info:", audioFile);
+      // Log the file info for debugging
+      console.log("Uploaded audio file:", req.file);
 
+      // Insert the file info into the Performance collection
       const insert = await Performance.create({
-        Audio1: originalFileName,
+        Audio1: req.file.id, // Storing the GridFS file ID
         // Add other fields as needed
       });
 
       if (insert) {
-        return res.json({
-          message: "Assessment Successfully Uploaded",
-        });
+        return res.json({ message: "Audio file uploaded successfully." });
       }
 
       return res.status(500).json({
@@ -246,8 +196,43 @@ const userInputAudio = async (req, res) => {
   });
 };
 
+// Get File from GridFS (Download)
+const downloadFile = (req, res) => {
+  const { filename } = req.params;
+
+  gfs.files.findOne({ filename }, (err, file) => {
+    if (!file || file.length === 0) {
+      return res.status(404).json({ error: "No file exists" });
+    }
+    const readStream = gridfsBucket.openDownloadStreamByName(filename);
+    readStream.pipe(res);
+  });
+};
+
+// Delete File from GridFS
+const deleteFile = (req, res) => {
+  const { id } = req.params;
+
+  gfs.files.deleteOne({ _id: mongoose.Types.ObjectId(id) }, (err) => {
+    if (err) return res.json({ error: err.message });
+    res.json({ message: "File deleted successfully" });
+  });
+};
+
+// Get All Files Metadata
+const getImportWords = (req, res) => {
+  gfs.files.find().toArray((err, files) => {
+    if (!files || files.length === 0) {
+      return res.json({ error: "No files found" });
+    }
+    res.json(files);
+  });
+};
+
 module.exports = {
   importWord,
+  deleteFile,
+  downloadFile,
   submitAssessment,
   getImportWords,
   getPerformance,

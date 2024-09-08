@@ -1,33 +1,39 @@
 const multer = require("multer");
+const { GridFsStorage } = require("multer-gridfs-storage");
 const path = require("path");
+const crypto = require("crypto");
+const mongoose = require("mongoose");
 
-// Set up multer storage
+// MongoDB URI
+const mongoURI = "mongodb://localhost:27017/your-database"; // replace with your actual MongoDB URI
 
-const uploadUserStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    let folder = "";
-    if (file.fieldname === "User") {
-      folder = "uploads/UserInput";
-    }
-    cb(null, folder);
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.fieldname + "_" + file.originalname);
-  },
-});
+// Create GridFS storage engine for "uploads"
+const storage = new GridFsStorage({
+  url: mongoURI,
+  file: (req, file) => {
+    return new Promise((resolve, reject) => {
+      // Define filename for GridFS storage
+      crypto.randomBytes(16, (err, buf) => {
+        if (err) {
+          return reject(err);
+        }
+        const filename = buf.toString("hex") + path.extname(file.originalname);
+        let bucketName = ""; // Default empty
 
-const uploadStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    let folder = "";
-    if (file.fieldname === "Image") {
-      folder = "uploads/Images/";
-    } else if (file.fieldname === "Audio") {
-      folder = "uploads/DefaultAudio/";
-    }
-    cb(null, folder);
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.fieldname + "_" + file.originalname);
+        // Set bucketName based on the file fieldname
+        if (file.fieldname === "Image") {
+          bucketName = "images";
+        } else if (file.fieldname === "Audio" || file.fieldname === "User") {
+          bucketName = "audios";
+        }
+
+        const fileInfo = {
+          filename: filename,
+          bucketName: bucketName,
+        };
+        resolve(fileInfo);
+      });
+    });
   },
 });
 
@@ -44,18 +50,7 @@ const fileFilter = (req, file, cb) => {
         )
       );
     }
-  } else if (file.fieldname === "Audio") {
-    // Accept only audio files
-    if (file.mimetype.startsWith("audio/")) {
-      cb(null, true);
-    } else {
-      cb(
-        new Error(
-          "Invalid file type. Only audio files are allowed for audio uploads."
-        )
-      );
-    }
-  } else if (file.fieldname === "User") {
+  } else if (file.fieldname === "Audio" || file.fieldname === "User") {
     // Accept only audio files
     if (file.mimetype.startsWith("audio/")) {
       cb(null, true);
@@ -80,17 +75,16 @@ const limits = {
   fileSize: (req, file, cb) => {
     if (file.fieldname === "Image") {
       return 10 * 1024 * 1024; // 10 MB for images
-    } else if (file.fieldname === "Audio") {
-      return 100 * 1024 * 1024; // 100 MB for audio files
-    } else if (file.fieldname === "User") {
+    } else if (file.fieldname === "Audio" || file.fieldname === "User") {
       return 100 * 1024 * 1024; // 100 MB for audio files
     }
     return 0; // No limit set for other files, but you can add more logic here
   },
 };
 
+// Configure the multer upload using GridFS storage
 const wordUpload = multer({
-  storage: uploadStorage,
+  storage: storage,
   fileFilter: fileFilter,
   limits: {
     fileSize: limits.fileSize,
@@ -101,11 +95,12 @@ const wordUpload = multer({
 ]);
 
 const UserUpload = multer({
-  storage: uploadUserStorage,
+  storage: storage,
   fileFilter: fileFilter,
   limits: {
     fileSize: limits.fileSize,
   },
 }).fields([{ name: "User", maxCount: 1 }]);
 
+// Export the upload handlers
 module.exports = { wordUpload, UserUpload };
