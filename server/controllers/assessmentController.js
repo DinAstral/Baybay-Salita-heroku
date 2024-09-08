@@ -1,11 +1,9 @@
+const mongoose = require("mongoose");
 const Material = require("../models/materials");
 const Performance = require("../models/performance");
 const AssessmentModel = require("../models/assessment");
-const { GridFsStorage } = require("multer-gridfs-storage");
-const Grid = require("gridfs-stream");
-const mongoose = require("mongoose");
-const multer = require("multer");
 const { wordUpload, UserUpload } = require("../middleware/upload");
+const { gfs } = require("../index"); // Import gfs from index.js
 
 function generateRandomCodeItem(length) {
   const characters = "0123456789";
@@ -16,6 +14,7 @@ function generateRandomCodeItem(length) {
   }
   return result;
 }
+
 function generateRandomCodeUser(length) {
   const characters = "0123456789";
   let result = "UserInput_";
@@ -25,6 +24,7 @@ function generateRandomCodeUser(length) {
   }
   return result;
 }
+
 function generateRandomCode(length) {
   const characters = "0123456789";
   let result = "assessment_";
@@ -40,30 +40,14 @@ const submitAssessment = async (req, res) => {
   try {
     const { Period, Type, Item1, Item2, Item3, Item4, Item5 } = req.body;
 
-    // Check if ActivityCode exists
     const exist = await AssessmentModel.findOne({ ActivityCode: randomCode });
     if (exist) {
-      return res.json({
-        error: "ActivityCode is already taken",
-      });
+      return res.json({ error: "ActivityCode is already taken" });
     }
-    if (!Period) {
-      return res.json({
-        error: "Period is required",
-      });
-    }
-    if (!Type) {
-      return res.json({
-        error: "Type of Assessment is required",
-      });
-    }
-    if (!Item1 || !Item2 || !Item3 || !Item4 || !Item5) {
-      return res.json({
-        error: "All Items are required",
-      });
+    if (!Period || !Type || !Item1 || !Item2 || !Item3 || !Item4 || !Item5) {
+      return res.json({ error: "All fields are required" });
     }
 
-    // Create assessment in the database (Table)
     const act = await AssessmentModel.create({
       ActivityCode: randomCode,
       Period,
@@ -88,43 +72,30 @@ const getPerformance = (req, res) => {
     .catch((err) => res.json(err));
 };
 
-// Delete the data of the Assessment based on the _id
 const deleteAssessment = async (req, res) => {
   const { id } = req.params;
 
-  // Check if the ID is valid
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({
-      message: "Invalid activity ID format",
-    });
+    return res.status(400).json({ message: "Invalid activity ID format" });
   }
 
   try {
-    // Find the activity by ID and delete it
     const activity = await AssessmentModel.findByIdAndDelete(id);
 
-    // If no activity is found, return 404
     if (!activity) {
-      return res.status(404).json({
-        message: "No activity found",
-      });
+      return res.status(404).json({ message: "No activity found" });
     }
 
-    // If successful, return the deleted activity
-    return res.status(200).json({
-      message: "Activity deleted successfully",
-      data: activity,
-    });
+    return res
+      .status(200)
+      .json({ message: "Activity deleted successfully", data: activity });
   } catch (error) {
-    // Catch any errors and return a 500 status
-    return res.status(500).json({
-      message: "Error deleting activity",
-      error: error.message,
-    });
+    return res
+      .status(500)
+      .json({ message: "Error deleting activity", error: error.message });
   }
 };
 
-// Upload Word with GridFS (importWord)
 const importWord = async (req, res) => {
   const itemID = generateRandomCodeItem(6);
 
@@ -146,8 +117,8 @@ const importWord = async (req, res) => {
         ItemCode: itemID,
         Type,
         Word,
-        Image: imageFileId, // Store the GridFS file ID
-        Audio: audioFileId, // Store the GridFS file ID
+        Image: imageFileId,
+        Audio: audioFileId,
       });
       await material.save();
 
@@ -158,7 +129,6 @@ const importWord = async (req, res) => {
   });
 };
 
-// Function for handling user input audio uploads
 const userInputAudio = async (req, res) => {
   UserUpload(req, res, async function (err) {
     if (err instanceof multer.MulterError) {
@@ -168,27 +138,23 @@ const userInputAudio = async (req, res) => {
     }
 
     try {
-      // Check if the file is uploaded
       if (!req.file) {
         return res.json({ error: "No file was uploaded." });
       }
 
-      // Log the file info for debugging
       console.log("Uploaded audio file:", req.file);
 
-      // Insert the file info into the Performance collection
       const insert = await Performance.create({
-        Audio1: req.file.id, // Storing the GridFS file ID
-        // Add other fields as needed
+        Audio1: req.file.id,
       });
 
       if (insert) {
         return res.json({ message: "Audio file uploaded successfully." });
       }
 
-      return res.status(500).json({
-        error: "Upload unsuccessful. Please try again later!",
-      });
+      return res
+        .status(500)
+        .json({ error: "Upload unsuccessful. Please try again later!" });
     } catch (error) {
       console.error("Error during upload process:", error);
       return res
@@ -198,7 +164,6 @@ const userInputAudio = async (req, res) => {
   });
 };
 
-// Get File from GridFS (Download)
 const downloadFile = (req, res) => {
   const { filename } = req.params;
 
@@ -206,21 +171,18 @@ const downloadFile = (req, res) => {
     if (!file || file.length === 0) {
       return res.status(404).json({ error: "No file exists" });
     }
-    const readStream = gridfsBucket.openDownloadStreamByName(filename);
+    const readStream = gfs.createReadStream({ filename });
     readStream.pipe(res);
   });
 };
 
-// Delete File from GridFS
 const deleteFile = (req, res) => {
   const { id } = req.params;
 
-  // Check if ID is valid
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ error: "Invalid file ID format" });
   }
 
-  // Delete the file from GridFS
   gfs.files.deleteOne({ _id: mongoose.Types.ObjectId(id) }, (err) => {
     if (err) {
       console.error("Error deleting file from GridFS:", err);
@@ -230,7 +192,6 @@ const deleteFile = (req, res) => {
   });
 };
 
-// Get All Files Metadata
 const getImportWords = (req, res) => {
   gfs.files.find().toArray((err, files) => {
     if (!files || files.length === 0) {

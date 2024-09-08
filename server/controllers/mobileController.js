@@ -18,10 +18,6 @@ const mobileLogin = async (req, res) => {
     jwt.sign(
       {
         LRN: user.LRN,
-        id: user._id,
-        role: user.role,
-        FirstName: user.FirstName,
-        LastName: user.LastName,
       },
       process.env.JWT_SECRET,
       {},
@@ -42,6 +38,26 @@ const mobileLogin = async (req, res) => {
   }
 };
 
+// Gets the data of the Student base on the _id
+const getStudentbyLRN = async (req, res) => {
+  const { LRN } = req.params;
+
+  try {
+    const student = await Student.findOne({ LRN });
+    if (!student) {
+      return res.status(404).json({
+        message: "No account found",
+      });
+    }
+    res.status(200).json(student);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   mobileLogin,
+  getStudentbyLRN,
 };

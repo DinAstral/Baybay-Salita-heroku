@@ -57,7 +57,10 @@ const {
   userInputAudio,
 } = require("../controllers/assessmentController");
 
-const { mobileLogin } = require("../controllers/mobileController");
+const {
+  mobileLogin,
+  getStudentbyLRN,
+} = require("../controllers/mobileController");
 
 const { compareAudio } = require("../controllers/CompareController");
 
@@ -72,6 +75,7 @@ router.use(
 
 //Mobile route
 router.post("/mobileLogin", mobileLogin); //okay
+router.get("/getStudent/:LRN", getStudentbyLRN);
 
 //Login Routes get data
 router.get("/", test); //okay
