@@ -24,7 +24,8 @@ conn.once("open", () => {
   gfs = gridfsStream(conn.db, mongoose.mongo);
   gfs.collection("uploads"); // Set the collection name to match your GridFS bucket
   console.log("GridFS is ready for file storage");
-  console.log("GridFS instance:", gfs);
+
+  console.log("Files collection exists:", !!gfs.files);
 });
 
 // Middleware

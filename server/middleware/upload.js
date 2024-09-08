@@ -28,6 +28,8 @@ const storage = new GridFsStorage({
           bucketName = "uploads";
         }
 
+        console.log("Bucket name used for file storage:", bucketName);
+
         const fileInfo = {
           filename: filename,
           bucketName: bucketName,

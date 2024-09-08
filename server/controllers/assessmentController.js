@@ -207,8 +207,13 @@ const deleteFile = (req, res) => {
   });
 };
 
-// Get imported words
 const getImportWords = (req, res) => {
+  if (!gfs || !gfs.files) {
+    return res
+      .status(500)
+      .json({ error: "GridFS instance is not properly initialized" });
+  }
+
   gfs.files.find().toArray((err, files) => {
     if (err) {
       return res.status(500).json({ error: "Error fetching files" });
@@ -219,7 +224,6 @@ const getImportWords = (req, res) => {
     res.json(files);
   });
 };
-
 module.exports = {
   importWord,
   deleteFile,
