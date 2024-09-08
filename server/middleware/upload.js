@@ -11,14 +11,26 @@ const storage = new GridFsStorage({
   options: { useNewUrlParser: true, useUnifiedTopology: true },
   file: (req, file) => {
     return new Promise((resolve, reject) => {
+      // Define filename for GridFS storage
       crypto.randomBytes(16, (err, buf) => {
         if (err) {
           return reject(err);
         }
         const filename = buf.toString("hex") + path.extname(file.originalname);
+        let bucketName = ""; // Default empty
+
+        // Set bucketName based on the file fieldname
+        if (file.fieldname === "Image") {
+          bucketName = "images";
+        } else if (file.fieldname === "Audio") {
+          bucketName = "audios";
+        } else if (file.fieldname === "User") {
+          bucketName = "user_files";
+        }
+
         const fileInfo = {
           filename: filename,
-          bucketName: "uploads",
+          bucketName: bucketName,
         };
         resolve(fileInfo);
       });
@@ -61,7 +73,7 @@ const fileFilter = (req, file, cb) => {
 
 // Set up limits
 const limits = {
-  fileSize: (file) => {
+  fileSize: (req, file, cb) => {
     if (file.fieldname === "Image") {
       return 10 * 1024 * 1024; // 10 MB for images
     } else if (file.fieldname === "Audio" || file.fieldname === "User") {
@@ -70,8 +82,6 @@ const limits = {
     return 0; // No limit set for other files, but you can add more logic here
   },
 };
-
-const upload = multer({ storage });
 
 // Configure the multer upload using GridFS storage
 const wordUpload = multer({
@@ -94,8 +104,4 @@ const UserUpload = multer({
 }).fields([{ name: "User", maxCount: 1 }]);
 
 // Export the upload handlers
-// Export upload middleware for use in routes
-module.exports = {
-  wordUpload,
-  UserUpload,
-};
+module.exports = { wordUpload, UserUpload };

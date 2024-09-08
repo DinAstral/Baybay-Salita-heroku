@@ -6,12 +6,12 @@ const multer = require("multer");
 const { wordUpload, UserUpload } = require("../middleware/upload");
 const { gfs } = require("../index"); // Import gfs from index.js
 
+// Utility functions to generate random codes
 function generateRandomCodeItem(length) {
   const characters = "0123456789";
   let result = "item_";
-  const charactersLength = characters.length;
   for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return result;
 }
@@ -19,9 +19,8 @@ function generateRandomCodeItem(length) {
 function generateRandomCodeUser(length) {
   const characters = "0123456789";
   let result = "UserInput_";
-  const charactersLength = characters.length;
   for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return result;
 }
@@ -29,24 +28,25 @@ function generateRandomCodeUser(length) {
 function generateRandomCode(length) {
   const characters = "0123456789";
   let result = "assessment_";
-  const charactersLength = characters.length;
   for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return result;
 }
 
+// Submit assessment
 const submitAssessment = async (req, res) => {
   const randomCode = generateRandomCode(6);
   try {
     const { Period, Type, Item1, Item2, Item3, Item4, Item5 } = req.body;
 
+    if (!Period || !Type || !Item1 || !Item2 || !Item3 || !Item4 || !Item5) {
+      return res.json({ error: "All fields are required" });
+    }
+
     const exist = await AssessmentModel.findOne({ ActivityCode: randomCode });
     if (exist) {
       return res.json({ error: "ActivityCode is already taken" });
-    }
-    if (!Period || !Type || !Item1 || !Item2 || !Item3 || !Item4 || !Item5) {
-      return res.json({ error: "All fields are required" });
     }
 
     const act = await AssessmentModel.create({
@@ -67,12 +67,14 @@ const submitAssessment = async (req, res) => {
   }
 };
 
+// Get performance data
 const getPerformance = (req, res) => {
   Performance.find()
     .then((users) => res.json(users))
     .catch((err) => res.json(err));
 };
 
+// Delete assessment
 const deleteAssessment = async (req, res) => {
   const { id } = req.params;
 
@@ -97,6 +99,7 @@ const deleteAssessment = async (req, res) => {
   }
 };
 
+// Import word and files
 const importWord = async (req, res) => {
   const itemID = generateRandomCodeItem(6);
 
@@ -130,6 +133,7 @@ const importWord = async (req, res) => {
   });
 };
 
+// Upload user input audio
 const userInputAudio = async (req, res) => {
   UserUpload(req, res, async function (err) {
     if (err instanceof multer.MulterError) {
@@ -170,36 +174,43 @@ const userInputAudio = async (req, res) => {
   });
 };
 
+// Download file
 const downloadFile = (req, res) => {
   const { filename } = req.params;
 
   gfs.files.findOne({ filename }, (err, file) => {
+    if (err) {
+      return res.json({ error: "Error fetching file" });
+    }
     if (!file || file.length === 0) {
-      return res.status(404).json({ error: "No file exists" });
+      return res.json({ error: "No file exists" });
     }
     const readStream = gfs.createReadStream({ filename });
     readStream.pipe(res);
   });
 };
 
-const deleteFile = (req, res) => {
-  const { id } = req.params;
+//const deleteFile = (req, res) => {
+// const { id } = req.params;
+// if (!mongoose.Types.ObjectId.isValid(id)) {
+//   return res.status(400).json({ error: "Invalid file ID format" });
+// }
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ error: "Invalid file ID format" });
-  }
+// gfs.files.deleteOne({ _id: mongoose.Types.ObjectId(id) }, (err) => {
+//   if (err) {
+//    console.error("Error deleting file from GridFS:", err);
+//   return res.status(500).json({ error: "Error deleting file from GridFS" });
+//  }
+//   res.json({ message: "File deleted successfully" });
+// });
+//};
 
-  gfs.files.deleteOne({ _id: mongoose.Types.ObjectId(id) }, (err) => {
-    if (err) {
-      console.error("Error deleting file from GridFS:", err);
-      return res.status(500).json({ error: "Error deleting file from GridFS" });
-    }
-    res.json({ message: "File deleted successfully" });
-  });
-};
-
+// Get imported words
 const getImportWords = (req, res) => {
   gfs.files.find().toArray((err, files) => {
+    if (err) {
+      return res.status(500).json({ error: "Error fetching files" });
+    }
     if (!files || files.length === 0) {
       return res.json({ error: "No files found" });
     }
