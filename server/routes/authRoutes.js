@@ -48,7 +48,7 @@ const {
 
 const {
   importWord,
-  //deleteFile,
+  deleteFile,
   downloadFile,
   submitAssessment,
   getImportWords,
@@ -91,7 +91,7 @@ getImportWords;
 //Upload Routes
 router.post("/importWord", importWord); // Route to upload word and associated files
 router.post("/userInput", userInputAudio); // Route to upload user input audio
-//router.delete("/deleteInputFile/:id", deleteFile); // Route to delete a file by ID
+router.delete("/deleteInputFile/:id", deleteFile); // Route to delete a file by ID
 router.get("/downloadInputfile/:filename", downloadFile); // Route to download file by filename
 router.get("/getImportWord", getImportWords); // Route to retrieve metadata of uploaded words
 

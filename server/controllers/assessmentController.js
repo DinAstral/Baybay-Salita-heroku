@@ -99,7 +99,6 @@ const deleteAssessment = async (req, res) => {
   }
 };
 
-// Import word and files
 const importWord = async (req, res) => {
   const itemID = generateRandomCodeItem(6);
 
@@ -109,21 +108,24 @@ const importWord = async (req, res) => {
     } else if (err) {
       return res.json({ error: `Error: ${err.message}` });
     }
+
     try {
       const { Type, Word } = req.body;
       if (!Type || !Word) {
         return res.json({ error: "Type and Word are required" });
       }
-      const imageFileId = req.files["Image"][0].id;
-      const audioFileId = req.files["Audio"][0].id;
+
+      const imageFile = req.files["Image"] ? req.files["Image"][0] : null;
+      const audioFile = req.files["Audio"] ? req.files["Audio"][0] : null;
 
       const material = new Material({
         ItemCode: itemID,
         Type,
         Word,
-        Image: imageFileId,
-        Audio: audioFileId,
+        Image: imageFile ? imageFile.id : undefined,
+        Audio: audioFile ? audioFile.id : undefined,
       });
+
       await material.save();
 
       res.json({ message: "Word and files successfully uploaded" });
@@ -190,20 +192,20 @@ const downloadFile = (req, res) => {
   });
 };
 
-//const deleteFile = (req, res) => {
-// const { id } = req.params;
-// if (!mongoose.Types.ObjectId.isValid(id)) {
-//   return res.status(400).json({ error: "Invalid file ID format" });
-// }
+const deleteFile = (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ error: "Invalid file ID format" });
+  }
 
-// gfs.files.deleteOne({ _id: mongoose.Types.ObjectId(id) }, (err) => {
-//   if (err) {
-//    console.error("Error deleting file from GridFS:", err);
-//   return res.status(500).json({ error: "Error deleting file from GridFS" });
-//  }
-//   res.json({ message: "File deleted successfully" });
-// });
-//};
+  gfs.files.deleteOne({ _id: mongoose.Types.ObjectId(id) }, (err) => {
+    if (err) {
+      console.error("Error deleting file from GridFS:", err);
+      return res.status(500).json({ error: "Error deleting file from GridFS" });
+    }
+    res.json({ message: "File deleted successfully" });
+  });
+};
 
 // Get imported words
 const getImportWords = (req, res) => {
@@ -220,7 +222,7 @@ const getImportWords = (req, res) => {
 
 module.exports = {
   importWord,
-  //deleteFile,
+  deleteFile,
   downloadFile,
   submitAssessment,
   getImportWords,
