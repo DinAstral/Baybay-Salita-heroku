@@ -126,7 +126,7 @@ const deleteAssessment = async (req, res) => {
 const importWord = async (req, res) => {
   const itemID = generateRandomCodeItem(6);
 
-  wordUpload.fields(req, res, async function (err) {
+  wordUpload(req, res, async function (err) {
     if (err instanceof multer.MulterError) {
       return res.status(400).json({ error: `Multer Error: ${err.message}` });
     } else if (err) {

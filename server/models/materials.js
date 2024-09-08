@@ -1,4 +1,4 @@
-const mongoose = require("mongoose"); //(npm i mongoose)
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const materialSchema = new Schema(
@@ -9,10 +9,15 @@ const materialSchema = new Schema(
     },
     Type: String,
     Word: String,
-    Image: String,
-    Audio: String,
+    Image: {
+      type: mongoose.Schema.Types.ObjectId, // Store the GridFS file ID
+      ref: "fs.files", // Reference to the GridFS collection
+    },
+    Audio: {
+      type: mongoose.Schema.Types.ObjectId, // Store the GridFS file ID
+      ref: "fs.files", // Reference to the GridFS collection
+    },
   },
-
   { timestamps: true }
 );
 
