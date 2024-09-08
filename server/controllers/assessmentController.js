@@ -139,23 +139,28 @@ const userInputAudio = async (req, res) => {
     }
 
     try {
-      if (!req.file) {
+      // Check if the file is uploaded
+      if (!req.files || !req.files.User || req.files.User.length === 0) {
         return res.json({ error: "No file was uploaded." });
       }
 
-      console.log("Uploaded audio file:", req.file);
+      // Access the uploaded file
+      const uploadedFile = req.files.User[0];
+      console.log("Uploaded audio file:", uploadedFile);
 
+      // Insert the file info into the Performance collection
       const insert = await Performance.create({
-        Audio1: req.file.id,
+        Audio1: uploadedFile.id, // Storing the GridFS file ID
+        // Add other fields as needed
       });
 
       if (insert) {
         return res.json({ message: "Audio file uploaded successfully." });
       }
 
-      return res
-        .status(500)
-        .json({ error: "Upload unsuccessful. Please try again later!" });
+      return res.status(500).json({
+        error: "Upload unsuccessful. Please try again later!",
+      });
     } catch (error) {
       console.error("Error during upload process:", error);
       return res

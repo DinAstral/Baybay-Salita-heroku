@@ -1,6 +1,5 @@
 const multer = require("multer");
-const { GridFsStorage } = require("multer-gridfs-storage");
-const Grid = require("gridfs-stream");
+const GridFsStorage = require("multer-gridfs-storage");
 const path = require("path");
 const crypto = require("crypto");
 const mongoose = require("mongoose");
@@ -8,27 +7,16 @@ const mongoose = require("mongoose");
 // Create GridFS storage engine for "uploads"
 const storage = new GridFsStorage({
   url: process.env.MONGO_URL,
-  options: { useNewUrlParser: true, useUnifiedTopology: true },
   file: (req, file) => {
     return new Promise((resolve, reject) => {
-      // Define filename for GridFS storage
       crypto.randomBytes(16, (err, buf) => {
         if (err) {
           return reject(err);
         }
         const filename = buf.toString("hex") + path.extname(file.originalname);
-        let bucketName = ""; // Default empty
-
-        // Set bucketName based on the file fieldname
-        if (file.fieldname === "Image") {
-          bucketName = "images";
-        } else if (file.fieldname === "Audio" || file.fieldname === "User") {
-          bucketName = "audios";
-        }
-
         const fileInfo = {
           filename: filename,
-          bucketName: bucketName,
+          bucketName: "uploads",
         };
         resolve(fileInfo);
       });
@@ -71,7 +59,7 @@ const fileFilter = (req, file, cb) => {
 
 // Set up limits
 const limits = {
-  fileSize: (req, file, cb) => {
+  fileSize: (file) => {
     if (file.fieldname === "Image") {
       return 10 * 1024 * 1024; // 10 MB for images
     } else if (file.fieldname === "Audio" || file.fieldname === "User") {
@@ -81,25 +69,23 @@ const limits = {
   },
 };
 
-// Configure the multer upload using GridFS storage
-const wordUpload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
-  limits: {
-    fileSize: limits.fileSize,
-  },
-}).fields([
+// Configure multer upload using GridFS storage
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: (req, file) => limits.fileSize(file) },
+});
+
+// Define upload middleware for word and user
+const wordUpload = upload.fields([
   { name: "Image", maxCount: 1 },
   { name: "Audio", maxCount: 1 },
 ]);
 
-const UserUpload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
-  limits: {
-    fileSize: limits.fileSize,
-  },
-}).fields([{ name: "User", maxCount: 1 }]);
+const UserUpload = upload.fields([{ name: "User", maxCount: 1 }]);
 
-// Export the upload handlers
-module.exports = { wordUpload, UserUpload };
+// Export upload middleware for use in routes
+module.exports = {
+  wordUpload,
+  UserUpload,
+};
