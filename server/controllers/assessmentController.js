@@ -151,12 +151,12 @@ const userInputAudio = async (req, res) => {
       }
 
       // Access the uploaded file
-      const uploadedFile = req.files.User[0];
+      const uploadedFile = req.files["User"][0];
       console.log("Uploaded audio file:", uploadedFile);
 
       // Insert the file info into the Performance collection
       const insert = await Performance.create({
-        Audio1: uploadedFile.id, // Storing the GridFS file ID
+        Audio1: uploadedFile.originalname, // Storing the GridFS file ID
         // Add other fields as needed
       });
 

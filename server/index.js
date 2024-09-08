@@ -22,12 +22,13 @@ let gfs;
 conn.once("open", () => {
   // Initialize GridFS stream
   gfs = gridfsStream(conn.db, mongoose.mongo);
-  gfs.collection("uploads"); // Name of collection in which GridFS will store files
+  gfs.collection("fs"); // Set the collection name to match your GridFS bucket
   console.log("GridFS is ready for file storage");
+  console.log("GridFS instance:", gfs);
 });
 
 // Middleware
-app.use(express.json({ limit: "10mb" })); // Limit for incoming JSON payload
+app.use(express.json({ limit: "100mb" })); // Limit for incoming JSON payload
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 
