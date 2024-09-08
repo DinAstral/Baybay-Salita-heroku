@@ -1,15 +1,14 @@
 const multer = require("multer");
 const { GridFsStorage } = require("multer-gridfs-storage");
+const Grid = require("gridfs-stream");
 const path = require("path");
 const crypto = require("crypto");
 const mongoose = require("mongoose");
 
-// MongoDB URI
-const mongoURI = "mongodb://localhost:27017/your-database"; // replace with your actual MongoDB URI
-
 // Create GridFS storage engine for "uploads"
 const storage = new GridFsStorage({
-  url: mongoURI,
+  url: process.env.MONGO_URL,
+  options: { useNewUrlParser: true, useUnifiedTopology: true },
   file: (req, file) => {
     return new Promise((resolve, reject) => {
       // Define filename for GridFS storage

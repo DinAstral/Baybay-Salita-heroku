@@ -3,6 +3,8 @@ const dotenv = require("dotenv").config();
 const cors = require("cors");
 const mongoose = require("mongoose"); // Removed unnecessary curly braces
 const gridfsStream = require("gridfs-stream");
+const { GridFsStorage } = require("multer-gridfs-storage");
+const Grid = require("gridfs-stream");
 const cookieParser = require("cookie-parser");
 
 const app = express();
@@ -16,14 +18,14 @@ mongoose
   .then(() => console.log("Database is Connected"))
   .catch((err) => console.error("Database not connected", err)); // Corrected typo and added err parameter
 
+let gfs, gridfsBucket;
 const conn = mongoose.connection;
-let gfs;
-
 conn.once("open", () => {
-  // Initialize GridFS stream
-  gfs = gridfsStream(conn.db, mongoose.mongo);
-  gfs.collection("uploads"); // Name of collection in which GridFS will store files
-  console.log("GridFS is ready for file storage");
+  gridfsBucket = new mongoose.mongo.GridFSBucket(conn.db, {
+    bucketName: "uploads", // Name of the bucket
+  });
+  gfs = Grid(conn.db, mongoose.mongo);
+  gfs.collection("uploads");
 });
 
 // Middleware

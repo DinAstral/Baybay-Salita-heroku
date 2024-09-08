@@ -1,9 +1,21 @@
 const Material = require("../models/materials");
 const Performance = require("../models/performance");
 const AssessmentModel = require("../models/assessment");
+const { GridFsStorage } = require("multer-gridfs-storage");
+const Grid = require("gridfs-stream");
 const mongoose = require("mongoose");
 const multer = require("multer");
 const { wordUpload, UserUpload } = require("../middleware/upload");
+
+let gfs, gridfsBucket;
+const conn = mongoose.connection;
+conn.once("open", () => {
+  gridfsBucket = new mongoose.mongo.GridFSBucket(conn.db, {
+    bucketName: "uploads", // Name of the bucket
+  });
+  gfs = Grid(conn.db, mongoose.mongo);
+  gfs.collection("uploads");
+});
 
 function generateRandomCodeItem(length) {
   const characters = "0123456789";
@@ -128,9 +140,9 @@ const importWord = async (req, res) => {
 
   wordUpload(req, res, async function (err) {
     if (err instanceof multer.MulterError) {
-      return res.status(400).json({ error: `Multer Error: ${err.message}` });
+      return res.json({ error: `Multer Error: ${err.message}` });
     } else if (err) {
-      return res.status(400).json({ error: `Error: ${err.message}` });
+      return res.json({ error: `Error: ${err.message}` });
     }
     try {
       const { Type, Word } = req.body;
@@ -160,15 +172,15 @@ const importWord = async (req, res) => {
 const userInputAudio = async (req, res) => {
   UserUpload(req, res, async function (err) {
     if (err instanceof multer.MulterError) {
-      return res.status(400).json({ error: `Multer Error: ${err.message}` });
+      return res.json({ error: `Multer Error: ${err.message}` });
     } else if (err) {
-      return res.status(400).json({ error: `Error: ${err.message}` });
+      return res.json({ error: `Error: ${err.message}` });
     }
 
     try {
       // Check if the file is uploaded
       if (!req.file) {
-        return res.status(400).json({ error: "No file was uploaded." });
+        return res.json({ error: "No file was uploaded." });
       }
 
       // Log the file info for debugging
