@@ -7,16 +7,6 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const { wordUpload, UserUpload } = require("../middleware/upload");
 
-let gfs, gridfsBucket;
-const conn = mongoose.connection;
-conn.once("open", () => {
-  gridfsBucket = new mongoose.mongo.GridFSBucket(conn.db, {
-    bucketName: "uploads", // Name of the bucket
-  });
-  gfs = Grid(conn.db, mongoose.mongo);
-  gfs.collection("uploads");
-});
-
 function generateRandomCodeItem(length) {
   const characters = "0123456789";
   let result = "item_";
@@ -225,8 +215,17 @@ const downloadFile = (req, res) => {
 const deleteFile = (req, res) => {
   const { id } = req.params;
 
+  // Check if ID is valid
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ error: "Invalid file ID format" });
+  }
+
+  // Delete the file from GridFS
   gfs.files.deleteOne({ _id: mongoose.Types.ObjectId(id) }, (err) => {
-    if (err) return res.json({ error: err.message });
+    if (err) {
+      console.error("Error deleting file from GridFS:", err);
+      return res.status(500).json({ error: "Error deleting file from GridFS" });
+    }
     res.json({ message: "File deleted successfully" });
   });
 };
