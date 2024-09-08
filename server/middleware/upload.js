@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 // Create GridFS storage engine for "uploads"
 const storage = new GridFsStorage({
   url: process.env.MONGO_URL,
+  options: { useNewUrlParser: true, useUnifiedTopology: true },
   file: (req, file) => {
     return new Promise((resolve, reject) => {
       crypto.randomBytes(16, (err, buf) => {
@@ -69,21 +70,29 @@ const limits = {
   },
 };
 
-// Configure multer upload using GridFS storage
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: { fileSize: (req, file) => limits.fileSize(file) },
-});
+const upload = multer({ storage });
 
-// Define upload middleware for word and user
-const wordUpload = upload.fields([
+// Configure the multer upload using GridFS storage
+const wordUpload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: limits.fileSize,
+  },
+}).fields([
   { name: "Image", maxCount: 1 },
   { name: "Audio", maxCount: 1 },
 ]);
 
-const UserUpload = upload.fields([{ name: "User", maxCount: 1 }]);
+const UserUpload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: limits.fileSize,
+  },
+}).fields([{ name: "User", maxCount: 1 }]);
 
+// Export the upload handlers
 // Export upload middleware for use in routes
 module.exports = {
   wordUpload,
