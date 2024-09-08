@@ -122,8 +122,8 @@ const importWord = async (req, res) => {
         ItemCode: itemID,
         Type,
         Word,
-        Image: imageFile ? imageFile.id : undefined,
-        Audio: audioFile ? audioFile.id : undefined,
+        Image: imageFile ? imageFile.originalname : undefined,
+        Audio: audioFile ? audioFile.originalname : undefined,
       });
 
       await material.save();

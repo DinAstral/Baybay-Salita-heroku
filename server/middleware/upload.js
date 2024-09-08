@@ -16,7 +16,7 @@ const storage = new GridFsStorage({
         if (err) {
           return reject(err);
         }
-        const filename = buf.toString("hex") + path.extname(file.originalname);
+        const filename = file.originalname;
         let bucketName = ""; // Default empty
 
         // Set bucketName based on the file fieldname
