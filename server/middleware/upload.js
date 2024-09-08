@@ -21,11 +21,11 @@ const storage = new GridFsStorage({
 
         // Set bucketName based on the file fieldname
         if (file.fieldname === "Image") {
-          bucketName = "images";
+          bucketName = "uploads";
         } else if (file.fieldname === "Audio") {
-          bucketName = "audios";
+          bucketName = "uploads";
         } else if (file.fieldname === "User") {
-          bucketName = "user_files";
+          bucketName = "uploads";
         }
 
         const fileInfo = {

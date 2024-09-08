@@ -22,7 +22,7 @@ let gfs;
 conn.once("open", () => {
   // Initialize GridFS stream
   gfs = gridfsStream(conn.db, mongoose.mongo);
-  gfs.collection("fs"); // Set the collection name to match your GridFS bucket
+  gfs.collection("uploads"); // Set the collection name to match your GridFS bucket
   console.log("GridFS is ready for file storage");
   console.log("GridFS instance:", gfs);
 });

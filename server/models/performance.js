@@ -15,27 +15,27 @@ const performanceSchema = new Schema(
     Itemcode1: String,
     Audio1: {
       type: mongoose.Schema.Types.ObjectId, // Store the GridFS file ID
-      ref: "fs.files", // Reference to the GridFS collection
+      ref: "uploads.files", // Reference to the GridFS collection
     },
     Itemcode2: String,
     Audio2: {
       type: mongoose.Schema.Types.ObjectId, // Store the GridFS file ID
-      ref: "fs.files", // Reference to the GridFS collection
+      ref: "uploads.files", // Reference to the GridFS collection
     },
     Itemcode3: String,
     Audio3: {
       type: mongoose.Schema.Types.ObjectId, // Store the GridFS file ID
-      ref: "fs.files", // Reference to the GridFS collection
+      ref: "uploads.files", // Reference to the GridFS collection
     },
     Itemcode4: String,
     Audio4: {
       type: mongoose.Schema.Types.ObjectId, // Store the GridFS file ID
-      ref: "fs.files", // Reference to the GridFS collection
+      ref: "uploads.files", // Reference to the GridFS collection
     },
     Itemcode5: String,
     Audio5: {
       type: mongoose.Schema.Types.ObjectId, // Store the GridFS file ID
-      ref: "fs.files", // Reference to the GridFS collection
+      ref: "uploads.files", // Reference to the GridFS collection
     },
   },
   { timestamps: true }
