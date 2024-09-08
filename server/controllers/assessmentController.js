@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Material = require("../models/materials");
 const Performance = require("../models/performance");
 const AssessmentModel = require("../models/assessment");
+const multer = require("multer");
 const { wordUpload, UserUpload } = require("../middleware/upload");
 const { gfs } = require("../index"); // Import gfs from index.js
 
