@@ -33,8 +33,7 @@ conn.once("open", () => {
 app.use(express.json({ limit: "100mb" })); // Limit for incoming JSON payload
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
-// Serve static files
-app.use(express.static(path.join(__dirname, "./routes/authRoutes")));
+
 // Fallback to serving index.html for any route not handled by the API
 app.get("/*", function (req, res) {
   res.sendFile(
