@@ -1,5 +1,5 @@
 const express = require("express");
-require("dotenv").config();
+const dotenv = require("dotenv").config();
 const cors = require("cors");
 const mongoose = require("mongoose"); // Removed unnecessary curly braces
 const gridfsStream = require("gridfs-stream");
