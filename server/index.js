@@ -4,6 +4,7 @@ const cors = require("cors");
 const mongoose = require("mongoose"); // Removed unnecessary curly braces
 const gridfsStream = require("gridfs-stream");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 
 const app = express();
 
