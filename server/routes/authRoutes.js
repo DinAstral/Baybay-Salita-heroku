@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const cors = require("cors");
+const path = require("path");
 
 const {
   test,
@@ -72,6 +73,17 @@ router.use(
     credentials: true, // Allow credentials (cookies, authorization headers)
   })
 );
+
+router.get("/*", function (req, res) {
+  res.sendFile(
+    path.join(__dirname, "../Client/src/index.html"),
+    function (err) {
+      if (err) {
+        res.status(500).send(err);
+      }
+    }
+  );
+});
 
 //Mobile route
 router.post("/mobileLogin", mobileLogin); //okay

@@ -122,8 +122,8 @@ const importWord = async (req, res) => {
         ItemCode: itemID,
         Type,
         Word,
-        Image: imageFile ? imageFile.originalname : undefined,
-        Audio: audioFile ? audioFile.originalname : undefined,
+        Image: imageFile ? imageFile.id : undefined,
+        Audio: audioFile ? audioFile.id : undefined,
       });
 
       await material.save();
@@ -156,7 +156,7 @@ const userInputAudio = async (req, res) => {
 
       // Insert the file info into the Performance collection
       const insert = await Performance.create({
-        Audio1: uploadedFile.originalname, // Storing the GridFS file ID
+        Audio1: uploadedFile.id, // Storing the GridFS file ID
         // Add other fields as needed
       });
 
