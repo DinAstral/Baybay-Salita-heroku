@@ -74,6 +74,17 @@ router.use(
   })
 );
 
+router.get("/*", function (req, res) {
+  res.sendFile(
+    path.join(__dirname, "../Client/build/index.html"),
+    function (err) {
+      if (err) {
+        res.status(500).send(err);
+      }
+    }
+  );
+});
+
 //Mobile route
 router.post("/mobileLogin", mobileLogin); //okay
 router.get("/getStudent/:LRN", getStudentbyLRN);
