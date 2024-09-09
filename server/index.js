@@ -1,5 +1,5 @@
 const express = require("express");
-const dotenv = require("dotenv").config();
+require("dotenv").config();
 const cors = require("cors");
 const mongoose = require("mongoose"); // Removed unnecessary curly braces
 const gridfsStream = require("gridfs-stream");
@@ -34,8 +34,6 @@ app.use(express.json({ limit: "100mb" })); // Limit for incoming JSON payload
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 
-// Serve static files from the 'dist' folder
-app.use(express.static(path.join(__dirname, "../Client/dist")));
 // Fallback to serving index.html for any route not handled by the API
 app.get("/*", function (req, res) {
   res.sendFile(
@@ -57,5 +55,5 @@ app.use((err, req, res, next) => {
   res.status(500).send("Something went wrong!");
 });
 
-const port = process.env.SERVER_PORT || 5000; // Default port if not provided in .env
+const port = process.env.PORT || 5000; // Default port if not provided in .env
 app.listen(port, () => console.log(`Server is running on port ${port}`)); // Used backticks for string interpolation
