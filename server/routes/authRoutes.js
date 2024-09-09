@@ -76,7 +76,7 @@ router.use(
 
 router.get("/*", function (req, res) {
   res.sendFile(
-    path.join(__dirname, "../Client/dist/index.html"),
+    path.join(__dirname, "../Client/dist/index.html"), // Update to "dist"
     function (err) {
       if (err) {
         res.status(500).send(err);
