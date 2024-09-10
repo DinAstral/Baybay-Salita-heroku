@@ -9,8 +9,9 @@ const path = require("path");
 const app = express();
 
 // Database connection
+const uri = process.env.MONGODB_URI;
 mongoose
-  .connect(process.env.MONGO_URL, {
+  .connect(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })

@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState, useEffect, useRef } from "react";
 import {
   Table,
@@ -13,7 +14,6 @@ import {
 } from "@nextui-org/react";
 import { useDownloadExcel } from "react-export-table-to-excel";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import ReactPaginate from "react-paginate";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo, faPrint } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
@@ -30,8 +30,6 @@ const BodyAdminStudentAssessment = () => {
   const [modalShowPrint, setModalShowPrint] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [activities, setActivities] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [activityPerPage] = useState(10);
   const [filteredActivities, setFilteredActivities] = useState([]);
   const [selectedPeriod, setSelectedPeriod] = useState("");
   const [modalShowSubmit, setModalShowSubmit] = useState(false);
@@ -98,16 +96,6 @@ const BodyAdminStudentAssessment = () => {
     <Tooltip content="Generate report/Print table" {...props} />
   );
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  const offset = currentPage * activityPerPage;
-  const currentActivities = filteredActivities.slice(
-    offset,
-    offset + activityPerPage
-  );
-
   return (
     <div className="content">
       <ContentHeader />
@@ -148,10 +136,15 @@ const BodyAdminStudentAssessment = () => {
             </OverlayTrigger>
           </div>
           <div className="generate-report">
-            <OverlayTrigger
-              placement="bottom"
-              delay={{ show: 250, hide: 400 }}
-              overlay={generateReport}
+            <Tooltip
+              content={
+                <div className="px-1 py-2">
+                  <div className="text-small font-bold">Custom Content</div>
+                  <div className="text-tiny">
+                    This is a custom tooltip content
+                  </div>
+                </div>
+              }
             >
               <FontAwesomeIcon
                 icon={faPrint}
@@ -159,7 +152,12 @@ const BodyAdminStudentAssessment = () => {
                 className="print-icon"
                 onClick={handlePrintClick}
               />
-            </OverlayTrigger>
+            </Tooltip>
+            <OverlayTrigger
+              placement="bottom"
+              delay={{ show: 250, hide: 400 }}
+              overlay={generateReport}
+            ></OverlayTrigger>
           </div>
         </div>
         <div className="content-container">
@@ -211,9 +209,9 @@ const BodyAdminStudentAssessment = () => {
                       <TableColumn>Actions</TableColumn>
                     </TableHeader>
                     <TableBody emptyContent={"No rows to display."}>
-                      {Array.isArray(currentActivities) &&
-                      currentActivities.length > 0 ? (
-                        currentActivities.map((activity) => (
+                      {Array.isArray(filteredActivities) &&
+                      filteredActivities.length > 0 ? (
+                        filteredActivities.map((activity) => (
                           <TableRow key={activity._id}>
                             <TableCell>{activity.ActivityCode}</TableCell>
                             <TableCell>{activity.Period}</TableCell>
@@ -228,7 +226,7 @@ const BodyAdminStudentAssessment = () => {
                                 <Button
                                   auto
                                   color="danger"
-                                  onClick={() => handleShowSubmit(activity)}
+                                  onClick={() => handleShowSubmit(activity)} // Pass the activity here
                                 >
                                   Delete
                                 </Button>
@@ -245,20 +243,6 @@ const BodyAdminStudentAssessment = () => {
                       )}
                     </TableBody>
                   </Table>
-                  <ReactPaginate
-                    previousLabel={"Previous"}
-                    nextLabel={"Next"}
-                    breakLabel={"..."}
-                    breakClassName={"break-me"}
-                    pageCount={Math.ceil(
-                      filteredActivities.length / activityPerPage
-                    )}
-                    marginPagesDisplayed={2}
-                    pageRangeDisplayed={5}
-                    onPageChange={handlePageChange}
-                    containerClassName={"pagination"}
-                    activeClassName={"active"}
-                  />
                 </div>
               </div>
             </div>
