@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 
 // Create GridFS storage engine for "uploads"
 const storage = new GridFsStorage({
-  url: process.env.MONGO_URL,
+  url: process.env.MONGODB_URI,
   options: { useNewUrlParser: true, useUnifiedTopology: true },
   file: (req, file) => {
     return new Promise((resolve, reject) => {
