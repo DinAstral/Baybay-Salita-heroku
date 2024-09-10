@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import "../ContentDasboard/Content.css";
 import ContentHeader from "../ContentDasboard/ContentHeader";
 import PrintRecord from "../Modals/PrintRecord";
@@ -22,6 +22,9 @@ import {
   TableRow,
   TableCell,
   Button,
+  Input,
+  Select,
+  SelectItem,
 } from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -31,179 +34,121 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 const BodyAdminUsers = () => {
-  const [modalShowUser, setModalShowUser] = useState(false);
-  const [modalShowPrint, setModalShowPrint] = useState(false);
-  const [modalShowAdd, setModalShowAdd] = useState(false);
-  const [modalShowEditTeacher, setModalShowEditTeacher] = useState(false);
-  const [modalShowViewTeacher, setModalShowViewTeacher] = useState(false);
-  const [modalShowEditParent, setModalShowEditParent] = useState(false);
-  const [modalShowViewParent, setModalShowViewParent] = useState(false);
-  const [modalShowDelete, setModalShowDelete] = useState(false);
-
+  const [modalState, setModalState] = useState({
+    add: false,
+    print: false,
+    editUser: false,
+    editTeacher: false,
+    viewTeacher: false,
+    editParent: false,
+    viewParent: false,
+    delete: false,
+  });
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [usersPerPage] = useState(10);
-  const [filteredRoles, setFilteredRoles] = useState([]);
-  const [selectedRole, setSelectedRole] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedRole, setSelectedRole] = useState("default");
 
   const tableRef = useRef(null);
-
   const { onDownload } = useDownloadExcel({
     currentTableRef: tableRef.current,
     filename: "Users table",
     sheet: "Users",
   });
 
-  const fetchUsers = () => {
-    axios
-      .get("/users")
-      .then((response) => {
-        setUsers(response.data);
-        setFilteredRoles(response.data);
-      })
-      .catch((err) => console.log(err));
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get("/users");
+      setUsers(response.data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   useEffect(() => {
     fetchUsers();
   }, []);
 
-  const renderTooltip = (props) => (
-    <Tooltip id="button-tooltip" {...props}>
-      This function will view Information of Registered User on the system.
-    </Tooltip>
-  );
+  const filteredUsers = useMemo(() => {
+    let filtered = users;
+    if (selectedRole !== "default") {
+      filtered = filtered.filter((user) => user.role === selectedRole);
+    }
+    if (searchQuery) {
+      filtered = filtered.filter((user) =>
+        user.email.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    return filtered;
+  }, [users, selectedRole, searchQuery]);
 
-  const generateReport = (props) => (
-    <Tooltip id="button-tooltip" {...props}>
-      Generate report/Print table
-    </Tooltip>
-  );
+  const currentUsers = useMemo(() => {
+    const offset = currentPage * usersPerPage;
+    return filteredUsers.slice(offset, offset + usersPerPage);
+  }, [currentPage, usersPerPage, filteredUsers]);
 
-  const handleAddUser = () => {
-    setModalShowAdd(true);
+  const handleModalStateChange = (modalType, value) => {
+    setModalState((prev) => ({ ...prev, [modalType]: value }));
   };
 
-  const handleEditClick = (user) => {
-    setModalShowUser(true);
-    setSelectedUser(user);
-  };
-
-  const handlePrintClick = () => {
-    setModalShowPrint(true);
-  };
-
-  const handleEditTeacher = (user) => {
-    setSelectedUser(user);
-    setModalShowEditTeacher(true);
-  };
-
-  const handleViewTeacher = (user) => {
-    setSelectedUser(user);
-    setModalShowViewTeacher(true);
-  };
-
-  const handleEditParent = (user) => {
-    setSelectedUser(user);
-    setModalShowEditParent(true);
-  };
-
-  const handleViewParent = (user) => {
-    setSelectedUser(user);
-    setModalShowViewParent(true);
-  };
-
-  const handleDeleteClick = (user) => {
-    setSelectedUser(user);
-    setModalShowDelete(true);
-  };
-
-  {
-    /* Page Interactions */
-  }
   const handlePageClick = (event) => {
     setCurrentPage(event.selected);
   };
-
-  const handleRoleChange = (e) => {
-    const role = e.target.value;
-    setSelectedRole(role);
-    filterUsers(role, searchQuery);
-  };
-
-  const handleSearchChange = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    filterUsers(selectedRole, query);
-  };
-
-  const filterUsers = (role, query) => {
-    let filtered = users;
-    if (role && role !== "default") {
-      filtered = filtered.filter((user) => user.role === role);
-    }
-    if (query) {
-      filtered = filtered.filter((user) => user.email.includes(query));
-    }
-    setFilteredRoles(filtered);
-  };
-
-  const offset = currentPage * usersPerPage;
-  const currentUsers = filteredRoles.slice(offset, offset + usersPerPage);
 
   return (
     <div className="content">
       <ContentHeader />
       <div className="content-body">
-        <AddUser show={modalShowAdd} onHide={() => setModalShowAdd(false)} />
+        <AddUser
+          show={modalState.add}
+          onHide={() => handleModalStateChange("add", false)}
+        />
         <EditUser
-          show={modalShowUser}
-          onHide={() => setModalShowUser(false)}
+          show={modalState.editUser}
+          onHide={() => handleModalStateChange("editUser", false)}
           user={selectedUser}
         />
         <PrintRecord
-          show={modalShowPrint}
-          onHide={() => setModalShowPrint(false)}
+          show={modalState.print}
+          onHide={() => handleModalStateChange("print", false)}
           print={onDownload}
         />
-        {/* Modals Teacher*/}
         <ViewTeacher
-          show={modalShowViewTeacher}
+          show={modalState.viewTeacher}
           user={selectedUser}
-          onHide={() => setModalShowViewTeacher(false)}
+          onHide={() => handleModalStateChange("viewTeacher", false)}
         />
         <UpdateTeacher
-          show={modalShowEditTeacher}
+          show={modalState.editTeacher}
           user={selectedUser}
-          onHide={() => setModalShowEditTeacher(false)}
+          onHide={() => handleModalStateChange("editTeacher", false)}
         />
-        {/* Modals Parent*/}
         <ViewParent
-          show={modalShowViewParent}
+          show={modalState.viewParent}
           user={selectedUser}
-          onHide={() => setModalShowViewParent(false)}
+          onHide={() => handleModalStateChange("viewParent", false)}
         />
         <UpdateParent
-          show={modalShowEditParent}
+          show={modalState.editParent}
           user={selectedUser}
-          onHide={() => setModalShowEditParent(false)}
+          onHide={() => handleModalStateChange("editParent", false)}
         />
-        {/* Modals Delete*/}
         <DeleteUser
-          show={modalShowDelete}
-          onHide={() => setModalShowDelete(false)}
+          show={modalState.delete}
+          onHide={() => handleModalStateChange("delete", false)}
           user={selectedUser}
           onDeleteSuccess={fetchUsers}
         />
+
         <div className="content-title-header">
           <div>
             Admin Manage User
             <OverlayTrigger
               placement="bottom"
               delay={{ show: 250, hide: 400 }}
-              overlay={renderTooltip}
+              overlay={<Tooltip>View user information</Tooltip>}
             >
               <FontAwesomeIcon
                 icon={faCircleInfo}
@@ -216,224 +161,116 @@ const BodyAdminUsers = () => {
             <OverlayTrigger
               placement="bottom"
               delay={{ show: 250, hide: 400 }}
-              overlay={generateReport}
+              overlay={<Tooltip>Generate report/Print table</Tooltip>}
             >
               <FontAwesomeIcon
                 icon={faPrint}
                 size="1x"
                 className="print-icon"
-                onClick={handlePrintClick}
+                onClick={() => handleModalStateChange("print", true)}
               />
             </OverlayTrigger>
           </div>
         </div>
+
         <div className="content-container">
           <div className="row">
             <div className="col">
               <div className="card mt-1 border-0">
                 <div className="list-header-drop-score">
-                  <select
-                    name=""
-                    id=""
-                    onChange={handleRoleChange}
+                  <Select
+                    labelPlacement="outside"
+                    label="Sort by Role"
+                    variant="bordered"
+                    defaultSelectedKeys={[""]}
+                    className="bg-transparent w-[20%]"
+                    onChange={(e) => setSelectedRole(e.target.value)}
                     value={selectedRole}
                   >
-                    {" "}
-                    {/* Filter the table by Role */}
-                    <option value="default">Select Role</option>
-                    <option value="Parent">Parent</option>
-                    <option value="Teacher">Teacher</option>
-                  </select>
-                  <div className="search-box-table">
-                    <FontAwesomeIcon
-                      icon={faSearch}
-                      size="1x"
-                      inverse
-                      className="con-icon"
-                    />
-                    <input
+                    <SelectItem key="">Select Role</SelectItem>
+                    <SelectItem key="Parent">Parent</SelectItem>
+                    <SelectItem key="Teacher">Teacher</SelectItem>
+                  </Select>
+                  <div className="w-[40%] flex pt-8">
+                    <Input
+                      variant="bordered"
                       type="text"
                       placeholder="Enter User Email"
                       value={searchQuery}
-                      onChange={handleSearchChange}
-                    />{" "}
-                    {/* Filter the table by Email Search */}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      startContent={
+                        <FontAwesomeIcon
+                          icon={faSearch}
+                          size="1x"
+                          inverse
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
+                    />
                   </div>
                   <div className="back-button-profile">
-                    <button
-                      className="btn-back"
-                      onClick={() => handleAddUser()}
+                    <Button
+                      auto
+                      color="primary"
+                      className=""
+                      onClick={() => handleModalStateChange("add", true)}
                     >
                       Add User
-                    </button>
+                    </Button>
                   </div>
                 </div>
+
                 <div className="card-body scrollable-table scrollable-container">
-                  {!selectedRole || selectedRole === "default" ? (
-                    <Table
-                      ref={tableRef}
-                      removeWrapper
-                      color="primary"
-                      selectionMode="single"
-                    >
-                      <TableHeader emptyContent={"No rows to display."}>
-                        <TableColumn>UserID</TableColumn>
-                        <TableColumn>Email</TableColumn>
-                        <TableColumn>Role</TableColumn>
-                        <TableColumn className="text-center">
-                          Actions
-                        </TableColumn>
-                      </TableHeader>
-                      <TableBody>
-                        {currentUsers.map((user) => (
-                          <TableRow key={user._id}>
-                            <TableCell>{user.UserID}</TableCell>
-                            <TableCell>{user.email}</TableCell>
-                            <TableCell>{user.role}</TableCell>
-                            <TableCell className="text-center">
-                              <div className="table-buttons">
-                                <Button
-                                  color="primary"
-                                  onClick={() => handleEditClick(user)}
-                                >
-                                  Update
-                                </Button>
-                                <Button
-                                  color="danger"
-                                  onClick={() => handleDeleteClick(user)}
-                                >
-                                  Delete
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  ) : (
-                    <>
-                      {selectedRole === "Parent" && (
-                        <Table
-                          ref={tableRef}
-                          removeWrapper
-                          color="primary"
-                          selectionMode="single"
-                        >
-                          <TableHeader emptyContent={"No rows to display."}>
-                            <TableColumn>UserID</TableColumn>
-                            <TableColumn>First Name</TableColumn>
-                            <TableColumn>Last Name</TableColumn>
-                            <TableColumn>Name of Student</TableColumn>
-                            <TableColumn>LRN of Student</TableColumn>
-                            <TableColumn>Email</TableColumn>
-                            <TableColumn>Role</TableColumn>
-                            <TableColumn className="text-center">
-                              Actions
-                            </TableColumn>
-                          </TableHeader>
-                          <TableBody>
-                            {currentUsers.map((user) => (
-                              <TableRow key={user._id}>
-                                <TableCell>{user.UserID}</TableCell>
-                                <TableCell>{user.FirstName}</TableCell>
-                                <TableCell>{user.LastName}</TableCell>
-                                <TableCell>{user.StudentName}</TableCell>
-                                <TableCell>{user.LRN}</TableCell>
-                                <TableCell>{user.email}</TableCell>
-                                <TableCell>{user.role}</TableCell>
-                                <TableCell className="text-center">
-                                  <div className="table-buttons">
-                                    <Button
-                                      color="default"
-                                      onClick={() => handleViewParent(user)}
-                                    >
-                                      View
-                                    </Button>
-                                    <Button
-                                      color="primary"
-                                      onClick={() => handleEditParent(user)}
-                                    >
-                                      Update
-                                    </Button>
-                                    <Button
-                                      color="danger"
-                                      onClick={() => handleDeleteClick(user)}
-                                    >
-                                      Delete
-                                    </Button>
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      )}
-                      {selectedRole === "Teacher" && (
-                        <Table
-                          ref={tableRef}
-                          removeWrapper
-                          color="primary"
-                          selectionMode="single"
-                        >
-                          <TableHeader emptyContent={"No rows to display."}>
-                            <TableColumn>TeacherID Number</TableColumn>
-                            <TableColumn>First Name</TableColumn>
-                            <TableColumn>Last Name</TableColumn>
-                            <TableColumn>Department</TableColumn>
-                            <TableColumn>Section</TableColumn>
-                            <TableColumn>Email</TableColumn>
-                            <TableColumn>Role</TableColumn>
-                            <TableColumn className="text-center">
-                              Actions
-                            </TableColumn>
-                          </TableHeader>
-                          <TableBody>
-                            {currentUsers.map((user) => (
-                              <TableRow key={user._id}>
-                                <TableCell>{user.UserID}</TableCell>
-                                <TableCell>{user.FirstName}</TableCell>
-                                <TableCell>{user.LastName}</TableCell>
-                                <TableCell>{user.Department}</TableCell>
-                                <TableCell>{user.Section}</TableCell>
-                                <TableCell>{user.email}</TableCell>
-                                <TableCell>{user.role}</TableCell>
-                                <TableCell className="text-center">
-                                  <div className="table-buttons">
-                                    <Button
-                                      color="default"
-                                      onClick={() => handleViewTeacher(user)}
-                                    >
-                                      View
-                                    </Button>
-                                    <Button
-                                      color="primary"
-                                      onClick={() => handleEditTeacher(user)}
-                                    >
-                                      Update
-                                    </Button>
-                                    <Button
-                                      color="danger"
-                                      onClick={() => handleDeleteClick(user)}
-                                    >
-                                      Delete
-                                    </Button>
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      )}
-                    </>
-                  )}
+                  <Table
+                    ref={tableRef}
+                    removeWrapper
+                    color="primary"
+                    selectionMode="single"
+                  >
+                    <TableHeader emptyContent={"No rows to display."}>
+                      <TableColumn>UserID</TableColumn>
+                      <TableColumn>Email</TableColumn>
+                      <TableColumn>Role</TableColumn>
+                      <TableColumn className="text-center">Actions</TableColumn>
+                    </TableHeader>
+                    <TableBody>
+                      {currentUsers.map((user) => (
+                        <TableRow key={user._id}>
+                          <TableCell>{user.UserID}</TableCell>
+                          <TableCell>{user.email}</TableCell>
+                          <TableCell>{user.role}</TableCell>
+                          <TableCell className="text-center">
+                            <div className="table-buttons">
+                              <Button
+                                color="primary"
+                                onClick={() =>
+                                  setSelectedUser(user) ||
+                                  handleModalStateChange("editUser", true)
+                                }
+                              >
+                                Update
+                              </Button>
+                              <Button
+                                color="danger"
+                                onClick={() =>
+                                  setSelectedUser(user) ||
+                                  handleModalStateChange("delete", true)
+                                }
+                              >
+                                Delete
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+
                   <ReactPaginate
                     previousLabel={"Previous"}
                     nextLabel={"Next"}
                     breakLabel={"..."}
-                    breakClassName={"break-me"}
-                    pageCount={Math.ceil(filteredRoles.length / usersPerPage)}
-                    marginPagesDisplayed={2}
-                    pageRangeDisplayed={10}
+                    pageCount={Math.ceil(filteredUsers.length / usersPerPage)}
                     onPageChange={handlePageClick}
                     containerClassName={"pagination"}
                     activeClassName={"active"}

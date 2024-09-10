@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { useState, useEffect, useRef } from "react";
 import {
   Table,
@@ -32,7 +31,7 @@ const BodyAdminStudentAssessment = () => {
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [activities, setActivities] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
-  const [usersPerPage] = useState(10);
+  const [activityPerPage] = useState(10);
   const [filteredActivities, setFilteredActivities] = useState([]);
   const [selectedPeriod, setSelectedPeriod] = useState("");
   const [modalShowSubmit, setModalShowSubmit] = useState(false);
@@ -103,8 +102,11 @@ const BodyAdminStudentAssessment = () => {
     setCurrentPage(page);
   };
 
-  const offset = currentPage * usersPerPage;
-  const currentUsers = filteredActivities.slice(offset, offset + usersPerPage);
+  const offset = currentPage * activityPerPage;
+  const currentActivities = filteredActivities.slice(
+    offset,
+    offset + activityPerPage
+  );
 
   return (
     <div className="content">
@@ -180,7 +182,7 @@ const BodyAdminStudentAssessment = () => {
                     <SelectItem key="3">Grading Period 3</SelectItem>
                     <SelectItem key="4">Grading Period 4</SelectItem>
                   </Select>
-                  <div className="flex flex-row gap-5 justify-end mt-2">
+                  <div className="flex flex-row gap-5 justify-end mt-3">
                     <Button auto onClick={handleImportClick} color="default">
                       Import Word
                     </Button>
@@ -209,29 +211,38 @@ const BodyAdminStudentAssessment = () => {
                       <TableColumn>Actions</TableColumn>
                     </TableHeader>
                     <TableBody emptyContent={"No rows to display."}>
-                      {currentUsers.map((activity) => (
-                        <TableRow key={activity._id}>
-                          <TableCell>{activity.ActivityCode}</TableCell>
-                          <TableCell>{activity.Period}</TableCell>
-                          <TableCell>{activity.Type}</TableCell>
-                          <TableCell>{activity.Item1}</TableCell>
-                          <TableCell>{activity.Item2}</TableCell>
-                          <TableCell>{activity.Item3}</TableCell>
-                          <TableCell>{activity.Item4}</TableCell>
-                          <TableCell>{activity.Item5}</TableCell>
-                          <TableCell className="text-center">
-                            <div className="table-buttons">
-                              <Button
-                                auto
-                                color="danger"
-                                onClick={() => handleShowSubmit(activity)} // Pass the activity here
-                              >
-                                Delete
-                              </Button>
-                            </div>
+                      {Array.isArray(currentActivities) &&
+                      currentActivities.length > 0 ? (
+                        currentActivities.map((activity) => (
+                          <TableRow key={activity._id}>
+                            <TableCell>{activity.ActivityCode}</TableCell>
+                            <TableCell>{activity.Period}</TableCell>
+                            <TableCell>{activity.Type}</TableCell>
+                            <TableCell>{activity.Item1}</TableCell>
+                            <TableCell>{activity.Item2}</TableCell>
+                            <TableCell>{activity.Item3}</TableCell>
+                            <TableCell>{activity.Item4}</TableCell>
+                            <TableCell>{activity.Item5}</TableCell>
+                            <TableCell className="text-center">
+                              <div className="table-buttons">
+                                <Button
+                                  auto
+                                  color="danger"
+                                  onClick={() => handleShowSubmit(activity)}
+                                >
+                                  Delete
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={9}>
+                            No activities found.
                           </TableCell>
                         </TableRow>
-                      ))}
+                      )}
                     </TableBody>
                   </Table>
                   <ReactPaginate
@@ -240,7 +251,7 @@ const BodyAdminStudentAssessment = () => {
                     breakLabel={"..."}
                     breakClassName={"break-me"}
                     pageCount={Math.ceil(
-                      filteredActivities.length / usersPerPage
+                      filteredActivities.length / activityPerPage
                     )}
                     marginPagesDisplayed={2}
                     pageRangeDisplayed={5}

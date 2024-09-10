@@ -183,10 +183,10 @@ const BodyAdminStudent = () => {
                 <div className="list-header-drop-score">
                   <Select
                     className="w-[20%]"
-                    label="Section"
+                    labelPlacement="outside"
+                    label="Sort by Section"
                     variant="bordered"
-                    defaultSelectedKeys={["Select Section"]}
-                    disabledKeys={["Select Section"]}
+                    defaultSelectedKeys={[""]}
                     onChange={handleSectionChange}
                     value={selectedRole}
                   >
@@ -201,7 +201,7 @@ const BodyAdminStudent = () => {
                     <SelectItem key="Tulip">Tulip</SelectItem>
                     <SelectItem key="SSC">SSC</SelectItem>
                   </Select>
-                  <div className="w-[40%] pt-2 p-2 flex">
+                  <div className="w-[40%] flex pt-8">
                     <Input
                       type="text"
                       placeholder="Search Student Name"
@@ -214,16 +214,17 @@ const BodyAdminStudent = () => {
                           className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
                         />
                       }
-                      className=""
                     />
                   </div>
                   <div className="back-button-profile">
-                    <button
-                      className="btn-back"
+                    <Button
+                      auto
+                      color="primary"
+                      className=""
                       onClick={() => handleAddClick()}
                     >
                       Add Student
-                    </button>
+                    </Button>
                   </div>
                 </div>
                 <div className="card-body scrollable-table scrollable-container">
