@@ -57,6 +57,34 @@ const ImportWord = ({ show, onHide }) => {
     Audio: null,
   });
 
+  //Upload files in cloudinary
+  const uploadFiles = async (type) => {
+    const { Image, Audio } = data;
+    const formData = new FormData();
+
+    formData.append("file", type === "image" ? Image : Audio);
+    formData.append(
+      "upload_preset",
+      type === "image" ? "images_preset" : "default_audio_preset"
+    );
+
+    try {
+      let cloudName = "dvcqnbkwb";
+      let resourceType = type === "image" ? "image" : "auto";
+      let api = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
+
+      const res = await axios.post(api, formData, {
+        // Explicitly set withCredentials to false if it's not needed
+        withCredentials: false,
+      });
+      const { secure_url } = res.data;
+      console.log(secure_url);
+      return secure_url;
+    } catch (error) {
+      console.error("Upload failed:", error);
+    }
+  };
+
   const importWord = async (e) => {
     e.preventDefault();
     const { Type, Word, Image, Audio } = data;
@@ -75,29 +103,29 @@ const ImportWord = ({ show, onHide }) => {
       return toast.error("Audio is required");
     }
 
-    try {
-      const formData = new FormData();
-      formData.append("Type", Type);
-      formData.append("Word", Word);
-      formData.append("Image", Image);
-      formData.append("Audio", Audio);
+    // Upload image file in database
+    const imageURL = await uploadFiles("image");
+    const audioURL = await uploadFiles("auto");
 
-      const response = await axios.post("/importWord", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+    // try {
+    //const response = await axios.post("/importWord", (imageURL, audioURL), {
+    //    Type,
+    //  Word,
+    //   headers: {
+    //     "Content-Type": "multipart/form-data",
+    //   },
+    //  });
 
-      if (response.data.error) {
-        toast.error(response.data.error);
-      } else {
-        toast.success("Import Word Successfully.");
-        setModalShow(true);
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to import a word.");
-    }
+    ///// if (response.data.error) {
+    //    toast.error(response.data.error);
+    //  } else {
+    //    toast.success("Import Word Successfully.");
+    //    setModalShow(true);
+    //  }
+    //} catch (error) {
+    // console.log(error);
+    //  toast.error("Failed to import a word.");
+    // }
   };
 
   return (
