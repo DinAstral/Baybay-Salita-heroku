@@ -44,12 +44,10 @@ const {
   forgotPassword,
   resetPassword,
   logout,
-} = require("../controllers/RegistrationController"); //registration functions
+} = require("../controllers/RegistrationController");
 
 const {
   importWord,
-  deleteFile,
-  downloadFile,
   submitAssessment,
   getImportWords,
   getPerformance,
@@ -73,53 +71,52 @@ router.use(
   })
 );
 
-//Mobile route
-router.post("/mobileLogin", mobileLogin); //okay
+// Mobile route
+router.post("/mobileLogin", mobileLogin);
 router.get("/getStudent/:LRN", getStudentbyLRN);
 
-//Login Routes get data
-router.get("/", test); //okay
-router.post("/registerParent", registerParent); //okay
-router.post("/registerTeacher", registerTeacher); //okay
-router.post("/verify", verifyOTP); //okay
-router.post("/login", loginUser); //okay
-router.post("/forgotPass", forgotPassword); //okay
-router.post("/reset-password/:id/:token", resetPassword); //okay
+// Login Routes
+router.get("/", test);
+router.post("/registerParent", registerParent);
+router.post("/registerTeacher", registerTeacher);
+router.post("/verify", verifyOTP);
+router.post("/login", loginUser);
+router.post("/forgotPass", forgotPassword);
+router.post("/reset-password/:id/:token", resetPassword);
 router.post("/logout", logout);
-getImportWords;
 
-//Upload Routes
-router.post("/importWord", importWord); // Route to upload word and associated files
-router.post("/userInput", userInputAudio); // Route to upload user input audio
-router.get("/getImportWord", getImportWords); // Route to retrieve metadata of uploaded words
+// Upload Routes
+router.post("/importWord", importWord);
+router.post("/userInput", userInputAudio);
+router.get("/getImportWord", getImportWords);
 
-//Assessment Route  getPerformance
+// Assessment Routes
 router.post("/submitAssessment", submitAssessment);
 router.get("/getPerformance", getPerformance);
 router.delete("/deleteAssessment/:id", deleteAssessment);
 
-//Admin Routes
+// Admin Routes
 router.post("/addUser", addUser);
-router.get("/users", getUsers); //okay
-router.get("/getUser/:id", getUser); //okay
+router.get("/users", getUsers);
+router.get("/getUser/:id", getUser);
 router.patch("/updateUser/:id", updateUser);
 router.delete("/deleteUser/:email", deleteUser);
-router.get("/profile", getProfile); //okay app.post("/compare-audio", upload.single("audio")
+router.get("/profile", getProfile);
 
-//Student Routes
+// Student Routes
 router.post("/addStudent", addStudent);
-router.get("/getStudents", getStudents); // Corrected route name to match client request
-router.get("/getStudent/:id", getStudent); // Route to get a student by ID
-router.delete("/getStudent/:id", deleteStudent);
-router.patch("/getStudent/:id", updateStudent);
+router.get("/getStudents", getStudents);
+router.get("/getStudent/:id", getStudent);
+router.delete("/deleteStudent/:id", deleteStudent);
+router.patch("/updateStudent/:id", updateStudent);
 
-//Parent Routes
+// Parent Routes
 router.get("/getParent", getParentUsers);
 router.get("/getParent/:UserID", getParentUser);
 router.get("/getStudentParent/:LRN", getStudentUser);
 router.patch("/updateParent/:id", updateParent);
 
-//Teacher Routes
+// Teacher Routes
 router.patch("/updateTeacher/:id", updateTeacher);
 router.post("/createAssessment", createAssessment);
 router.get("/getAssessments", getActivities);
