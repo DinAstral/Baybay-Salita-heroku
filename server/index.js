@@ -1,10 +1,10 @@
 const express = require("express");
-const dotenv = require("dotenv").config();
+require("dotenv").config();
 const cors = require("cors");
 const mongoose = require("mongoose"); // Removed unnecessary curly braces
-const gridfsStream = require("gridfs-stream");
 const cookieParser = require("cookie-parser");
 const path = require("path");
+const cloudinary = require("cloudinary").v2;
 
 const app = express();
 
@@ -18,16 +18,11 @@ mongoose
   .then(() => console.log("Database is Connected"))
   .catch((err) => console.error("Database not connected", err)); // Corrected typo and added err parameter
 
-const conn = mongoose.connection;
-let gfs;
-
-conn.once("open", () => {
-  // Initialize GridFS stream
-  gfs = gridfsStream(conn.db, mongoose.mongo);
-  gfs.collection("uploads"); // Set the collection name to match your GridFS bucket
-  console.log("GridFS is ready for file storage");
-
-  console.log("Files collection exists:", !!gfs.files);
+// Cloudinary Setup
+cloudinary.config({
+  cloud_name: "dvcqnbkwb",
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 // Middleware
