@@ -6,7 +6,7 @@ const cloudinary = require("cloudinary").v2;
 const path = require("path");
 const multer = require("multer");
 
-const { wordUpload } = require("../middleware/multer");
+const { wordUpload, UserUpload } = require("../middleware/multer");
 const {
   cloudinaryUploader,
   cloudinaryUploaderUser,
@@ -169,7 +169,7 @@ const userInputAudio = async (req, res) => {
       const { Type, Word } = req.body;
       const uploadResponse = await cloudinaryUploaderUser(req, res);
       // Access the uploaded file
-      const UserFile = uploadResponse.uploadImage.secure_url;
+      const UserFile = uploadResponse.uploadAudioUser.secure_url;
 
       // Insert the file info into the Performance collection
       const insert = await Performance.create({

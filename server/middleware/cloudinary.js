@@ -38,11 +38,14 @@ const cloudinaryUploaderUser = async (req, res) => {
   }
 
   try {
-    const uploadAudioUser = await cloudinary.uploader.upload(audioFile.path, {
-      resource_type: "auto",
-      public_id: `audioUser/${audioFile.filename}`,
-      folder: "user_audio",
-    });
+    const uploadAudioUser = await cloudinary.uploader.upload(
+      audioUserFile.path,
+      {
+        resource_type: "auto",
+        public_id: `audioUser/${audioUserFile.filename}`,
+        folder: "user_audio",
+      }
+    );
 
     return { uploadAudioUser };
   } catch (error) {
