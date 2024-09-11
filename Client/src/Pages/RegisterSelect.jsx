@@ -9,15 +9,18 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 
 const RegisterSelect = () => {
-  const [selectedRole, setSelectedRole] = useState("");
+  const [selectedRoles, setSelectedRoles] = useState([]);
   const [isInvalid, setIsInvalid] = useState(true);
   const navigate = useNavigate();
 
   const handleNext = () => {
-    if (selectedRole === "Parent") {
-      navigate("/registerParent");
-    } else if (selectedRole === "Teacher") {
-      navigate("/registerTeacher");
+    if (selectedRoles.length === 1) {
+      const selectedRole = selectedRoles[0];
+      if (selectedRole === "Parent") {
+        navigate("/registerParent");
+      } else if (selectedRole === "Teacher") {
+        navigate("/registerTeacher");
+      }
     } else {
       setIsInvalid(true);
     }
@@ -37,20 +40,23 @@ const RegisterSelect = () => {
             <form>
               <div className="flex flex-col items-center justify-center mb-6">
                 <CheckboxGroup
-                  isRequired
-                  description="Select only one"
-                  orientation="horizontal"
-                  isInvalid={isInvalid}
-                  label="Select role"
-                  onValueChange={(value) => {
-                    setSelectedRole(value[0]);
+                  value={selectedRoles}
+                  onChange={(value) => {
+                    setSelectedRoles(value);
                     setIsInvalid(value.length !== 1);
                   }}
+                  orientation="horizontal"
+                  isInvalid={isInvalid}
                   className="space-x-4"
                 >
                   <Checkbox value="Parent">Parent</Checkbox>
                   <Checkbox value="Teacher">Teacher</Checkbox>
                 </CheckboxGroup>
+                {isInvalid && (
+                  <p className="text-red-600 text-sm mt-2">
+                    Please select exactly one role.
+                  </p>
+                )}
               </div>
               <div className="flex items-center justify-center gap-4">
                 <Button className="my-2" size="lg" radius="md" color="danger">

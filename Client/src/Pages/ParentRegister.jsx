@@ -36,6 +36,7 @@ const ParentRegister = () => {
     confirmPassword: "",
   });
 
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   const [isVisible, setIsVisible] = useState(false);
@@ -43,8 +44,125 @@ const ParentRegister = () => {
   const [isVisibleConfirm, setIsVisibleConfirm] = useState(false);
   const toggleVisibilityConfirm = () => setIsVisibleConfirm(!isVisibleConfirm);
 
+  function isNumber(input) {
+    return !isNaN(input);
+  }
+
+  function validatePassword(password) {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasDigit = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    if (password.length < minLength) {
+      return "Password must be at least 8 characters long.";
+    }
+    if (!hasUpperCase) {
+      return "Password must contain at least one uppercase letter.";
+    }
+    if (!hasLowerCase) {
+      return "Password must contain at least one lowercase letter.";
+    }
+    if (!hasDigit) {
+      return "Password must contain at least one digit.";
+    }
+    if (!hasSpecialChar) {
+      return "Password must contain at least one special character.";
+    }
+    return null; // No error
+  }
+
+  const validateInputs = () => {
+    let isValid = true;
+    let newErrors = {};
+
+    if (!data.FirstName) {
+      newErrors.FirstName = "First Name is required";
+      isValid = false;
+    }
+    if (!data.LastName) {
+      newErrors.LastName = "Last Name is required";
+      isValid = false;
+    }
+    if (!data.LRN) {
+      newErrors.LRN = "LRN is required";
+      isValid = false;
+    }
+    // Validate LRN
+    if (data.LRN.length !== 12) {
+      newErrors.LRN = "LRN must be 12 characters long.";
+      isValid = false;
+    }
+    if (!isNumber(data.LRN)) {
+      newErrors.LRN = "Invalid LRN";
+      isValid = false;
+    }
+    if (!data.StudentName) {
+      newErrors.StudentName = "StudentName is required";
+      isValid = false;
+    }
+    if (!data.Birthday) {
+      newErrors.Birthday = "Birthday is required";
+      isValid = false;
+    }
+    if (!data.Gender) {
+      newErrors.Gender = "Gender is required";
+      isValid = false;
+    }
+    if (!data.Address) {
+      newErrors.Address = "Address is required";
+      isValid = false;
+    }
+    if (!data.Status) {
+      newErrors.Status = "Status is required";
+      isValid = false;
+    }
+
+    if (!data.ContactNumber) {
+      newErrors.ContactNumber = "Contact Number is required";
+      isValid = false;
+    }
+    if (!isNumber(data.ContactNumber)) {
+      newErrors.ContactNumber = "Invalid Contact Number";
+      isValid = false;
+    }
+    // Validate Contact Number (starts with 09 and 11 digits long)
+    const phoneRegex = /^09\d{9}$/;
+    if (!phoneRegex.test(data.ContactNumber)) {
+      newErrors.ContactNumber = "Enter PH Contact number";
+      isValid = false;
+    }
+
+    if (!data.email) {
+      newErrors.email = "Email is required";
+      isValid = false;
+    }
+
+    const passwordError = validatePassword(data.password);
+    if (passwordError) {
+      newErrors.password = passwordError;
+      isValid = false;
+    }
+
+    // Validate passwords match
+    else if (data.password !== data.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match.";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const registerParent = async (e) => {
     e.preventDefault();
+
+    if (!validateInputs()) {
+      toast.error("Please fix the errors in the form.");
+      return;
+    }
+
     const {
       FirstName,
       LastName,
@@ -57,13 +175,7 @@ const ParentRegister = () => {
       ContactNumber,
       email,
       password,
-      confirmPassword,
     } = data;
-
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
 
     try {
       const response = await axios.post("/registerParent", {
@@ -79,12 +191,13 @@ const ParentRegister = () => {
         email,
         password,
       });
+
       if (response.data.error) {
         toast.error(response.data.error);
       } else {
         setData({});
         toast.success("Register Verification.");
-        localStorage.setItem("userId", response.data.data.userId); // Store userId for verification step
+        localStorage.setItem("userId", response.data.data.userId);
         navigate("/verifyEmail");
       }
     } catch (error) {
@@ -94,18 +207,18 @@ const ParentRegister = () => {
   };
 
   return (
-    <div className="flex bg-[#f4e7c9] w-full h-screen ">
-      <div className="w-full flex flex-col items-center justify-center m-3">
-        <Card className="w-[70%] flex flex-col p-4 ">
-          <h1 className="text-3xl font-bold items-center justify-center">
+    <div className="flex bg-[#f4e7c9] w-full items-center min-h-screen p-4 md:p-8">
+      <div className="w-full max-w-4xl mx-auto">
+        <Card className="w-full flex flex-col p-4">
+          <h1 className="text-2xl md:text-3xl font-bold text-center">
             Parent Registration
           </h1>
-          <p className="text-sm items-center justify-center">
+          <p className="text-sm text-center mb-4">
             Please fill up the details needed!
           </p>
           <CardBody>
             <form onSubmit={registerParent}>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   type="text"
                   name="FirstName"
@@ -113,13 +226,15 @@ const ParentRegister = () => {
                   variant="bordered"
                   className="bg-transparent py-1 my-1"
                   value={data.FirstName}
+                  errorMessage={errors.FirstName}
+                  isInvalid={!!errors.FirstName}
                   onChange={(e) =>
                     setData({ ...data, FirstName: e.target.value })
                   }
                   endContent={
                     <FontAwesomeIcon
                       icon={faUser}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
                     />
                   }
                 />
@@ -130,13 +245,15 @@ const ParentRegister = () => {
                   variant="bordered"
                   className="bg-transparent py-1 my-1"
                   value={data.LastName}
+                  errorMessage={errors.LastName}
+                  isInvalid={!!errors.LastName}
                   onChange={(e) =>
                     setData({ ...data, LastName: e.target.value })
                   }
                   endContent={
                     <FontAwesomeIcon
                       icon={faUser}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
                     />
                   }
                 />
@@ -147,13 +264,15 @@ const ParentRegister = () => {
                   variant="bordered"
                   className="bg-transparent py-1 my-1"
                   value={data.StudentName}
+                  errorMessage={errors.StudentName}
+                  isInvalid={!!errors.StudentName}
                   onChange={(e) =>
                     setData({ ...data, StudentName: e.target.value })
                   }
                   endContent={
                     <FontAwesomeIcon
                       icon={faUser}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
                     />
                   }
                 />
@@ -165,10 +284,13 @@ const ParentRegister = () => {
                   className="bg-transparent py-1 my-1"
                   value={data.LRN}
                   onChange={(e) => setData({ ...data, LRN: e.target.value })}
+                  maxLength={12} // Limit LRN to 12 characters
+                  errorMessage={errors.LRN}
+                  isInvalid={!!errors.LRN}
                   endContent={
                     <FontAwesomeIcon
                       icon={faUser}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
                     />
                   }
                 />
@@ -179,6 +301,8 @@ const ParentRegister = () => {
                   onChange={(e) =>
                     setData({ ...data, Birthday: e.target.value })
                   }
+                  errorMessage={errors.Birthday}
+                  isInvalid={!!errors.Birthday}
                 />
 
                 <Select
@@ -189,6 +313,8 @@ const ParentRegister = () => {
                   className="bg-transparent py-1 my-1"
                   value={data.Gender}
                   onChange={(e) => setData({ ...data, Gender: e.target.value })}
+                  errorMessage={errors.Gender}
+                  isInvalid={!!errors.Gender}
                 >
                   <SelectItem key="" disabled>
                     Select Gender
@@ -207,10 +333,12 @@ const ParentRegister = () => {
                   onChange={(e) =>
                     setData({ ...data, Address: e.target.value })
                   }
+                  errorMessage={errors.Address}
+                  isInvalid={!!errors.Address}
                   endContent={
                     <FontAwesomeIcon
                       icon={faLocationDot}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
                     />
                   }
                 />
@@ -222,6 +350,8 @@ const ParentRegister = () => {
                   className="bg-transparent py-1 my-1"
                   value={data.Status}
                   onChange={(e) => setData({ ...data, Status: e.target.value })}
+                  errorMessage={errors.Status}
+                  isInvalid={!!errors.Status}
                 >
                   <SelectItem key="" disabled>
                     Select Status
@@ -242,10 +372,13 @@ const ParentRegister = () => {
                   onChange={(e) =>
                     setData({ ...data, ContactNumber: e.target.value })
                   }
+                  maxLength={11} // Limit to 11 characters
+                  errorMessage={errors.ContactNumber}
+                  isInvalid={!!errors.ContactNumber}
                   endContent={
                     <FontAwesomeIcon
                       icon={faPhone}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
                     />
                   }
                 />
@@ -257,81 +390,64 @@ const ParentRegister = () => {
                   className="bg-transparent py-1 my-1"
                   value={data.email}
                   onChange={(e) => setData({ ...data, email: e.target.value })}
+                  errorMessage={errors.email}
+                  isInvalid={!!errors.email}
                   endContent={
                     <FontAwesomeIcon
                       icon={faEnvelope}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
                     />
                   }
                 />
+              </div>
+
+              <div className="mt-4">
                 <Input
+                  type={isVisible ? "text" : "password"}
                   name="password"
                   label="Password"
                   variant="bordered"
-                  className="py-1 my-0 mb-2"
+                  className="bg-transparent py-1 my-1"
                   value={data.password}
                   onChange={(e) =>
                     setData({ ...data, password: e.target.value })
                   }
+                  errorMessage={errors.password}
+                  isInvalid={!!errors.password}
                   endContent={
-                    <button
-                      className="focus:outline-none"
-                      type="button"
+                    <FontAwesomeIcon
+                      icon={isVisible ? faEye : faEyeSlash}
+                      className="text-xl md:text-2xl text-default-400 cursor-pointer"
                       onClick={toggleVisibility}
-                      aria-label="toggle password visibility"
-                    >
-                      {isVisible ? (
-                        <FontAwesomeIcon
-                          icon={faEyeSlash}
-                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                        />
-                      ) : (
-                        <FontAwesomeIcon
-                          icon={faEye}
-                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                        />
-                      )}
-                    </button>
+                    />
                   }
-                  type={isVisible ? "text" : "password"}
                 />
+              </div>
+              <div className="mt-4">
                 <Input
+                  type={isVisibleConfirm ? "text" : "password"}
                   name="confirmPassword"
                   label="Confirm Password"
                   variant="bordered"
-                  className="py-1 my-0 mb-2"
-                  endContent={
-                    <button
-                      className="focus:outline-none"
-                      type="button"
-                      onClick={toggleVisibilityConfirm}
-                      aria-label="toggle password visibility"
-                    >
-                      {isVisibleConfirm ? (
-                        <FontAwesomeIcon
-                          icon={faEyeSlash}
-                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                        />
-                      ) : (
-                        <FontAwesomeIcon
-                          icon={faEye}
-                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                        />
-                      )}
-                    </button>
-                  }
-                  type={isVisibleConfirm ? "text" : "password"}
+                  className="bg-transparent py-1 my-1"
                   value={data.confirmPassword}
                   onChange={(e) =>
                     setData({ ...data, confirmPassword: e.target.value })
                   }
+                  errorMessage={errors.confirmPassword}
+                  isInvalid={!!errors.confirmPassword}
+                  endContent={
+                    <FontAwesomeIcon
+                      icon={isVisibleConfirm ? faEye : faEyeSlash}
+                      className="text-xl md:text-2xl text-default-400 cursor-pointer"
+                      onClick={toggleVisibilityConfirm}
+                    />
+                  }
                 />
               </div>
-              <div className="w-full flex items-center justify-center gap-6 my-4">
+              <div className="flex items-center justify-center gap-6 my-4">
                 <Button
-                  className="my-2"
-                  size="lg"
-                  radius="md"
+                  className="w-full md:w-1/3 text-md"
                   color="danger"
                   onClick={() => navigate(-1)}
                 >
@@ -339,12 +455,10 @@ const ParentRegister = () => {
                 </Button>
                 <Button
                   type="submit"
-                  className="my-2"
-                  size="lg"
-                  radius="md"
+                  className="w-full md:w-1/3 text-md"
                   color="primary"
                 >
-                  Submit
+                  Register
                 </Button>
               </div>
             </form>

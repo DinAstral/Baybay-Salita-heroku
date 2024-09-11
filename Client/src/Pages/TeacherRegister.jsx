@@ -36,6 +36,7 @@ const TeacherRegister = () => {
     confirmPassword: "",
   });
 
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   const [isVisible, setIsVisible] = useState(false);
@@ -43,8 +44,114 @@ const TeacherRegister = () => {
   const [isVisibleConfirm, setIsVisibleConfirm] = useState(false);
   const toggleVisibilityConfirm = () => setIsVisibleConfirm(!isVisibleConfirm);
 
+  function isNumber(input) {
+    return !isNaN(input);
+  }
+
+  function validatePassword(password) {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasDigit = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    if (password.length < minLength) {
+      return "Password must be at least 8 characters long.";
+    }
+    if (!hasUpperCase) {
+      return "Password must contain at least one uppercase letter.";
+    }
+    if (!hasLowerCase) {
+      return "Password must contain at least one lowercase letter.";
+    }
+    if (!hasDigit) {
+      return "Password must contain at least one digit.";
+    }
+    if (!hasSpecialChar) {
+      return "Password must contain at least one special character.";
+    }
+    return null; // No error
+  }
+
+  const validateInputs = () => {
+    let isValid = true;
+    let newErrors = {};
+
+    if (!data.FirstName) {
+      newErrors.FirstName = "First Name is required";
+      isValid = false;
+    }
+    if (!data.LastName) {
+      newErrors.LastName = "Last Name is required";
+      isValid = false;
+    }
+    if (!data.Section) {
+      newErrors.Section = "Section is required";
+      isValid = false;
+    }
+    if (!data.Department) {
+      newErrors.Department = "Department is required";
+      isValid = false;
+    }
+    if (!data.Birthday) {
+      newErrors.Birthday = "Birthday is required";
+      isValid = false;
+    }
+    if (!data.Gender) {
+      newErrors.Gender = "Gender is required";
+      isValid = false;
+    }
+    if (!data.Address) {
+      newErrors.Address = "Address is required";
+      isValid = false;
+    }
+    if (!data.Status) {
+      newErrors.Status = "Status is required";
+      isValid = false;
+    }
+    if (!data.ContactNumber) {
+      newErrors.ContactNumber = "Contact Number is required";
+      isValid = false;
+    }
+    if (!isNumber(data.ContactNumber)) {
+      newErrors.ContactNumber = "Invalid Contact Number";
+      isValid = false;
+    }
+    // Validate Contact Number (starts with 09 and 11 digits long)
+    const phoneRegex = /^09\d{9}$/;
+    if (!phoneRegex.test(data.ContactNumber)) {
+      newErrors.ContactNumber = "Enter PH Contact number";
+      isValid = false;
+    }
+    if (!data.email) {
+      newErrors.email = "Email is required";
+      isValid = false;
+    }
+
+    const passwordError = validatePassword(data.password);
+    if (passwordError) {
+      newErrors.password = passwordError;
+      isValid = false;
+    }
+
+    // Validate passwords match
+    else if (data.password !== data.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match.";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const registerTeacher = async (e) => {
     e.preventDefault();
+
+    if (!validateInputs()) {
+      toast.error("Please fix the errors in the form.");
+      return;
+    }
+
     const {
       FirstName,
       LastName,
@@ -94,18 +201,18 @@ const TeacherRegister = () => {
   };
 
   return (
-    <div className="flex bg-[#f4e7c9] w-full h-screen ">
-      <div className="w-full flex flex-col items-center justify-center m-3">
-        <Card className="w-[70%] flex flex-col p-4 ">
-          <h1 className="text-3xl font-bold items-center justify-center">
+    <div className="flex bg-[#f4e7c9] w-full items-center min-h-screen p-4 md:p-8">
+      <div className="w-full max-w-4xl mx-auto">
+        <Card className="w-full flex flex-col p-4">
+          <h1 className="text-2xl md:text-3xl font-bold text-center">
             Teacher Registration
           </h1>
-          <p className="text-sm items-center justify-center">
+          <p className="text-sm text-center mb-4">
             Please fill up the details needed!
           </p>
           <CardBody>
             <form onSubmit={registerTeacher}>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   type="text"
                   name="FirstName"
@@ -116,10 +223,12 @@ const TeacherRegister = () => {
                   onChange={(e) =>
                     setData({ ...data, FirstName: e.target.value })
                   }
+                  errorMessage={errors.FirstName}
+                  isInvalid={!!errors.FirstName}
                   endContent={
                     <FontAwesomeIcon
                       icon={faUser}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
                     />
                   }
                 />
@@ -133,10 +242,12 @@ const TeacherRegister = () => {
                   onChange={(e) =>
                     setData({ ...data, LastName: e.target.value })
                   }
+                  errorMessage={errors.LastName}
+                  isInvalid={!!errors.LastName}
                   endContent={
                     <FontAwesomeIcon
                       icon={faUser}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
                     />
                   }
                 />
@@ -149,6 +260,8 @@ const TeacherRegister = () => {
                   onChange={(e) =>
                     setData({ ...data, Section: e.target.value })
                   }
+                  errorMessage={errors.Section}
+                  isInvalid={!!errors.Section}
                 >
                   <SelectItem key="" disabled>
                     Select Section
@@ -163,7 +276,6 @@ const TeacherRegister = () => {
                   <SelectItem key="Tulip">Tulip</SelectItem>
                   <SelectItem key="SSC">SSC</SelectItem>
                 </Select>
-
                 <Select
                   label="Department"
                   placeholder="Select your department"
@@ -173,13 +285,14 @@ const TeacherRegister = () => {
                   onChange={(e) =>
                     setData({ ...data, Department: e.target.value })
                   }
+                  errorMessage={errors.Department}
+                  isInvalid={!!errors.Department}
                 >
                   <SelectItem key="" disabled>
                     Select Department
                   </SelectItem>
                   <SelectItem key="Filipino">Filipino</SelectItem>
                 </Select>
-
                 <Input
                   type="date"
                   placeholder="Ilagay ang iyong Kaarawan"
@@ -187,8 +300,9 @@ const TeacherRegister = () => {
                   onChange={(e) =>
                     setData({ ...data, Birthday: e.target.value })
                   }
+                  errorMessage={errors.Birthday}
+                  isInvalid={!!errors.Birthday}
                 />
-
                 <Select
                   label="Gender"
                   name="Gender"
@@ -197,6 +311,8 @@ const TeacherRegister = () => {
                   className="bg-transparent py-1 my-1"
                   value={data.Gender}
                   onChange={(e) => setData({ ...data, Gender: e.target.value })}
+                  errorMessage={errors.Gender}
+                  isInvalid={!!errors.Gender}
                 >
                   <SelectItem key="" disabled>
                     Select Gender
@@ -215,10 +331,12 @@ const TeacherRegister = () => {
                   onChange={(e) =>
                     setData({ ...data, Address: e.target.value })
                   }
+                  errorMessage={errors.Address}
+                  isInvalid={!!errors.Address}
                   endContent={
                     <FontAwesomeIcon
                       icon={faLocationDot}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
                     />
                   }
                 />
@@ -230,6 +348,8 @@ const TeacherRegister = () => {
                   className="bg-transparent py-1 my-1"
                   value={data.Status}
                   onChange={(e) => setData({ ...data, Status: e.target.value })}
+                  errorMessage={errors.Status}
+                  isInvalid={!!errors.Status}
                 >
                   <SelectItem key="" disabled>
                     Select Status
@@ -250,10 +370,12 @@ const TeacherRegister = () => {
                   onChange={(e) =>
                     setData({ ...data, ContactNumber: e.target.value })
                   }
+                  errorMessage={errors.ContactNumber}
+                  isInvalid={!!errors.ContactNumber}
                   endContent={
                     <FontAwesomeIcon
                       icon={faPhone}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
                     />
                   }
                 />
@@ -265,22 +387,28 @@ const TeacherRegister = () => {
                   className="bg-transparent py-1 my-1"
                   value={data.email}
                   onChange={(e) => setData({ ...data, email: e.target.value })}
+                  errorMessage={errors.email}
+                  isInvalid={!!errors.email}
                   endContent={
                     <FontAwesomeIcon
                       icon={faEnvelope}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
                     />
                   }
                 />
+              </div>
+              <div className="mt-2">
                 <Input
                   name="password"
                   label="Password"
                   variant="bordered"
-                  className="py-1 my-0 mb-2"
+                  className="bg-transparent py-1 my-1"
                   value={data.password}
                   onChange={(e) =>
                     setData({ ...data, password: e.target.value })
                   }
+                  errorMessage={errors.password}
+                  isInvalid={!!errors.password}
                   endContent={
                     <button
                       className="focus:outline-none"
@@ -291,12 +419,12 @@ const TeacherRegister = () => {
                       {isVisible ? (
                         <FontAwesomeIcon
                           icon={faEyeSlash}
-                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                          className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
                         />
                       ) : (
                         <FontAwesomeIcon
                           icon={faEye}
-                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                          className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
                         />
                       )}
                     </button>
@@ -307,7 +435,7 @@ const TeacherRegister = () => {
                   name="confirmPassword"
                   label="Confirm Password"
                   variant="bordered"
-                  className="py-1 my-0 mb-2"
+                  className="bg-transparent py-1 my-1"
                   endContent={
                     <button
                       className="focus:outline-none"
@@ -318,12 +446,12 @@ const TeacherRegister = () => {
                       {isVisibleConfirm ? (
                         <FontAwesomeIcon
                           icon={faEyeSlash}
-                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                          className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
                         />
                       ) : (
                         <FontAwesomeIcon
                           icon={faEye}
-                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                          className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
                         />
                       )}
                     </button>
@@ -333,13 +461,13 @@ const TeacherRegister = () => {
                   onChange={(e) =>
                     setData({ ...data, confirmPassword: e.target.value })
                   }
+                  errorMessage={errors.confirmPassword}
+                  isInvalid={!!errors.confirmPassword}
                 />
               </div>
-              <div className="w-full flex items-center justify-center gap-6 my-4">
+              <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-6">
                 <Button
-                  className="my-2"
-                  size="lg"
-                  radius="md"
+                  className="w-full md:w-1/2 text-md"
                   color="danger"
                   onClick={() => navigate(-1)}
                 >
@@ -347,9 +475,7 @@ const TeacherRegister = () => {
                 </Button>
                 <Button
                   type="submit"
-                  className="my-2"
-                  size="lg"
-                  radius="md"
+                  className="w-full md:w-1/2 text-md"
                   color="primary"
                 >
                   Submit
