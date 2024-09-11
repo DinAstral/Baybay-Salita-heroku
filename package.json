@@ -6,6 +6,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "cd server && node index.js"
   },
+  "engines": {
+    "node": "21.7.3"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/DinAstral/Baybay-Salita-heroku.git"
