@@ -123,8 +123,8 @@ router.patch("/updateParent/:id", updateParent);
 router.patch("/updateTeacher/:id", updateTeacher);
 router.post("/createAssessment", createAssessment);
 router.get("/getAssessments", getActivities);
-router.get("/getAssessment/id", getActivity);
-router.patch("/updateAssessment/id", updateActivity);
+router.get("/getAssessment/:id", getActivity);
+router.patch("/updateAssessment/:id", updateActivity);
 router.get("/getTeacher", getTeacherUsers);
 router.get("/getTeacher/:UserID", getTeacherUser);
 
