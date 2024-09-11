@@ -67,7 +67,7 @@ const { compareAudio } = require("../controllers/CompareController");
 // Configure CORS middleware
 router.use(
   cors({
-    origin: "http://192.168.56.1:3000", // Update this with your client's URL
+    origin: "https://baybay-salita-heroku-8c328f3ddd0f.herokuapp.com", // Update this with your client's URL
     methods: ["GET", "POST", "DELETE", "PATCH"], // Add the allowed HTTP methods
     credentials: true, // Allow credentials (cookies, authorization headers)
   })

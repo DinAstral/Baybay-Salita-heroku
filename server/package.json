@@ -32,7 +32,6 @@
     "nodemailer": "^6.9.14",
     "nodemon": "^3.1.4",
     "path": "^0.12.7",
-    "path-to-regexp": "^8.1.0",
     "react-redux": "^9.1.2"
   }
 }
