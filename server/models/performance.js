@@ -4,39 +4,24 @@ const { Schema } = mongoose;
 const performanceSchema = new Schema(
   {
     UserInputId: String,
-    //  LRN: String,
-    //  Section: String,
-    // ActivityCode: {
-    // type: String,
-    //  unique: true,
-    // },
-    //Period: String,
-    //Type: String,
+    LRN: String,
+    Section: String,
+    ActivityCode: {
+      type: String,
+      unique: true,
+    },
+    Period: String,
+    Type: String,
     Itemcode1: String,
-    Audio1: {
-      type: mongoose.Schema.Types.ObjectId, // Store the GridFS file ID
-      ref: "uploads.files", // Reference to the GridFS collection
-    },
+    Audio1: String,
     Itemcode2: String,
-    Audio2: {
-      type: mongoose.Schema.Types.ObjectId, // Store the GridFS file ID
-      ref: "uploads.files", // Reference to the GridFS collection
-    },
+    Audio2: String,
     Itemcode3: String,
-    Audio3: {
-      type: mongoose.Schema.Types.ObjectId, // Store the GridFS file ID
-      ref: "uploads.files", // Reference to the GridFS collection
-    },
+    Audio3: String,
     Itemcode4: String,
-    Audio4: {
-      type: mongoose.Schema.Types.ObjectId, // Store the GridFS file ID
-      ref: "uploads.files", // Reference to the GridFS collection
-    },
+    Audio4: String,
     Itemcode5: String,
-    Audio5: {
-      type: mongoose.Schema.Types.ObjectId, // Store the GridFS file ID
-      ref: "uploads.files", // Reference to the GridFS collection
-    },
+    Audio5: String,
   },
   { timestamps: true }
 );

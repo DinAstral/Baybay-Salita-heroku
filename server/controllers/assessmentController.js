@@ -2,9 +2,22 @@ const mongoose = require("mongoose");
 const Material = require("../models/materials");
 const Performance = require("../models/performance");
 const AssessmentModel = require("../models/assessment");
+const cloudinary = require("cloudinary").v2;
+const path = require("path");
 const multer = require("multer");
-const { wordUpload, UserUpload } = require("../middleware/upload");
-const { gfs } = require("../index"); // Import gfs from index.js
+
+const { wordUpload } = require("../middleware/multer");
+const {
+  cloudinaryUploader,
+  cloudinaryUploaderUser,
+} = require("../middleware/cloudinary");
+
+cloudinary.config({
+  cloud_name: "dvcqnbkwb",
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true,
+});
 
 // Utility functions to generate random codes
 function generateRandomCodeItem(length) {
@@ -100,7 +113,7 @@ const deleteAssessment = async (req, res) => {
 };
 
 const importWord = async (req, res) => {
-  const itemID = generateRandomCodeItem(6);
+  const itemID = generateRandomCodeItem(6); // Assume this function is defined somewhere
 
   wordUpload(req, res, async function (err) {
     if (err instanceof multer.MulterError) {
@@ -110,33 +123,41 @@ const importWord = async (req, res) => {
     }
 
     try {
+      // Extracting Type and Word from request body
       const { Type, Word } = req.body;
       if (!Type || !Word) {
         return res.json({ error: "Type and Word are required" });
       }
 
-      const imageFile = req.files["Image"] ? req.files["Image"][0] : null;
-      const audioFile = req.files["Audio"] ? req.files["Audio"][0] : null;
+      // Uploading to Cloudinary
+      const uploadResponse = await cloudinaryUploader(req, res);
+      const imageFile = uploadResponse.uploadImage.secure_url;
+      const audioFile = uploadResponse.uploadAudio.secure_url;
 
+      // Creating a new Material object
       const material = new Material({
         ItemCode: itemID,
         Type,
         Word,
-        Image: imageFile ? imageFile.id : undefined,
-        Audio: audioFile ? audioFile.id : undefined,
+        Image: imageFile,
+        Audio: audioFile,
       });
 
+      // Saving material to the database
       await material.save();
 
-      res.json({ message: "Word and files successfully uploaded" });
+      return res.json({ message: "Word and files successfully uploaded" });
     } catch (error) {
-      res.status(500).json({ error: "Server error" });
+      console.error(error);
+      return res.status(500).json({ error: "Server error" });
     }
   });
 };
 
 // Upload user input audio
 const userInputAudio = async (req, res) => {
+  const InputID = generateRandomCodeUser(6);
+
   UserUpload(req, res, async function (err) {
     if (err instanceof multer.MulterError) {
       return res.json({ error: `Multer Error: ${err.message}` });
@@ -145,19 +166,15 @@ const userInputAudio = async (req, res) => {
     }
 
     try {
-      // Check if the file is uploaded
-      if (!req.files || !req.files.User || req.files.User.length === 0) {
-        return res.json({ error: "No file was uploaded." });
-      }
-
+      const { Type, Word } = req.body;
+      const uploadResponse = await cloudinaryUploaderUser(req, res);
       // Access the uploaded file
-      const uploadedFile = req.files["User"][0];
-      console.log("Uploaded audio file:", uploadedFile);
+      const UserFile = uploadResponse.uploadImage.secure_url;
 
       // Insert the file info into the Performance collection
       const insert = await Performance.create({
-        Audio1: uploadedFile.id, // Storing the GridFS file ID
-        // Add other fields as needed
+        UserInputId: InputID,
+        Audio1: UserFile,
       });
 
       if (insert) {
@@ -176,58 +193,14 @@ const userInputAudio = async (req, res) => {
   });
 };
 
-// Download file
-const downloadFile = (req, res) => {
-  const { filename } = req.params;
-
-  gfs.files.findOne({ filename }, (err, file) => {
-    if (err) {
-      return res.json({ error: "Error fetching file" });
-    }
-    if (!file || file.length === 0) {
-      return res.json({ error: "No file exists" });
-    }
-    const readStream = gfs.createReadStream({ filename });
-    readStream.pipe(res);
-  });
-};
-
-const deleteFile = (req, res) => {
-  const { id } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ error: "Invalid file ID format" });
-  }
-
-  gfs.files.deleteOne({ _id: mongoose.Types.ObjectId(id) }, (err) => {
-    if (err) {
-      console.error("Error deleting file from GridFS:", err);
-      return res.status(500).json({ error: "Error deleting file from GridFS" });
-    }
-    res.json({ message: "File deleted successfully" });
-  });
-};
-
 const getImportWords = (req, res) => {
-  if (!gfs || !gfs.files) {
-    return res
-      .status(500)
-      .json({ error: "GridFS instance is not properly initialized" });
-  }
-
-  gfs.files.find().toArray((err, files) => {
-    if (err) {
-      return res.status(500).json({ error: "Error fetching files" });
-    }
-    if (!files || files.length === 0) {
-      return res.json({ error: "No files found" });
-    }
-    res.json(files);
-  });
+  Material.find()
+    .then((users) => res.json(users))
+    .catch((err) => res.json(err));
 };
+
 module.exports = {
   importWord,
-  deleteFile,
-  downloadFile,
   submitAssessment,
   getImportWords,
   getPerformance,

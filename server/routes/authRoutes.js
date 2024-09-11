@@ -67,7 +67,7 @@ const { compareAudio } = require("../controllers/CompareController");
 // Configure CORS middleware
 router.use(
   cors({
-    origin: "https://baybay-salita-edu-62edacaa3ac6.herokuapp.com", // Update this with your client's URL
+    origin: "http://192.168.56.1:3000", // Update this with your client's URL
     methods: ["GET", "POST", "DELETE", "PATCH"], // Add the allowed HTTP methods
     credentials: true, // Allow credentials (cookies, authorization headers)
   })
@@ -91,8 +91,6 @@ getImportWords;
 //Upload Routes
 router.post("/importWord", importWord); // Route to upload word and associated files
 router.post("/userInput", userInputAudio); // Route to upload user input audio
-router.delete("/deleteInputFile/:id", deleteFile); // Route to delete a file by ID
-router.get("/downloadInputfile/:filename", downloadFile); // Route to download file by filename
 router.get("/getImportWord", getImportWords); // Route to retrieve metadata of uploaded words
 
 //Assessment Route  getPerformance

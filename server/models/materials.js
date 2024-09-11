@@ -9,14 +9,8 @@ const materialSchema = new Schema(
     },
     Type: String,
     Word: String,
-    Image: {
-      type: mongoose.Schema.Types.ObjectId, // Store the GridFS file ID
-      ref: "uploads.files", // Reference to the GridFS collection
-    },
-    Audio: {
-      type: mongoose.Schema.Types.ObjectId, // Store the GridFS file ID
-      ref: "uploads.files", // Reference to the GridFS collection
-    },
+    Image: String,
+    Audio: String,
   },
   { timestamps: true }
 );

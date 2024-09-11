@@ -2,7 +2,7 @@
 import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import PropTypes from "prop-types"; // Import PropTypes
+import PropTypes from "prop-types";
 import {
   Modal,
   ModalContent,
@@ -57,75 +57,37 @@ const ImportWord = ({ show, onHide }) => {
     Audio: null,
   });
 
-  //Upload files in cloudinary
-  const uploadFiles = async (type) => {
-    const { Image, Audio } = data;
-    const formData = new FormData();
-
-    formData.append("file", type === "image" ? Image : Audio);
-    formData.append(
-      "upload_preset",
-      type === "image" ? "images_preset" : "default_audio_preset"
-    );
-
-    try {
-      let cloudName = "dvcqnbkwb";
-      let resourceType = type === "image" ? "image" : "auto";
-      let api = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
-
-      const res = await axios.post(api, formData, {
-        // Explicitly set withCredentials to false if it's not needed
-        withCredentials: false,
-      });
-      const { secure_url } = res.data;
-      console.log(secure_url);
-      return secure_url;
-    } catch (error) {
-      console.error("Upload failed:", error);
-    }
-  };
-
   const importWord = async (e) => {
     e.preventDefault();
     const { Type, Word, Image, Audio } = data;
 
-    console.log(Type, Word, Image, Audio);
-    if (!Type && !Word && !Image && !Audio) {
-      return toast.error("Please add inputs to the fields");
-    }
-    if (!Type) {
-      return toast.error("Type is required");
-    } else if (!Word) {
-      return toast.error("Word is required");
-    } else if (!Image) {
-      return toast.error("Image is required");
-    } else if (!Audio) {
-      return toast.error("Audio is required");
+    if (!Type || !Word || !Image || !Audio) {
+      return toast.error("All fields are required.");
     }
 
-    // Upload image file in database
-    const imageURL = await uploadFiles("image");
-    const audioURL = await uploadFiles("auto");
+    const formData = new FormData();
+    formData.append("Type", Type);
+    formData.append("Word", Word);
+    formData.append("Image", Image);
+    formData.append("Audio", Audio);
 
-    // try {
-    //const response = await axios.post("/importWord", (imageURL, audioURL), {
-    //    Type,
-    //  Word,
-    //   headers: {
-    //     "Content-Type": "multipart/form-data",
-    //   },
-    //  });
+    try {
+      const response = await axios.post("/importWord", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-    ///// if (response.data.error) {
-    //    toast.error(response.data.error);
-    //  } else {
-    //    toast.success("Import Word Successfully.");
-    //    setModalShow(true);
-    //  }
-    //} catch (error) {
-    // console.log(error);
-    //  toast.error("Failed to import a word.");
-    // }
+      if (response.data.error) {
+        toast.error(response.data.error);
+      } else {
+        toast.success("Word imported successfully.");
+        setModalShow(true); // Show success modal
+      }
+    } catch (error) {
+      console.error("Failed to import word:", error);
+      toast.error("Failed to import word.");
+    }
   };
 
   return (
@@ -152,9 +114,7 @@ const ImportWord = ({ show, onHide }) => {
                 value={data.Type}
                 variant="bordered"
                 className="bg-transparent py-1 my-1"
-                onChange={(e) => {
-                  setData({ ...data, Type: e.target.value });
-                }}
+                onChange={(e) => setData({ ...data, Type: e.target.value })}
               >
                 <SelectItem key="">Select Type of Assessment:</SelectItem>
                 <SelectItem key="Pagbabaybay">
