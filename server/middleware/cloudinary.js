@@ -51,7 +51,7 @@ const cloudinaryUploaderUser = async (req, res) => {
   }
 };
 
-const url = cloudinary.url("Din_DOST_jdwhi5", {
+const url = cloudinary.url("", {
   transformation: [
     {
       fetch_format: "auto",
