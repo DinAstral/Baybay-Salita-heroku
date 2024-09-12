@@ -3,13 +3,13 @@ const { Schema } = mongoose;
 
 const performanceSchema = new Schema(
   {
-    UserInputId: String,
-    LRN: String,
-    Section: String,
-    ActivityCode: {
+    UserInputId: {
       type: String,
       unique: true,
     },
+    LRN: String,
+    Section: String,
+    ActivityCode: String,
     Period: String,
     Type: String,
     Itemcode1: String,
