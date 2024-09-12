@@ -10,7 +10,7 @@ const { wordUpload, UserUpload } = require("../middleware/multer");
 const {
   cloudinaryUploader,
   cloudinaryUploaderUser,
-} = require("../middleware/cloudinary");
+} = require("../api/cloudinary");
 
 cloudinary.config({
   cloud_name: "dvcqnbkwb",
