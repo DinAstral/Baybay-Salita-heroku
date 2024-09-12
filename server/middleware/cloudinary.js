@@ -54,7 +54,7 @@ const cloudinaryUploaderUser = async (req, res) => {
   }
 };
 
-const url = cloudinary.url("", {
+/*const url = cloudinary.url("", {
   transformation: [
     {
       fetch_format: "auto",
@@ -87,7 +87,7 @@ const url = cloudinary.url("", {
   } catch (error) {
     console.error("Error uploading image:", error);
   }
-})();
+})();*/
 
 module.exports = {
   cloudinaryUploader,

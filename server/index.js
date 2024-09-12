@@ -5,6 +5,7 @@ const mongoose = require("mongoose"); // Removed unnecessary curly braces
 const cookieParser = require("cookie-parser");
 const path = require("path");
 const cloudinary = require("cloudinary").v2;
+const { audioTry } = require("./api/speechToText");
 
 const app = express();
 
@@ -24,51 +25,6 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
-//SPEECH-TO-TEXT MODULE
-const fs = require("fs");
-const { OpenAI } = require("openai"); // Use OpenAI directly
-
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // Make sure this is set in your environment variables
-});
-
-// Retry function for exponential backoff
-const retry = async (fn, retries = 3, delay = 1000) => {
-  try {
-    return await fn();
-  } catch (error) {
-    if (retries === 0) throw error;
-    console.log(`Retrying... ${retries} attempts left`);
-    await new Promise((resolve) => setTimeout(resolve, delay));
-    return retry(fn, retries - 1, delay * 2); // Exponential backoff
-  }
-};
-
-const audioTry = async () => {
-  try {
-    const transcription = await retry(() =>
-      openai.audio.transcriptions.create({
-        file: fs.createReadStream("Bibo.m4a"), // Ensure this path is correct
-        model: "whisper-1",
-        language: "tl", // Specify language if needed
-      })
-    );
-    console.log("Your Text:", transcription.text); // Log the transcription text
-  } catch (error) {
-    if (error.response) {
-      console.error("API Response Error:", error.response);
-    } else if (error.request) {
-      console.error("API Request Error:", error.request);
-    } else {
-      console.log("Error:", error);
-    }
-  }
-};
-
-// Run the transcription
-audioTry();
 
 // Middleware
 app.use(express.json({ limit: "100mb" })); // Limit for incoming JSON payload
