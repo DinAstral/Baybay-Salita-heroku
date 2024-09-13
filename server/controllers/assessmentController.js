@@ -131,8 +131,8 @@ const importWord = async (req, res) => {
 
       // Uploading to Cloudinary
       const uploadResponse = await cloudinaryUploader(req, res);
-      const imageFile = uploadResponse.uploadImage.secure_url;
-      const audioFile = uploadResponse.uploadAudio.secure_url;
+      const imageFile = uploadResponse.uploadImage.url;
+      const audioFile = uploadResponse.uploadAudio.url;
 
       // Creating a new Material object
       const material = new Material({
@@ -180,7 +180,7 @@ const userInputAudio = async (req, res) => {
 
       const uploadResponse = await cloudinaryUploaderUser(req, res);
       // Access the uploaded file
-      const UserFile = uploadResponse.uploadAudioUser.secure_url;
+      const UserFile = uploadResponse.uploadAudioUser.url;
 
       // Insert the file info into the Performance collection
       const insert = await Performance.create({

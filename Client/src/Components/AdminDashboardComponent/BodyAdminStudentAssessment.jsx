@@ -12,7 +12,6 @@ import {
   SelectItem,
 } from "@nextui-org/react";
 import { useDownloadExcel } from "react-export-table-to-excel";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo, faPrint } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
@@ -84,17 +83,6 @@ const BodyAdminStudentAssessment = () => {
     }
   };
 
-  const renderTooltip = (props) => (
-    <Tooltip
-      content="This function will view the assessment of your students in each section."
-      {...props}
-    />
-  );
-
-  const generateReport = (props) => (
-    <Tooltip content="Generate report/Print table" {...props} />
-  );
-
   return (
     <div className="content">
       <ContentHeader />
@@ -122,26 +110,30 @@ const BodyAdminStudentAssessment = () => {
         <div className="content-title-header">
           <div>
             Manage Student Assessment
-            <OverlayTrigger
-              placement="bottom"
-              delay={{ show: 250, hide: 400 }}
-              overlay={renderTooltip}
+            <Tooltip
+              content={
+                <div className="px-1 py-2">
+                  <div className="text-small font-bold">Assessment Table</div>
+                  <div className="text-tiny">
+                    This function will view the assessment of your students in
+                    each section.
+                  </div>
+                </div>
+              }
             >
               <FontAwesomeIcon
                 icon={faCircleInfo}
                 size="1x"
                 className="help-icon"
               />
-            </OverlayTrigger>
+            </Tooltip>
           </div>
           <div className="generate-report">
             <Tooltip
               content={
                 <div className="px-1 py-2">
-                  <div className="text-small font-bold">Custom Content</div>
-                  <div className="text-tiny">
-                    This is a custom tooltip content
-                  </div>
+                  <div className="text-small font-bold">Print</div>
+                  <div className="text-tiny">Generate report/Print table</div>
                 </div>
               }
             >
