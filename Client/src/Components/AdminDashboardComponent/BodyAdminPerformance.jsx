@@ -260,10 +260,10 @@ const BodyAdminPerformance = () => {
                     selectionMode="single"
                   >
                     <TableHeader emptyContent={"No rows to display."}>
+                      <TableColumn>Input ID</TableColumn>
                       <TableColumn>LRN</TableColumn>
                       <TableColumn>Section</TableColumn>
                       <TableColumn>Activity Code</TableColumn>
-                      <TableColumn>Period</TableColumn>
                       <TableColumn>Type</TableColumn>
                       <TableColumn>Audio1</TableColumn>
                       <TableColumn>Audio2</TableColumn>
@@ -274,11 +274,11 @@ const BodyAdminPerformance = () => {
                     </TableHeader>
                     <TableBody>
                       {currentUsers.map((performance) => (
-                        <TableRow key={performance.LRN}>
+                        <TableRow key={performance._id}>
+                          <TableCell>{performance.UserInputId}</TableCell>
                           <TableCell>{performance.LRN}</TableCell>
                           <TableCell>{performance.Section}</TableCell>
                           <TableCell>{performance.ActivityCode}</TableCell>
-                          <TableCell>{performance.Period}</TableCell>
                           <TableCell>{performance.Type}</TableCell>
                           <TableCell>{performance.Audio1}</TableCell>
                           <TableCell>{performance.Audio2}</TableCell>

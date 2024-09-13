@@ -7,8 +7,6 @@ const jwt = require("jsonwebtoken");
 const UserOTPVerification = require("../models/UserOTPVerification");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcryptjs");
-const multer = require("multer");
-const path = require("path");
 
 function validatePassword(password) {
   const minLength = 8;

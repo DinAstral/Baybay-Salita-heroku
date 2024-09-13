@@ -166,7 +166,18 @@ const userInputAudio = async (req, res) => {
     }
 
     try {
-      const { Type, Word } = req.body;
+      const {
+        Type,
+        LRN,
+        Section,
+        AssessmentID,
+        Itemcode1,
+        Itemcode2,
+        Itemcode3,
+        Itemcode4,
+        Itemcode5,
+      } = req.body;
+
       const uploadResponse = await cloudinaryUploaderUser(req, res);
       // Access the uploaded file
       const UserFile = uploadResponse.uploadAudioUser.secure_url;
@@ -174,7 +185,25 @@ const userInputAudio = async (req, res) => {
       // Insert the file info into the Performance collection
       const insert = await Performance.create({
         UserInputId: InputID,
-        Audio1: UserFile,
+        AssessmentID: AssessmentID,
+        LRN: LRN,
+        Section: Section,
+        Type: Type,
+        Itemcode1: Itemcode1,
+        Audio1: "Submitted",
+        AudioURL1: UserFile,
+        Itemcode1: Itemcode2,
+        Audio1: "Submitted",
+        AudioURL1: UserFile,
+        Itemcode1: Itemcode3,
+        Audio1: "Submitted",
+        AudioURL1: UserFile,
+        Itemcode1: Itemcode4,
+        Audio1: "Submitted",
+        AudioURL1: UserFile,
+        Itemcode1: Itemcode5,
+        Audio1: "Submitted",
+        AudioURL1: UserFile,
       });
 
       if (insert) {

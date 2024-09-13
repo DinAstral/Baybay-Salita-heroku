@@ -152,11 +152,6 @@ const BodyAdminStudentAssessment = () => {
                 onClick={handlePrintClick}
               />
             </Tooltip>
-            <OverlayTrigger
-              placement="bottom"
-              delay={{ show: 250, hide: 400 }}
-              overlay={generateReport}
-            ></OverlayTrigger>
           </div>
         </div>
         <div className="content-container">
@@ -208,38 +203,29 @@ const BodyAdminStudentAssessment = () => {
                       <TableColumn>Actions</TableColumn>
                     </TableHeader>
                     <TableBody emptyContent={"No rows to display."}>
-                      {Array.isArray(filteredActivities) &&
-                      filteredActivities.length > 0 ? (
-                        filteredActivities.map((activity) => (
-                          <TableRow key={activity._id}>
-                            <TableCell>{activity.ActivityCode}</TableCell>
-                            <TableCell>{activity.Period}</TableCell>
-                            <TableCell>{activity.Type}</TableCell>
-                            <TableCell>{activity.Item1}</TableCell>
-                            <TableCell>{activity.Item2}</TableCell>
-                            <TableCell>{activity.Item3}</TableCell>
-                            <TableCell>{activity.Item4}</TableCell>
-                            <TableCell>{activity.Item5}</TableCell>
-                            <TableCell className="text-center">
-                              <div className="table-buttons">
-                                <Button
-                                  auto
-                                  color="danger"
-                                  onClick={() => handleShowSubmit(activity)} // Pass the activity here
-                                >
-                                  Delete
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={9}>
-                            No activities found.
+                      {filteredActivities.map((activity) => (
+                        <TableRow key={activity._id}>
+                          <TableCell>{activity.ActivityCode}</TableCell>
+                          <TableCell>{activity.Period}</TableCell>
+                          <TableCell>{activity.Type}</TableCell>
+                          <TableCell>{activity.Item1}</TableCell>
+                          <TableCell>{activity.Item2}</TableCell>
+                          <TableCell>{activity.Item3}</TableCell>
+                          <TableCell>{activity.Item4}</TableCell>
+                          <TableCell>{activity.Item5}</TableCell>
+                          <TableCell className="text-center">
+                            <div className="table-buttons">
+                              <Button
+                                auto
+                                color="danger"
+                                onClick={() => handleShowSubmit(activity)} // Pass the activity here
+                              >
+                                Delete
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
-                      )}
+                      ))}
                     </TableBody>
                   </Table>
                 </div>

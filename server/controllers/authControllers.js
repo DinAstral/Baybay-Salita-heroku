@@ -7,16 +7,6 @@ const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcryptjs");
 
-function generateRandomCodeParent(length) {
-  const characters = "0123456789";
-  let result = "parentID_";
-  const charactersLength = characters.length;
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
-
 let transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   auth: {
