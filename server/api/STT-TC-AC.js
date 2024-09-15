@@ -93,7 +93,13 @@ const extractAudioFeatures = async (audioPath) => {
             const totalChunks = audioChunks.length;
             const sumFeatures = audioChunks.reduce((acc, chunk, index) => {
               const features = Meyda.extract(
-                ["mfcc", "chroma", "spectralCentroid"],
+                [
+                  "mfcc",
+                  "chroma",
+                  "spectralCentroid",
+                  "zcr",
+                  "perceptualSpread",
+                ],
                 chunk
               );
 
@@ -153,12 +159,48 @@ const compareAudioFeatures = (features1, features2) => {
     features1.spectralCentroid,
     features2.spectralCentroid
   );
+  const zcr = euclideanDistance(features1.zcr, features2.zcr);
+  const perceptualSpread = euclideanDistance(
+    features1.perceptualSpread,
+    features2.perceptualSpread
+  );
 
   return {
     mfccDistance,
     chromaDistance,
     spectralCentroidDistance,
+    zcr,
+    perceptualSpread,
   };
+};
+
+// Function to compute Stent Weighted Audio Similarity with NaN handling
+const stentWeightedAudioSimilarity = (
+  mfccDistance,
+  chromaDistance,
+  spectralCentroidDistance,
+  zcr,
+  perceptualSpread
+) => {
+  const weightMfcc = 0.4;
+  const weightChroma = 0.3;
+  const weightSpectralCentroid = 0.15;
+  const weightZcr = 0.1;
+  const weightPerceptualSpread = 0.05;
+
+  // Handle NaN values by setting them to 0
+  const safeSpectralCentroidDistance = isNaN(spectralCentroidDistance)
+    ? 0
+    : spectralCentroidDistance;
+  const safePerceptualSpread = isNaN(perceptualSpread) ? 0 : perceptualSpread;
+
+  return (
+    weightMfcc * mfccDistance +
+    weightChroma * chromaDistance +
+    weightSpectralCentroid * safeSpectralCentroidDistance +
+    weightZcr * zcr +
+    weightPerceptualSpread * safePerceptualSpread
+  );
 };
 
 // Main function to orchestrate the process
@@ -177,6 +219,18 @@ const run = async () => {
     // Compare audio features
     const audioComparison = compareAudioFeatures(features1, features2);
     console.log("Audio Feature Comparison:", audioComparison);
+
+    // Compute Stent Weighted Audio Similarity
+    const weightedSimilarity = stentWeightedAudioSimilarity(
+      audioComparison.mfccDistance,
+      audioComparison.chromaDistance,
+      audioComparison.spectralCentroidDistance,
+      audioComparison.zcr,
+      audioComparison.perceptualSpread
+    );
+
+    console.log("Mfcc Distance:", audioComparison.mfccDistance);
+    console.log("Stent Weighted Audio Similarity:", weightedSimilarity);
 
     // You can also add transcription code here if needed...
   } catch (error) {

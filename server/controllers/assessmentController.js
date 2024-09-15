@@ -62,21 +62,54 @@ const submitAssessment = async (req, res) => {
       return res.json({ error: "ActivityCode is already taken" });
     }
 
+    // Fetch image and audio for each item
+    const items = [Item1, Item2, Item3, Item4, Item5];
+    const materials = await Material.find({ ItemCode: { $in: items } });
+
+    const assessmentItems = items.map((itemCode) => {
+      const material = materials.find((m) => m.ItemCode === itemCode);
+      return {
+        ItemCode: itemCode,
+        Image: material?.Image || "",
+        Audio: material?.Audio || "",
+      };
+    });
+
     const act = await AssessmentModel.create({
       ActivityCode: randomCode,
       Period,
       Type,
-      Item1,
-      Item2,
-      Item3,
-      Item4,
-      Item5,
+      Items: assessmentItems, // Save items with image and audio
     });
 
     return res.json(act);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Server error" });
+  }
+};
+
+// get assessment based on Activitycode
+const getAssessmentCode = async (req, res) => {
+  const { ActivityCode } = req.params;
+
+  try {
+    const activity = await AssessmentModel.findOne({ ActivityCode });
+
+    // If no parent is found, return a 404 status
+    if (!activity) {
+      return res.json({
+        message: "No activity found",
+      });
+    }
+
+    // Return the found parent
+    res.json(activity);
+  } catch (error) {
+    // Handle any other errors
+    res.json({
+      message: error.message,
+    });
   }
 };
 
@@ -231,6 +264,7 @@ const getImportWords = (req, res) => {
 module.exports = {
   importWord,
   submitAssessment,
+  getAssessmentCode,
   getImportWords,
   getPerformance,
   deleteAssessment,

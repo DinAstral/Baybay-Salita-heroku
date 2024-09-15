@@ -49,6 +49,7 @@ const {
 const {
   importWord,
   submitAssessment,
+  getAssessmentCode,
   getImportWords,
   getPerformance,
   deleteAssessment,
@@ -92,6 +93,7 @@ router.get("/getImportWord", getImportWords);
 
 // Assessment Routes
 router.post("/submitAssessment", submitAssessment);
+router.get("/getActivity/:ActivityCode", getAssessmentCode);
 router.get("/getPerformance", getPerformance);
 router.delete("/deleteAssessment/:id", deleteAssessment);
 

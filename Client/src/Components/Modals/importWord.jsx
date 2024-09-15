@@ -122,7 +122,6 @@ const ImportWord = ({ show, onHide }) => {
                 </SelectItem>
                 <SelectItem key="Pantig">Assessment 2: Pantig</SelectItem>
                 <SelectItem key="Salita">Assessment 3: Salita</SelectItem>
-                <SelectItem key="Pagbabasa">Assessment 4: Pagbabasa</SelectItem>
               </Select>
 
               <Input
