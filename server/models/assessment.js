@@ -11,11 +11,7 @@ const assessSchema = new Schema(
       type: String,
     },
     Type: String,
-    Item1: String,
-    Item2: String,
-    Item3: String,
-    Item4: String,
-    Item5: String,
+    Items: Object,
   },
 
   { timestamps: true }
