@@ -31,10 +31,10 @@ const BodyAdminDashboard = () => {
 
       // Count teachers and parents
       const teachers = response.data.filter(
-        (user) => user.role === "teacher"
+        (user) => user.role === "Teacher"
       ).length;
       const parents = response.data.filter(
-        (user) => user.role === "parent"
+        (user) => user.role === "Parent"
       ).length;
 
       setTeachersCount(teachers);
