@@ -37,7 +37,7 @@ const cloudinaryUploaderUser = async (req, res) => {
   const audioUserFile4 = files["User4"] ? files["User4"][0] : null;
   const audioUserFile5 = files["User5"] ? files["User5"][0] : null;
 
-  if (!audioUserFile1 || audioUserFile2) {
+  if (!audioUserFile1) {
     return res.json({ error: "File not found" });
   }
 
