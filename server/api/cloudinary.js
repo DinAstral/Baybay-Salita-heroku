@@ -46,12 +46,12 @@ const cloudinaryUploaderUser = async (req, res) => {
       audioUserFile1.path,
       {
         resource_type: "auto",
-        public_id: `audioUser/${audioUserFile1.filename}`,
+        public_id: `audioUser/${uploadAudioUser2.filename}`,
         folder: "user_audio",
       }
     );
     const uploadAudioUser2 = await cloudinary.uploader.upload(
-      audioUserFile1.path,
+      uploadAudioUser2.path,
       {
         resource_type: "auto",
         public_id: `audioUser/${audioUserFile2.filename}`,
@@ -59,7 +59,7 @@ const cloudinaryUploaderUser = async (req, res) => {
       }
     );
     const uploadAudioUser3 = await cloudinary.uploader.upload(
-      audioUserFile1.path,
+      uploadAudioUser3.path,
       {
         resource_type: "auto",
         public_id: `audioUser/${audioUserFile3.filename}`,
@@ -67,7 +67,7 @@ const cloudinaryUploaderUser = async (req, res) => {
       }
     );
     const uploadAudioUser4 = await cloudinary.uploader.upload(
-      audioUserFile1.path,
+      uploadAudioUser4.path,
       {
         resource_type: "auto",
         public_id: `audioUser/${audioUserFile4.filename}`,
@@ -75,7 +75,7 @@ const cloudinaryUploaderUser = async (req, res) => {
       }
     );
     const uploadAudioUser5 = await cloudinary.uploader.upload(
-      audioUserFile1.path,
+      uploadAudioUser5.path,
       {
         resource_type: "auto",
         public_id: `audioUser/${audioUserFile5.filename}`,

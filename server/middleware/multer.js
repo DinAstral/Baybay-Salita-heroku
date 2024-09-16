@@ -14,7 +14,19 @@ const storage = multer.diskStorage({
     if (file.fieldname === "Audio") {
       fileName = `audio_${fileExt}`;
     }
-    if (file.fieldname === "User") {
+    if (file.fieldname === "User1") {
+      fileName = `user_${fileExt}`;
+    }
+    if (file.fieldname === "User2") {
+      fileName = `user_${fileExt}`;
+    }
+    if (file.fieldname === "User3") {
+      fileName = `user_${fileExt}`;
+    }
+    if (file.fieldname === "User4") {
+      fileName = `user_${fileExt}`;
+    }
+    if (file.fieldname === "User5") {
       fileName = `user_${fileExt}`;
     }
 
@@ -35,7 +47,14 @@ const fileFilter = (req, file, cb) => {
         )
       );
     }
-  } else if (file.fieldname === "Audio" || file.fieldname === "User") {
+  } else if (
+    file.fieldname === "Audio" ||
+    file.fieldname === "User1" ||
+    file.fieldname === "User2" ||
+    file.fieldname === "User3" ||
+    file.fieldname === "User4" ||
+    file.fieldname === "User5"
+  ) {
     // Accept only audio files
     if (file.mimetype.startsWith("audio/")) {
       cb(null, true);
@@ -85,7 +104,13 @@ const UserUpload = multer({
   limits: {
     fileSize: limits.fileSize,
   },
-}).fields([{ name: "User", maxCount: 1 }]);
+}).fields([
+  { name: "User1", maxCount: 1 },
+  { name: "User2", maxCount: 1 },
+  { name: "User3", maxCount: 1 },
+  { name: "User4", maxCount: 1 },
+  { name: "User5", maxCount: 1 },
+]);
 
 // Export the upload handlers
 module.exports = { wordUpload, UserUpload };
