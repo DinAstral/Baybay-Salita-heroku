@@ -212,15 +212,16 @@ const userInputAudio = async (req, res) => {
       } = req.body;
 
       const uploadResponse = await cloudinaryUploaderUser(req, res);
+      console.log("Upload Response:", uploadResponse);
 
-      // Access the uploaded file
-      const UserFile1 = uploadResponse.uploadAudioUser1.url;
-      const UserFile2 = uploadResponse.uploadAudioUser2.url;
-      const UserFile3 = uploadResponse.uploadAudioUser3.url;
-      const UserFile4 = uploadResponse.uploadAudioUser4.url;
-      const UserFile5 = uploadResponse.uploadAudioUser5.url;
+      const files = ["User1", "User2", "User3", "User4", "User5"];
+      const fileUrls = {};
 
-      // Insert the file info into the Performance collection
+      files.forEach((fileKey, index) => {
+        const fileUpload = uploadResponse[`uploadAudioUser${index + 1}`];
+        fileUrls[`AudioURL${index + 1}`] = fileUpload ? fileUpload.url : "";
+      });
+
       const insert = await Performance.create({
         UserInputId: InputID,
         AssessmentID: AssessmentID,
@@ -229,19 +230,19 @@ const userInputAudio = async (req, res) => {
         Type: Type,
         Itemcode1: Itemcode1,
         Audio1: "Submitted",
-        AudioURL1: UserFile1,
+        AudioURL1: fileUrls.AudioURL1,
         Itemcode2: Itemcode2,
         Audio2: "Submitted",
-        AudioURL2: UserFile2,
+        AudioURL2: fileUrls.AudioURL2,
         Itemcode3: Itemcode3,
         Audio3: "Submitted",
-        AudioURL3: UserFile3,
+        AudioURL3: fileUrls.AudioURL3,
         Itemcode4: Itemcode4,
         Audio4: "Submitted",
-        AudioURL4: UserFile4,
+        AudioURL4: fileUrls.AudioURL4,
         Itemcode5: Itemcode5,
         Audio5: "Submitted",
-        AudioURL5: UserFile5,
+        AudioURL5: fileUrls.AudioURL5,
       });
 
       if (insert) {

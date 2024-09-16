@@ -31,57 +31,37 @@ const cloudinaryUploader = async (req, res) => {
 
 const cloudinaryUploaderUser = async (req, res) => {
   const { files } = req;
-  const audioUserFile1 = files["User1"] ? files["User1"][0] : null;
-  const audioUserFile2 = files["User2"] ? files["User2"][0] : null;
-  const audioUserFile3 = files["User3"] ? files["User3"][0] : null;
-  const audioUserFile4 = files["User4"] ? files["User4"][0] : null;
-  const audioUserFile5 = files["User5"] ? files["User5"][0] : null;
+  const audioFiles = {
+    User1: files["User1"] ? files["User1"][0] : null,
+    User2: files["User2"] ? files["User2"][0] : null,
+    User3: files["User3"] ? files["User3"][0] : null,
+    User4: files["User4"] ? files["User4"][0] : null,
+    User5: files["User5"] ? files["User5"][0] : null,
+  };
 
-  if (!audioUserFile1) {
-    return res.json({ error: "File not found" });
+  // Check if at least one file exists
+  const fileKeys = Object.keys(audioFiles);
+  const allFiles = fileKeys.every((key) => audioFiles[key]);
+  if (!allFiles) {
+    return res.json({ error: "One or more files are missing" });
   }
 
   try {
-    const uploadAudioUser1 = await cloudinary.uploader.upload(
-      audioUserFile1.path,
-      {
+    const uploadPromises = fileKeys.map((key) =>
+      cloudinary.uploader.upload(audioFiles[key].path, {
         resource_type: "auto",
-        public_id: `audioUser/${audioUserFile1.filename}`,
+        public_id: `audioUser/${audioFiles[key].filename}`,
         folder: "user_audio",
-      }
+      })
     );
-    const uploadAudioUser2 = await cloudinary.uploader.upload(
-      audioUserFile2.path,
-      {
-        resource_type: "auto",
-        public_id: `audioUser/${audioUserFile2.filename}`,
-        folder: "user_audio",
-      }
-    );
-    const uploadAudioUser3 = await cloudinary.uploader.upload(
-      audioUserFile3.path,
-      {
-        resource_type: "auto",
-        public_id: `audioUser/${audioUserFile3.filename}`,
-        folder: "user_audio",
-      }
-    );
-    const uploadAudioUser4 = await cloudinary.uploader.upload(
-      audioUserFile4.path,
-      {
-        resource_type: "auto",
-        public_id: `audioUser/${audioUserFile4.filename}`,
-        folder: "user_audio",
-      }
-    );
-    const uploadAudioUser5 = await cloudinary.uploader.upload(
-      audioUserFile5.path,
-      {
-        resource_type: "auto",
-        public_id: `audioUser/${audioUserFile5.filename}`,
-        folder: "user_audio",
-      }
-    );
+
+    const [
+      uploadAudioUser1,
+      uploadAudioUser2,
+      uploadAudioUser3,
+      uploadAudioUser4,
+      uploadAudioUser5,
+    ] = await Promise.all(uploadPromises);
 
     return {
       uploadAudioUser1,
