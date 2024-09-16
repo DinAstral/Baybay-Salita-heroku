@@ -10,8 +10,7 @@ import UpdateParent from "../Modals/AdminModal/UpdateParent";
 import UpdateTeacher from "../Modals/AdminModal/UpdateTeacher";
 import DeleteUser from "../Modals/AdminModal/DeleteUser";
 import { useDownloadExcel } from "react-export-table-to-excel";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
+import { Tooltip } from "@nextui-org/react";
 import ReactPaginate from "react-paginate";
 import axios from "axios";
 import {
@@ -145,23 +144,32 @@ const BodyAdminUsers = () => {
         <div className="content-title-header">
           <div>
             Admin Manage User
-            <OverlayTrigger
-              placement="bottom"
-              delay={{ show: 250, hide: 400 }}
-              overlay={<Tooltip>View user information</Tooltip>}
+            <Tooltip
+              content={
+                <div className="px-1 py-2">
+                  <div className="text-small font-bold">User Table</div>
+                  <div className="text-tiny">
+                    This function will view the information of the students in
+                    the system.
+                  </div>
+                </div>
+              }
             >
               <FontAwesomeIcon
                 icon={faCircleInfo}
                 size="1x"
                 className="help-icon"
               />
-            </OverlayTrigger>
+            </Tooltip>
           </div>
           <div className="generate-report">
-            <OverlayTrigger
-              placement="bottom"
-              delay={{ show: 250, hide: 400 }}
-              overlay={<Tooltip>Generate report/Print table</Tooltip>}
+            <Tooltip
+              content={
+                <div className="px-1 py-2">
+                  <div className="text-small font-bold">Print</div>
+                  <div className="text-tiny">Generate report/Print table</div>
+                </div>
+              }
             >
               <FontAwesomeIcon
                 icon={faPrint}
@@ -169,7 +177,7 @@ const BodyAdminUsers = () => {
                 className="print-icon"
                 onClick={() => handleModalStateChange("print", true)}
               />
-            </OverlayTrigger>
+            </Tooltip>
           </div>
         </div>
 

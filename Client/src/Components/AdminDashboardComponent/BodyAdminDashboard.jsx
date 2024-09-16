@@ -1,121 +1,125 @@
-import React, { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
+import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCircleInfo,
-  faEye,
-  faPen,
-  faTrash,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import "../ContentDasboard/Content.css";
-import {
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Pagination,
-  getKeyValue,
-  User,
-  Chip,
-} from "@nextui-org/react";
-import { columns, users } from "./data";
-import { Card, CardHeader, CardBody, Image } from "@nextui-org/react";
-
-import { LineChart } from "@mui/x-charts/LineChart";
+import { Tooltip } from "@nextui-org/react";
+import { PieChart } from "@mui/x-charts/PieChart";
+import { BarChart } from "@mui/x-charts/BarChart";
+import { Card, CardHeader, CardBody } from "@nextui-org/react";
 import ContentHeader from "../ContentDasboard/ContentHeader";
-
-const statusColorMap = {
-  active: "success",
-  paused: "danger",
-  vacation: "warning",
-};
+import axios from "axios";
 
 const BodyAdminDashboard = () => {
-  const location = useLocation();
-  const [activeIndex, setActiveIndex] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [teachersCount, setTeachersCount] = useState(0);
+  const [parentsCount, setParentsCount] = useState(0);
+  const [asterCount, setAsterCount] = useState(0);
+  const [camiaCount, setCamiaCount] = useState(0);
+  const [dahliaCount, setDahliaCount] = useState(0);
+  const [irisCount, setIrisCount] = useState(0);
+  const [jasminCount, setJasminCount] = useState(0);
+  const [orchidCount, setOrchidCount] = useState(0);
+  const [roseCount, setRoseCount] = useState(0);
+  const [tulipCount, setTulipCount] = useState(0);
+  const [sscCount, setSSCCount] = useState(0);
 
-  const [page, setPage] = useState(1);
-  const rowsPerPage = 3;
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get("/users");
+      setUsers(response.data);
 
-  const pages = Math.ceil(users.length / rowsPerPage);
+      // Count teachers and parents
+      const teachers = response.data.filter(
+        (user) => user.role === "teacher"
+      ).length;
+      const parents = response.data.filter(
+        (user) => user.role === "parent"
+      ).length;
 
-  const items = React.useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-
-    return users.slice(start, end);
-  }, [page]);
-
-  const renderTooltip = (props) => (
-    <Tooltip id="button-tooltip" {...props}>
-      This function will add Information for your students in your section.
-    </Tooltip>
-  );
-
-  const toggleActive = (index) => {
-    setActiveIndex(index);
-  };
-
-  const renderCell = (user, columnKey) => {
-    const cellValue = user[columnKey];
-
-    switch (columnKey) {
-      case "name":
-        return (
-          <User
-            avatarProps={{ radius: "lg", src: user.avatar }}
-            description={user.email}
-            name={cellValue}
-          />
-        );
-      case "role":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-sm capitalize">{cellValue}</p>
-            <p className="text-bold text-sm capitalize text-default-400">
-              {user.team}
-            </p>
-          </div>
-        );
-      case "status":
-        return (
-          <Chip
-            className="capitalize"
-            color={statusColorMap[user.status]}
-            size="sm"
-            variant="flat"
-          >
-            {cellValue}
-          </Chip>
-        );
-      case "actions":
-        return (
-          <div className="relative flex items-center gap-2">
-            <Tooltip content="Details">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <FontAwesomeIcon icon={faEye} />
-              </span>
-            </Tooltip>
-            <Tooltip content="Edit user">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <FontAwesomeIcon icon={faPen} />
-              </span>
-            </Tooltip>
-            <Tooltip color="danger" content="Delete user">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                <FontAwesomeIcon icon={faTrash} />
-              </span>
-            </Tooltip>
-          </div>
-        );
-      default:
-        return cellValue;
+      setTeachersCount(teachers);
+      setParentsCount(parents);
+    } catch (err) {
+      console.error(err);
     }
   };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchStudents = async () => {
+    try {
+      const response = await axios.get("/getStudents");
+      setStudents(response.data);
+
+      // Count pre section
+      const aster = response.data.filter(
+        (student) => student.Section === "Aster"
+      ).length;
+      const camia = response.data.filter(
+        (student) => student.Section === "Camia"
+      ).length;
+      const dahlia = response.data.filter(
+        (student) => student.Section === "Dahlia"
+      ).length;
+      const iris = response.data.filter(
+        (student) => student.Section === "Iris"
+      ).length;
+      const jasmin = response.data.filter(
+        (student) => student.Section === "Jasmin"
+      ).length;
+      const orchid = response.data.filter(
+        (student) => student.Section === "Orchid"
+      ).length;
+      const rose = response.data.filter(
+        (student) => student.Section === "Rose"
+      ).length;
+      const tulip = response.data.filter(
+        (student) => student.Section === "Tulip"
+      ).length;
+      const SSC = response.data.filter(
+        (student) => student.Section === "SSC"
+      ).length;
+
+      setAsterCount(aster);
+      setCamiaCount(camia);
+      setDahliaCount(dahlia);
+      setIrisCount(iris);
+      setJasminCount(jasmin);
+      setOrchidCount(orchid);
+      setRoseCount(rose);
+      setTulipCount(tulip);
+      setSSCCount(SSC);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  const sectionData = [
+    { section: "Aster", count: asterCount },
+    { section: "Camia", count: camiaCount },
+    { section: "Dahlia", count: dahliaCount },
+    { section: "Iris", count: irisCount },
+    { section: "Jasmin", count: jasminCount },
+    { section: "Orchid", count: orchidCount },
+    { section: "Rose", count: roseCount },
+    { section: "Tulip", count: tulipCount },
+    { section: "SSC", count: sscCount },
+  ];
+
+  useEffect(() => {
+    axios
+      .get("/getStudents") // Corrected route
+      .then((response) => {
+        setStudents(response.data);
+      })
+      .catch((err) => console.log(err));
+  }, []);
 
   return (
     <div className="content">
@@ -123,101 +127,123 @@ const BodyAdminDashboard = () => {
       <div className="content-body">
         <div className="content-title-header">
           <div>
-            Dashboard
-            <OverlayTrigger
-              placement="bottom"
-              delay={{ show: 250, hide: 400 }}
-              overlay={renderTooltip}
+            Admin Dashboard
+            <Tooltip
+              content={
+                <div className="px-1 py-2">
+                  <div className="text-small font-bold">Dashboard Table</div>
+                  <div className="text-tiny">
+                    This function will view the data of the system in each
+                    section.
+                  </div>
+                </div>
+              }
             >
               <FontAwesomeIcon
                 icon={faCircleInfo}
                 size="1x"
                 className="help-icon"
               />
-            </OverlayTrigger>
+            </Tooltip>
           </div>
         </div>
         <div className="flex flex-col w-[100%] h-full max-h-[800px] bg-[#fff] mt-2 p-5 rounded-md shadow-sm">
+          <div className="flex m-3">
+            <p className="text-2xl font-semibold">Data Information</p>
+          </div>
           <div className="flex items-center gap-3 mb-3">
-            <Card className="py-4">
-              <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
-                <p className="text-md uppercase font-bold">Total User</p>
-                <small className="text-default-500">12 Tracks</small>
+            <Card className="py-4 w-[20%]">
+              <CardHeader className="pb-0 pt-2 px-4 flex-col items-center">
+                <p className="text-md uppercase font-bold">Users</p>
               </CardHeader>
-              <CardBody className="overflow-visible py-2">
-                <Image
-                  alt="Card background"
-                  className="object-cover rounded-xl"
-                  src="https://nextui.org/images/hero-card-complete.jpeg"
-                  width={270}
+              <CardBody className="items-center">
+                <p className="text-5xl">{users.length}</p>
+              </CardBody>
+            </Card>
+            <Card className="py-4 w-[20%]">
+              <CardHeader className="pb-0 pt-2 px-4 flex-col items-center">
+                <p className="text-md uppercase font-bold">Student</p>
+              </CardHeader>
+              <CardBody className="items-center">
+                <p className="text-5xl">{students.length}</p>
+              </CardBody>
+            </Card>
+            <Card className="py-4 w-[20%]">
+              <CardHeader className="pb-0 pt-2 px-4 flex-col items-center">
+                <p className="text-md uppercase font-bold">Teacher</p>
+              </CardHeader>
+              <CardBody className="items-center">
+                <p className="text-5xl">{teachersCount}</p>
+              </CardBody>
+            </Card>
+            <Card className="py-4 w-[20%]">
+              <CardHeader className="pb-0 pt-2 px-4 flex-col items-center">
+                <p className="text-md uppercase font-bold">Parent</p>
+              </CardHeader>
+              <CardBody className="items-center">
+                <p className="text-5xl">{parentsCount}</p>
+              </CardBody>
+            </Card>
+            <Card className="py-4 w-[80%]">
+              <CardBody className="overflow-visible py-2 flex items-center justify-center">
+                <PieChart
+                  series={[
+                    {
+                      data: [
+                        { id: 0, value: users.length, label: "User" },
+                        { id: 1, value: students.length, label: "Student" },
+                        { id: 2, value: teachersCount, label: "Teacher" },
+                        { id: 3, value: parentsCount, label: "Parent" },
+                      ],
+                    },
+                  ]}
+                  width={400}
+                  height={200}
                 />
               </CardBody>
             </Card>
-            <Card className="py-4">
-              <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
-                <p className="text-md uppercase font-bold">Total User</p>
-                <small className="text-default-500">12 Tracks</small>
-              </CardHeader>
-              <CardBody className="overflow-visible py-2">
-                <Image
-                  alt="Card background"
-                  className="object-cover rounded-xl"
-                  src="https://nextui.org/images/hero-card-complete.jpeg"
-                  width={270}
-                />
-              </CardBody>
-            </Card>
-            <div className="w-full">
-              <Card className="py-4 w-full">
-                <CardBody className="overflow-visible py-2">
-                  <Table
-                    aria-label="Example table with custom cells"
-                    bottomContent={
-                      <div className="flex w-full justify-center"></div>
-                    }
-                    classNames={{
-                      wrapper: "min-h-[222px]",
-                    }}
-                  >
-                    <TableHeader columns={columns}>
-                      {(column) => (
-                        <TableColumn
-                          key={column.uid}
-                          align={column.uid === "actions" ? "center" : "start"}
-                        >
-                          {column.name}
-                        </TableColumn>
-                      )}
-                    </TableHeader>
-                    <TableBody items={items}>
-                      {(item) => (
-                        <TableRow key={item.id}>
-                          {(columnKey) => (
-                            <TableCell>{renderCell(item, columnKey)}</TableCell>
-                          )}
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </CardBody>
-              </Card>
-            </div>
           </div>
           <div className="flex">
             <Card className="py-4 w-full">
+              <CardHeader className="pb-0 pt-2 px-4 flex-col items-center">
+                <p className="text-md uppercase font-bold">Students</p>
+              </CardHeader>
               <CardBody className="overflow-visible py-2">
-                <LineChart
-                  xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
-                  series={[
+                <BarChart
+                  xAxis={[
                     {
-                      data: [2, 5.5, 2, 8.5, 1.5, 5],
+                      scaleType: "band",
+                      data: [
+                        "Aster",
+                        "Camia",
+                        "Dahlia",
+                        "Iris",
+                        "Jasmin",
+                        "Orchid",
+                        "Rose",
+                        "Tulip",
+                        "SSC",
+                      ],
                     },
                   ]}
-                  width={1250}
-                  height={250}
-                  margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
-                  grid={{ vertical: true, horizontal: true }}
-                  className="pl-10"
+                  yAxis={[
+                    {
+                      label: "Number of Students",
+                    },
+                  ]}
+                  series={[
+                    { data: [asterCount] },
+                    { data: [camiaCount] },
+                    { data: [dahliaCount] },
+                    { data: [irisCount] },
+                    { data: [jasminCount] },
+                    { data: [orchidCount] },
+                    { data: [roseCount] },
+                    { data: [tulipCount] },
+                    { data: [sscCount] },
+                  ]}
+                  width={1400}
+                  height={300}
                 />
               </CardBody>
             </Card>

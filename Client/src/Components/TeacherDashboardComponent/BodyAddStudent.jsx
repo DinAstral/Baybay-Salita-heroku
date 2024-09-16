@@ -7,7 +7,7 @@ import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import "../ContentDasboard/Content.css";
 import axios from "axios";
 import toast from "react-hot-toast";
-import TeacherContentHeader from "../ContentDasboard/TeacherContentHeader";
+import ContentHeader from "../ContentDasboard/ContentHeader";
 import { Select, SelectItem } from "@nextui-org/react";
 
 const BodyTeacherAddStudent = () => {
@@ -76,7 +76,7 @@ const BodyTeacherAddStudent = () => {
 
   return (
     <div className="content">
-      <TeacherContentHeader />
+      <ContentHeader />
       <div className="content-body">
         <div className="content-title-header">
           <div>

@@ -10,7 +10,7 @@ import {
   faCircleInfo,
   faEnvelope,
 } from "@fortawesome/free-solid-svg-icons";
-import TeacherContentHeader from "../ContentDasboard/TeacherContentHeader";
+import ContentHeader from "../ContentDasboard/ContentHeader";
 import { UserContext } from "../../../context/userContext";
 import axios from "axios";
 
@@ -112,7 +112,7 @@ const BodyTeacherProfileBasic = () => {
 
   return (
     <div className="content">
-      <TeacherContentHeader />
+      <ContentHeader />
       <div className="content-body">
         <EditUser
           show={modalShow}

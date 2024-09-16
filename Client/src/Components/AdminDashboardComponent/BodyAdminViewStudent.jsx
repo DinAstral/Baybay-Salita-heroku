@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
+import { useState, useEffect } from "react";
+import { Tooltip } from "@nextui-org/react";
 import profile from "./../../assets/profile.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -18,12 +17,6 @@ const BodyAdminViewStudent = () => {
     setActiveIndex(index);
   }, [location.pathname]);
 
-  const renderTooltip = (props) => (
-    <Tooltip id="button-tooltip" {...props}>
-      This function will view your profile.
-    </Tooltip>
-  );
-
   const toggleActive = (index) => {
     setActiveIndex(index);
   };
@@ -35,17 +28,23 @@ const BodyAdminViewStudent = () => {
         <div className="content-title-header">
           <div>
             Information of the Student
-            <OverlayTrigger
-              placement="bottom"
-              delay={{ show: 250, hide: 400 }}
-              overlay={renderTooltip}
+            <Tooltip
+              content={
+                <div className="px-1 py-2">
+                  <div className="text-small font-bold">View Information</div>
+                  <div className="text-tiny">
+                    This function will view the information of the student in
+                    the system.
+                  </div>
+                </div>
+              }
             >
               <FontAwesomeIcon
                 icon={faCircleInfo}
                 size="1x"
                 className="help-icon"
               />
-            </OverlayTrigger>
+            </Tooltip>
           </div>
         </div>
         <div className="content-container">

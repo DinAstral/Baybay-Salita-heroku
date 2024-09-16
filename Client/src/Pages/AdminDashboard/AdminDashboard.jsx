@@ -4,11 +4,14 @@ import BodyAdminDashboard from "../../Components/AdminDashboardComponent/BodyAdm
 
 const AdminDashboard = () => {
   return (
-    <div className="w-full h-screen flex">
-      <div className="flex w-[15%] h-full gap-10 bg-[#F5EBD6]">
+    <div className="w-full h-full flex">
+      {/* Sidebar */}
+      <div className="fixed top-0 left-0 w-[15%] h-full bg-[#F5EBD6]">
         <AdminSidebar />
       </div>
-      <div className="flex flex-[1] w-full h-full bg-[#F2EDE3] p-[2rem] gap-[1.5rem] justify-between">
+
+      {/* Main Dashboard Content */}
+      <div className="ml-[15%] w-[85%] h-full bg-[#F2EDE3] p-[2rem] flex flex-col gap-[1.5rem]">
         <BodyAdminDashboard />
       </div>
     </div>

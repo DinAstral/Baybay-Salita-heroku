@@ -115,7 +115,7 @@ const BodyAdminStudentAssessment = () => {
                 <div className="px-1 py-2">
                   <div className="text-small font-bold">Assessment Table</div>
                   <div className="text-tiny">
-                    This function will view the assessment of your students in
+                    This function will view the assessment of the students in
                     each section.
                   </div>
                 </div>

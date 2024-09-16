@@ -1,7 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useState, useEffect } from "react";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
+import { Tooltip } from "@nextui-org/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
@@ -41,12 +40,6 @@ const BodyAdminEditStudent = () => {
         toast.error("Failed to fetch student data. Please try again later.");
       });
   }, [id]); // Added 'id' to dependency array
-
-  const renderTooltip = (props) => (
-    <Tooltip id="button-tooltip" {...props}>
-      This function will edit the information of your students.
-    </Tooltip>
-  );
 
   const editStudent = async (e) => {
     e.preventDefault();
@@ -100,17 +93,23 @@ const BodyAdminEditStudent = () => {
         <div className="content-title-header">
           <div>
             Update Student's Information
-            <OverlayTrigger
-              placement="bottom"
-              delay={{ show: 250, hide: 400 }}
-              overlay={renderTooltip}
+            <Tooltip
+              content={
+                <div className="px-1 py-2">
+                  <div className="text-small font-bold">Update Information</div>
+                  <div className="text-tiny">
+                    This function will update the information of the students in
+                    system.
+                  </div>
+                </div>
+              }
             >
               <FontAwesomeIcon
                 icon={faCircleInfo}
                 size="1x"
                 className="help-icon"
               />
-            </OverlayTrigger>
+            </Tooltip>
           </div>
         </div>
         <form onSubmit={editStudent}>

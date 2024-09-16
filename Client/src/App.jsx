@@ -3,6 +3,7 @@ import { NextUIProvider } from "@nextui-org/react";
 import { Route, Routes, useNavigate } from "react-router-dom"; // Import BrowserRouter, Route, and Routes
 import axios from "axios";
 import { Toaster } from "react-hot-toast";
+import { UserContextProvider } from "../context/userContext";
 import Login from "./Pages/Login";
 import RegisterSelect from "./Pages/RegisterSelect";
 import ForgotPassword from "./Pages/ForgotPassword";
@@ -12,7 +13,6 @@ import AdminEditProfile from "./Pages/AdminDashboard/AdminEditProfile";
 import AdminUser from "./Pages/AdminDashboard/AdminUser";
 import AdminEditUser from "./Pages/AdminDashboard/AdminEditUser";
 import AdminStudent from "./Pages/AdminDashboard/AdminStudent";
-import AdminStudentProgress from "./Pages/AdminDashboard/AdminStudentProgress";
 import AdminViewStudent from "./Pages/AdminDashboard/AdminViewStudent";
 import AdminAssessment from "./Pages/AdminDashboard/AdminAssessment";
 import AdminEditStudent from "./Pages/AdminDashboard/AdminEditStudent";
@@ -37,7 +37,6 @@ import ViewScore from "./Pages/TeacherDashboard/ViewScore";
 import EditStudent from "./Pages/TeacherDashboard/EditStudent";
 import ViewAssessment from "./Pages/TeacherDashboard/ViewAssessment";
 import ViewStudent from "./Pages/TeacherDashboard/ViewStudent";
-import { UserContextProvider } from "../context/userContext";
 import RoleBasedRoute from "./Components/RoleBasedRoute";
 import UnauthorizedPage from "./Pages/UnauthorizedPage";
 import InformationKid from "./Pages/ParentDashboard/InformationKid";
@@ -265,14 +264,6 @@ const App = () => {
               element={
                 <RoleBasedRoute allowedRoles={["Admin"]}>
                   <AdminAssessment />
-                </RoleBasedRoute>
-              }
-            />
-            <Route
-              path="/adminStudentProgress"
-              element={
-                <RoleBasedRoute allowedRoles={["Admin"]}>
-                  <AdminStudentProgress />
                 </RoleBasedRoute>
               }
             />

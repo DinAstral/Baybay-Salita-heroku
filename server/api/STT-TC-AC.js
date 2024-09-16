@@ -8,11 +8,6 @@ const fs = require("fs");
 const ffmpeg = require("fluent-ffmpeg");
 const wav = require("wav-decoder");
 
-// Initialize AssemblyAI client
-const client = new AssemblyAI({
-  apiKey: "3b4f512cbda24b0ab31463b8200b3916", // Update with your API key
-});
-
 // URLs to the audio files
 const audioUrl1 =
   "http://res.cloudinary.com/dvcqnbkwb/video/upload/v1726210673/user_audio/audioUser/user_hello1.wav.wav";

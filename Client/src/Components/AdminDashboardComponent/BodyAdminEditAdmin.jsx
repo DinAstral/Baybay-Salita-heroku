@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Tooltip } from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import "../ContentDasboard/Content.css";
@@ -12,12 +11,6 @@ import ContentHeader from "../ContentDasboard/ContentHeader";
 const BodyAdminEditAdmin = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-
-  const renderTooltip = (props) => (
-    <Tooltip id="button-tooltip" {...props}>
-      This function will add Information for your students in your section.
-    </Tooltip>
-  );
 
   const [data, setData] = useState({
     FirstName: "",
@@ -88,17 +81,23 @@ const BodyAdminEditAdmin = () => {
         <div className="content-title-header">
           <div>
             Edit Your Information
-            <OverlayTrigger
-              placement="bottom"
-              delay={{ show: 250, hide: 400 }}
-              overlay={renderTooltip}
+            <Tooltip
+              content={
+                <div className="px-1 py-2">
+                  <div className="text-small font-bold">Update Function</div>
+                  <div className="text-tiny">
+                    This function will edit the information of the admin in each
+                    section.
+                  </div>
+                </div>
+              }
             >
               <FontAwesomeIcon
                 icon={faCircleInfo}
                 size="1x"
                 className="help-icon"
               />
-            </OverlayTrigger>
+            </Tooltip>
           </div>
         </div>
         <form onSubmit={editAdmin}>

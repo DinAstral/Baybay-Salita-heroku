@@ -10,7 +10,7 @@ import {
   faPrint,
 } from "@fortawesome/free-solid-svg-icons";
 import "../ContentDasboard/Content.css";
-import TeacherContentHeader from "../ContentDasboard/TeacherContentHeader";
+import ContentHeader from "../ContentDasboard/ContentHeader";
 import {
   Modal,
   ModalContent,
@@ -125,7 +125,7 @@ const BodyViewScore = () => {
 
   return (
     <div className="content">
-      <TeacherContentHeader />
+      <ContentHeader />
       <div className="content-body">
         <div className="content-title-header">
           <div>

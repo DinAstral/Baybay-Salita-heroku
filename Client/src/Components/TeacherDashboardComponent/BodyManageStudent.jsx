@@ -14,7 +14,7 @@ import { Table, Modal, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import "../ContentDasboard/Content.css";
-import TeacherContentHeader from "../ContentDasboard/TeacherContentHeader";
+import ContentHeader from "../ContentDasboard/ContentHeader";
 
 const PrintRecord = ({ show, onHide, print }) => {
   return (
@@ -195,7 +195,7 @@ const BodyAdminStudent = () => {
 
   return (
     <div className="content">
-      <TeacherContentHeader />
+      <ContentHeader />
       <div className="content-body">
         <PrintRecord
           show={modalShowPrint}

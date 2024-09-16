@@ -18,7 +18,7 @@ import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import "../ContentDasboard/Content.css";
 import toast from "react-hot-toast";
-import TeacherContentHeader from "../ContentDasboard/TeacherContentHeader";
+import ContentHeader from "../ContentDasboard/ContentHeader";
 import PrintRecord from "../Modals/PrintRecord";
 import CreateAssessment from "../Modals/CreateAssessment";
 
@@ -503,7 +503,7 @@ const BodyAssessment = () => {
 
   return (
     <div className="content">
-      <TeacherContentHeader />
+      <ContentHeader />
       <div className="content-body">
         <PrintRecord
           show={modalShowPrint}

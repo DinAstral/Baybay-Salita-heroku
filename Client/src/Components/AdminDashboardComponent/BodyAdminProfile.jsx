@@ -1,9 +1,8 @@
 import { useState, useEffect, useContext } from "react";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
 import profileImage from "./../../assets/profile.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Tooltip } from "@nextui-org/react";
 import {
   faAddressCard,
   faCircleInfo,
@@ -26,12 +25,6 @@ const BodyAdminProfile = () => {
     setActiveIndex(index);
   }, [location.pathname]);
 
-  const renderTooltip = (props) => (
-    <Tooltip id="button-tooltip" {...props}>
-      This function will view your profile.
-    </Tooltip>
-  );
-
   const handleEditClick = () => {
     setModalShow(true);
   };
@@ -52,17 +45,24 @@ const BodyAdminProfile = () => {
         <div className="content-title-header">
           <div>
             Admin Profile
-            <OverlayTrigger
-              placement="bottom"
-              delay={{ show: 250, hide: 400 }}
-              overlay={renderTooltip}
+            <Tooltip
+              content={
+                <div className="px-1 py-2">
+                  <div className="text-small font-bold">
+                    Profile Information
+                  </div>
+                  <div className="text-tiny">
+                    This function will view your information.
+                  </div>
+                </div>
+              }
             >
               <FontAwesomeIcon
                 icon={faCircleInfo}
                 size="1x"
                 className="help-icon"
               />
-            </OverlayTrigger>
+            </Tooltip>
           </div>
         </div>
         <div className="content-container">

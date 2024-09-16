@@ -1,7 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import { useDownloadExcel } from "react-export-table-to-excel";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
 import ReactPaginate from "react-paginate";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -20,6 +18,7 @@ import {
   Select,
   SelectItem,
   Input,
+  Tooltip,
 } from "@nextui-org/react";
 import axios from "axios";
 import "../ContentDasboard/Content.css";
@@ -61,18 +60,6 @@ const BodyAdminStudent = () => {
       })
       .catch((err) => console.log(err));
   }, []);
-
-  const renderTooltip = (props) => (
-    <Tooltip id="button-tooltip" {...props}>
-      This function will view Information of your students on each section.
-    </Tooltip>
-  );
-
-  const generateReport = (props) => (
-    <Tooltip id="button-tooltip" {...props}>
-      Generate report/Print table
-    </Tooltip>
-  );
 
   const handlePrintClick = () => {
     setModalShowPrint(true);
@@ -149,23 +136,32 @@ const BodyAdminStudent = () => {
         <div className="content-title-header">
           <div>
             Admin Manage Student
-            <OverlayTrigger
-              placement="bottom"
-              delay={{ show: 250, hide: 400 }}
-              overlay={renderTooltip}
+            <Tooltip
+              content={
+                <div className="px-1 py-2">
+                  <div className="text-small font-bold">Student Table</div>
+                  <div className="text-tiny">
+                    This function will view the list of the students in each
+                    section.
+                  </div>
+                </div>
+              }
             >
               <FontAwesomeIcon
                 icon={faCircleInfo}
                 size="1x"
                 className="help-icon"
               />
-            </OverlayTrigger>
+            </Tooltip>
           </div>
           <div className="generate-report">
-            <OverlayTrigger
-              placement="bottom"
-              delay={{ show: 250, hide: 400 }}
-              overlay={generateReport}
+            <Tooltip
+              content={
+                <div className="px-1 py-2">
+                  <div className="text-small font-bold">Print</div>
+                  <div className="text-tiny">Generate report/Print table</div>
+                </div>
+              }
             >
               <FontAwesomeIcon
                 icon={faPrint}
@@ -173,7 +169,7 @@ const BodyAdminStudent = () => {
                 className="print-icon"
                 onClick={handlePrintClick}
               />
-            </OverlayTrigger>
+            </Tooltip>
           </div>
         </div>
         <div className="content-container">

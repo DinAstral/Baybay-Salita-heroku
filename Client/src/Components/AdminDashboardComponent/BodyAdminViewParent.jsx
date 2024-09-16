@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
+import { useState, useEffect } from "react";
+import { Tooltip } from "@nextui-org/react";
 import profile from "./../../assets/profile.png";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -50,13 +49,7 @@ const BodyAdminViewParent = () => {
     const menuItem = [`/adminViewParent/${data?._id}`];
     const index = menuItem.findIndex((item) => item === location.pathname);
     setActiveIndex(index);
-  }, [location.pathname]);
-
-  const renderTooltip = (props) => (
-    <Tooltip id="button-tooltip" {...props}>
-      This function will view your profile.
-    </Tooltip>
-  );
+  }, [data?._id, location.pathname]);
 
   const toggleActive = (index) => {
     setActiveIndex(index);
@@ -69,17 +62,23 @@ const BodyAdminViewParent = () => {
         <div className="content-title-header">
           <div>
             View Parent Profile
-            <OverlayTrigger
-              placement="bottom"
-              delay={{ show: 250, hide: 400 }}
-              overlay={renderTooltip}
+            <Tooltip
+              content={
+                <div className="px-1 py-2">
+                  <div className="text-small font-bold">View Information</div>
+                  <div className="text-tiny">
+                    This function will view the information of the parent in the
+                    system.
+                  </div>
+                </div>
+              }
             >
               <FontAwesomeIcon
                 icon={faCircleInfo}
                 size="1x"
                 className="help-icon"
               />
-            </OverlayTrigger>
+            </Tooltip>
           </div>
         </div>
         <div className="content-container">

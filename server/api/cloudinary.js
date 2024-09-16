@@ -31,23 +31,65 @@ const cloudinaryUploader = async (req, res) => {
 
 const cloudinaryUploaderUser = async (req, res) => {
   const { files } = req;
-  const audioUserFile = files["User"] ? files["User"][0] : null;
+  const audioUserFile1 = files["User1"] ? files["User1"][0] : null;
+  const audioUserFile2 = files["User2"] ? files["User2"][0] : null;
+  const audioUserFile3 = files["User3"] ? files["User3"][0] : null;
+  const audioUserFile4 = files["User4"] ? files["User4"][0] : null;
+  const audioUserFile5 = files["User5"] ? files["User5"][0] : null;
 
-  if (!audioUserFile) {
+  if (!audioUserFile1 || audioUserFile2) {
     return res.json({ error: "File not found" });
   }
 
   try {
-    const uploadAudioUser = await cloudinary.uploader.upload(
-      audioUserFile.path,
+    const uploadAudioUser1 = await cloudinary.uploader.upload(
+      audioUserFile1.path,
       {
         resource_type: "auto",
-        public_id: `audioUser/${audioUserFile.filename}`,
+        public_id: `audioUser/${audioUserFile1.filename}`,
+        folder: "user_audio",
+      }
+    );
+    const uploadAudioUser2 = await cloudinary.uploader.upload(
+      audioUserFile1.path,
+      {
+        resource_type: "auto",
+        public_id: `audioUser/${audioUserFile2.filename}`,
+        folder: "user_audio",
+      }
+    );
+    const uploadAudioUser3 = await cloudinary.uploader.upload(
+      audioUserFile1.path,
+      {
+        resource_type: "auto",
+        public_id: `audioUser/${audioUserFile3.filename}`,
+        folder: "user_audio",
+      }
+    );
+    const uploadAudioUser4 = await cloudinary.uploader.upload(
+      audioUserFile1.path,
+      {
+        resource_type: "auto",
+        public_id: `audioUser/${audioUserFile4.filename}`,
+        folder: "user_audio",
+      }
+    );
+    const uploadAudioUser5 = await cloudinary.uploader.upload(
+      audioUserFile1.path,
+      {
+        resource_type: "auto",
+        public_id: `audioUser/${audioUserFile5.filename}`,
         folder: "user_audio",
       }
     );
 
-    return { uploadAudioUser };
+    return {
+      uploadAudioUser1,
+      uploadAudioUser2,
+      uploadAudioUser3,
+      uploadAudioUser4,
+      uploadAudioUser5,
+    };
   } catch (error) {
     console.log(error);
     throw new Error("Cloudinary upload failed");

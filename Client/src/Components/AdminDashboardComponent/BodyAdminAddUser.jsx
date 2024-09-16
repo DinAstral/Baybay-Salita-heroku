@@ -1,7 +1,7 @@
+/* eslint-disable react/no-unescaped-entities */
 import { useState } from "react";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
 import { useNavigate } from "react-router-dom";
+import { Tooltip } from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import "../ContentDasboard/Content.css";
@@ -35,12 +35,6 @@ function generateRandomCode(role, length) {
 
 const BodyAdminAddUser = () => {
   const navigate = useNavigate();
-
-  const renderTooltip = (props) => (
-    <Tooltip id="button-tooltip" {...props}>
-      This function will add user information for your section.
-    </Tooltip>
-  );
 
   const [data, setData] = useState({
     UserID: "",
@@ -88,17 +82,23 @@ const BodyAdminAddUser = () => {
         <div className="content-title-header">
           <div>
             Add User's Information
-            <OverlayTrigger
-              placement="bottom"
-              delay={{ show: 250, hide: 400 }}
-              overlay={renderTooltip}
+            <Tooltip
+              content={
+                <div className="px-1 py-2">
+                  <div className="text-small font-bold">Add User</div>
+                  <div className="text-tiny">
+                    This function will add the information of the user in
+                    system.
+                  </div>
+                </div>
+              }
             >
               <FontAwesomeIcon
                 icon={faCircleInfo}
                 size="1x"
                 className="help-icon"
               />
-            </OverlayTrigger>
+            </Tooltip>
           </div>
         </div>
         <form onSubmit={addUser}>
