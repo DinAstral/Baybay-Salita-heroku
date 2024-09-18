@@ -11,7 +11,7 @@ import {
   faEye,
 } from "@fortawesome/free-solid-svg-icons";
 
-import Image1 from "../src/assets/Login_Baybay.png";
+import Image1 from "../assets/Login_baybay.png";
 
 const Login = () => {
   const { setUser } = useContext(UserContext);
