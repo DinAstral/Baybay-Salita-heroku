@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from "react";
-import "./../ContentDasboard/Sidebar.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faHome,
@@ -41,10 +40,10 @@ const AdminSidebar = () => {
 
   return (
     <div className="menu-dash">
-      <div className="logo-dash">
+      <div className="logo-dash p-4">
         <img src={logo} alt="Baybay Salita Logo" />
       </div>
-      <div className="menu--list">
+      <div className="menu--list flex flex-col">
         {[
           { icon: faHome, text: "Dashboard", link: "/AdminDashboard" },
           { icon: faUser, text: "Manage Users", link: "/AdminUsers" },
@@ -63,29 +62,23 @@ const AdminSidebar = () => {
           <Link
             key={index}
             to={item.link}
-            className={`item ${index === activeIndex ? "active" : ""}`}
+            className={`flex items-center p-2 font-semibold text-md text-gray-850 hover:bg-blue-100 rounded-md ${
+              index === activeIndex ? "bg-blue-400 text-white" : ""
+            }`}
           >
-            <div onClick={() => toggleActive(index)}>
-              <FontAwesomeIcon
-                icon={item.icon}
-                size="1x"
-                className="dash-icon"
-              />
-              {item.text}
-            </div>
+            <FontAwesomeIcon icon={item.icon} size="1x" className="mr-2" />
+            {item.text}
           </Link>
         ))}
       </div>
-      <div className="menu-logout">
-        <div className="menu-logout-btn">
-          <Button
-            color="primary"
-            className="w-[150px] text-md p-4"
-            onClick={handleLogout}
-          >
-            Logout
-          </Button>
-        </div>
+      <div className="menu-logout p-4">
+        <Button
+          color="primary"
+          className="w-full text-md"
+          onClick={handleLogout}
+        >
+          Logout
+        </Button>
       </div>
     </div>
   );

@@ -68,7 +68,7 @@ const { compareAudio } = require("../controllers/CompareController");
 // Configure CORS middleware
 router.use(
   cors({
-    origin: "http://192.168.56.1:3000", // Update this with your client's URL
+    origin: "https://baybay-salita-edu.netlify.app", // Update this with your client's URL
     methods: ["GET", "POST", "DELETE", "PATCH"], // Add the allowed HTTP methods
     credentials: true, // Allow credentials (cookies, authorization headers)
   })
@@ -98,6 +98,8 @@ router.post("/profileUpdate", profileUpdate); //okay
 router.post("/submitAssessment", submitAssessment); //okay
 router.get("/getActivity/:ActivityCode", getAssessmentCode); //okay
 router.get("/getPerformance", getPerformance); //okay
+router.get("/getAssessments", getActivities); //okay
+router.get("/getAssessment/:id", getActivity);
 router.delete("/deleteAssessment/:id", deleteAssessment);
 
 // Admin Routes
@@ -125,8 +127,6 @@ router.patch("/updateParent/:id", updateParent);
 // Teacher Routes
 router.patch("/updateTeacher/:id", updateTeacher);
 router.post("/createAssessment", createAssessment);
-router.get("/getAssessments", getActivities);
-router.get("/getAssessment/:id", getActivity);
 router.patch("/updateAssessment/:id", updateActivity);
 router.get("/getTeacher", getTeacherUsers);
 router.get("/getTeacher/:UserID", getTeacherUser);

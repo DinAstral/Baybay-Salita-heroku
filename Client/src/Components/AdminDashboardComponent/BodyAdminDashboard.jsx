@@ -10,11 +10,13 @@ import {
 import { Tooltip } from "@nextui-org/react";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { BarChart } from "@mui/x-charts/BarChart";
+import { LineChart } from "@mui/x-charts/LineChart";
 import axios from "axios";
 
 const BodyAdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [students, setStudents] = useState([]);
+  const [assessments, setAssessment] = useState([]);
   const [teachersCount, setTeachersCount] = useState(0);
   const [parentsCount, setParentsCount] = useState(0);
 
@@ -28,6 +30,17 @@ const BodyAdminDashboard = () => {
     Rose: 0,
     Tulip: 0,
     SSC: 0,
+  });
+
+  const [marginCount, setMarginCount] = useState({
+    count: 0,
+  });
+
+  const [activityCounts, setActivityCounts] = useState({
+    Aster: 0,
+    Camia: 0,
+    Dahlia: 0,
+    Iris: 0,
   });
 
   useEffect(() => {
@@ -70,6 +83,25 @@ const BodyAdminDashboard = () => {
         }, {});
 
         setSectionCounts(counts);
+        setMarginCount(counts);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    const fetchAssessment = async () => {
+      try {
+        const response = await axios.get("/getAssessments");
+        const data = response.data;
+        setAssessment(data);
+
+        const activities = ["Pagbabaybay", "Pantig", "Salita", "Pagbabasa"];
+        const counts = activities.reduce((acc, activity) => {
+          acc[activity] = data.filter((type) => type.Type === activity).length;
+          return acc;
+        }, {});
+
+        setActivityCounts(counts);
       } catch (err) {
         console.error(err);
       }
@@ -77,13 +109,14 @@ const BodyAdminDashboard = () => {
 
     fetchUsers();
     fetchStudents();
+    fetchAssessment();
   }, []);
 
   return (
-    <div>
+    <div className="">
       <div className="px-9">
         <div className="flex items-center mb-4">
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+          <h1 className="text-3xl font-semibold">Admin Dashboard</h1>
           <Tooltip
             showArrow={true}
             content={
@@ -156,7 +189,7 @@ const BodyAdminDashboard = () => {
           </div>
 
           <div className="col-span-1 lg:col-span-2 bg-white rounded-lg shadow p-4">
-            <h2 className="text-2xl font-semibold">Students Per Section</h2>
+            <h2 className="text-xl font-semibold">Students Per Section</h2>
             <BarChart
               xAxis={[
                 {
@@ -169,6 +202,7 @@ const BodyAdminDashboard = () => {
                   label: "Number of Students",
                 },
               ]}
+              margin={{ top: 20, bottom: 30, left: 40, right: 60 }}
               series={[
                 {
                   data: Object.values(sectionCounts),
@@ -187,7 +221,7 @@ const BodyAdminDashboard = () => {
               xAxis={[
                 {
                   scaleType: "band",
-                  data: Object.keys(sectionCounts),
+                  data: Object.keys(activityCounts),
                 },
               ]}
               yAxis={[
@@ -195,6 +229,35 @@ const BodyAdminDashboard = () => {
                   label: "Number of Students",
                 },
               ]}
+              margin={{ top: 20, bottom: 30, left: 40, right: 60 }}
+              series={[
+                {
+                  data: Object.values(activityCounts),
+                },
+              ]}
+              width={1500}
+              height={300}
+            />
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <h2 className="text-2xl font-semibold mb-4">Output Per Section</h2>
+          <div className="bg-white rounded-lg shadow p-4">
+            <BarChart
+              xAxis={[
+                {
+                  scaleType: "band",
+                  data: Object.keys(sectionCounts),
+                  dataKey: "section",
+                },
+              ]}
+              yAxis={[
+                {
+                  label: "Number of Students",
+                },
+              ]}
+              margin={{ top: 20, bottom: 30, left: 40, right: 60 }}
               series={[
                 {
                   data: Object.values(sectionCounts),
@@ -207,57 +270,14 @@ const BodyAdminDashboard = () => {
         </div>
 
         <div className="mt-6">
-          <h2 className="text-2xl font-semibold mb-4">
-            Answered Assessment Per Section
-          </h2>
+          <h2 className="text-2xl font-semibold mb-4">Compared Result</h2>
           <div className="bg-white rounded-lg shadow p-4">
-            <BarChart
-              xAxis={[
-                {
-                  scaleType: "band",
-                  data: Object.keys(sectionCounts),
-                },
-              ]}
-              yAxis={[
-                {
-                  label: "Number of Students",
-                },
-              ]}
-              series={[
-                {
-                  data: Object.values(sectionCounts),
-                },
-              ]}
-              width={1500}
+            <LineChart
+              xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
+              series={[{ data: [1, 1, 4, 6, 3, 10] }]}
               height={300}
-            />
-          </div>
-        </div>
-
-        <div className="mt-6">
-          <h2 className="text-2xl font-semibold mb-4">
-            Result from each Assessment
-          </h2>
-          <div className="bg-white rounded-lg shadow p-4">
-            <BarChart
-              xAxis={[
-                {
-                  scaleType: "band",
-                  data: Object.keys(sectionCounts),
-                },
-              ]}
-              yAxis={[
-                {
-                  label: "Number of Students",
-                },
-              ]}
-              series={[
-                {
-                  data: Object.values(sectionCounts),
-                },
-              ]}
-              width={1500}
-              height={300}
+              margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
+              grid={{ vertical: true, horizontal: true }}
             />
           </div>
         </div>

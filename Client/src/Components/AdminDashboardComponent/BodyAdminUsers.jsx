@@ -96,7 +96,7 @@ const BodyAdminUsers = () => {
   };
 
   return (
-    <div className="content-body">
+    <div className="px-9">
       <AddUser
         show={modalState.add}
         onHide={() => handleModalStateChange("add", false)}
@@ -236,13 +236,13 @@ const BodyAdminUsers = () => {
                   color="primary"
                   selectionMode="single"
                 >
-                  <TableHeader emptyContent={"No rows to display."}>
+                  <TableHeader>
                     <TableColumn>UserID</TableColumn>
                     <TableColumn>Email</TableColumn>
                     <TableColumn>Role</TableColumn>
                     <TableColumn className="text-center">Actions</TableColumn>
                   </TableHeader>
-                  <TableBody>
+                  <TableBody emptyContent={"No rows to display."}>
                     {currentUsers.map((user) => (
                       <TableRow key={user._id}>
                         <TableCell>{user.UserID}</TableCell>

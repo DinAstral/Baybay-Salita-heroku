@@ -83,7 +83,7 @@ const BodyAdminStudentAssessment = () => {
   };
 
   return (
-    <div className="content-body">
+    <div className="px-9">
       <PrintRecord
         show={modalShowPrint}
         onHide={() => setModalShowPrint(false)}
