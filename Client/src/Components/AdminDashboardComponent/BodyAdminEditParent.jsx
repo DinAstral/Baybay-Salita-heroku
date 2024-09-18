@@ -7,7 +7,6 @@ import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import "../ContentDasboard/Content.css";
 import axios from "axios";
 import toast from "react-hot-toast";
-import ContentHeader from "../ContentDasboard/ContentHeader";
 
 const BodyAdminEditParent = () => {
   const navigate = useNavigate();
@@ -76,165 +75,155 @@ const BodyAdminEditParent = () => {
   };
 
   return (
-    <div className="content">
-      <ContentHeader />
-      <div className="content-body">
-        <div className="content-title-header">
-          <div>
-            Edit Parent's Information
-            <Tooltip
-              content={
-                <div className="px-1 py-2">
-                  <div className="text-small font-bold">
-                    Update Informaation
-                  </div>
-                  <div className="text-tiny">
-                    This function will update the information of the parent in
-                    system.
-                  </div>
+    <div className="content-body">
+      <div className="content-title-header">
+        <div>
+          Edit Parent's Information
+          <Tooltip
+            showArrow={true}
+            content={
+              <div className="px-1 py-2">
+                <div className="text-small font-bold">Update Informaation</div>
+                <div className="text-tiny">
+                  This function will update the information of the parent in
+                  system.
                 </div>
-              }
-            >
-              <FontAwesomeIcon
-                icon={faCircleInfo}
-                size="1x"
-                className="help-icon"
+              </div>
+            }
+          >
+            <FontAwesomeIcon
+              icon={faCircleInfo}
+              size="1x"
+              className="help-icon"
+            />
+          </Tooltip>
+        </div>
+      </div>
+      <form onSubmit={editParent}>
+        <div className="content-container">
+          <div className="back-button-profile">
+            <div className="btn-back" onClick={() => navigate(-1)}>
+              Back
+            </div>
+          </div>
+          <div className="add-inputs">
+            <div className="add-input">
+              <div className="label-add">First Name</div>
+              <input
+                type="text"
+                name="addFirstName"
+                id="addFirstName"
+                placeholder="Enter the First Name"
+                value={data.FirstName}
+                onChange={(e) =>
+                  setData({ ...data, FirstName: e.target.value })
+                }
               />
-            </Tooltip>
+            </div>
+            <div className="add-input">
+              <div className="label-add">Last Name</div>
+              <input
+                type="text"
+                name="addLastName"
+                id="addLastName"
+                placeholder="Enter the Last Name"
+                value={data.LastName}
+                onChange={(e) => setData({ ...data, LastName: e.target.value })}
+              />
+            </div>
+            <div className="add-input">
+              <div className="label-add">Age</div>
+              <input
+                type="text"
+                name="addAge"
+                id="addAge"
+                placeholder="Enter Teacher's age"
+                value={data.Age}
+                onChange={(e) => setData({ ...data, Age: e.target.value })}
+              />
+            </div>
+            <div className="add-input">
+              <div className="label-add">Birthday</div>
+              <input
+                type="date"
+                name="addBirthday"
+                id="addBirthday"
+                placeholder="Enter Parent's Birthday"
+                value={data.Birthday}
+                onChange={(e) => setData({ ...data, Birthday: e.target.value })}
+              />
+            </div>
+            <div className="add-input">
+              <div className="label-add">Gender</div>
+              <select
+                className="select-gender"
+                name="addGender"
+                id="addGender"
+                value={data.Gender}
+                onChange={(e) => setData({ ...data, Gender: e.target.value })}
+              >
+                <option value="" disabled>
+                  Select Gender
+                </option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div className="add-input">
+              <div className="label-add">Address</div>
+              <input
+                type="text"
+                name="addAddress"
+                id="addAddress"
+                placeholder="Enter the Address"
+                value={data.Address}
+                onChange={(e) => setData({ ...data, Address: e.target.value })}
+              />
+            </div>
+            <div className="add-input">
+              <div className="label-add">Status</div>
+              <input
+                type="text"
+                name="addStatus"
+                id="addStatus"
+                placeholder="Enter the Status"
+                value={data.Status}
+                onChange={(e) => setData({ ...data, Status: e.target.value })}
+              />
+            </div>
+            <div className="add-input">
+              <div className="label-add">Contact Number</div>
+              <input
+                type="text"
+                name="addContactNumber"
+                id="addContactNumber"
+                placeholder="Enter the Contact Number"
+                value={data.ContactNumber}
+                onChange={(e) =>
+                  setData({ ...data, ContactNumber: e.target.value })
+                }
+              />
+            </div>
+            <div className="add-input">
+              <div className="label-add">Email</div>
+              <input
+                type="email"
+                name="addEmail"
+                id="addEmail"
+                placeholder="Enter the Teacher's Email"
+                value={data.email}
+                onChange={(e) => setData({ ...data, email: e.target.value })}
+              />
+            </div>
+          </div>
+          <div className="add-student">
+            <button className="btn-add" type="submit">
+              Save Changes
+            </button>
           </div>
         </div>
-        <form onSubmit={editParent}>
-          <div className="content-container">
-            <div className="back-button-profile">
-              <div className="btn-back" onClick={() => navigate(-1)}>
-                Back
-              </div>
-            </div>
-            <div className="add-inputs">
-              <div className="add-input">
-                <div className="label-add">First Name</div>
-                <input
-                  type="text"
-                  name="addFirstName"
-                  id="addFirstName"
-                  placeholder="Enter the First Name"
-                  value={data.FirstName}
-                  onChange={(e) =>
-                    setData({ ...data, FirstName: e.target.value })
-                  }
-                />
-              </div>
-              <div className="add-input">
-                <div className="label-add">Last Name</div>
-                <input
-                  type="text"
-                  name="addLastName"
-                  id="addLastName"
-                  placeholder="Enter the Last Name"
-                  value={data.LastName}
-                  onChange={(e) =>
-                    setData({ ...data, LastName: e.target.value })
-                  }
-                />
-              </div>
-              <div className="add-input">
-                <div className="label-add">Age</div>
-                <input
-                  type="text"
-                  name="addAge"
-                  id="addAge"
-                  placeholder="Enter Teacher's age"
-                  value={data.Age}
-                  onChange={(e) => setData({ ...data, Age: e.target.value })}
-                />
-              </div>
-              <div className="add-input">
-                <div className="label-add">Birthday</div>
-                <input
-                  type="date"
-                  name="addBirthday"
-                  id="addBirthday"
-                  placeholder="Enter Parent's Birthday"
-                  value={data.Birthday}
-                  onChange={(e) =>
-                    setData({ ...data, Birthday: e.target.value })
-                  }
-                />
-              </div>
-              <div className="add-input">
-                <div className="label-add">Gender</div>
-                <select
-                  className="select-gender"
-                  name="addGender"
-                  id="addGender"
-                  value={data.Gender}
-                  onChange={(e) => setData({ ...data, Gender: e.target.value })}
-                >
-                  <option value="" disabled>
-                    Select Gender
-                  </option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              <div className="add-input">
-                <div className="label-add">Address</div>
-                <input
-                  type="text"
-                  name="addAddress"
-                  id="addAddress"
-                  placeholder="Enter the Address"
-                  value={data.Address}
-                  onChange={(e) =>
-                    setData({ ...data, Address: e.target.value })
-                  }
-                />
-              </div>
-              <div className="add-input">
-                <div className="label-add">Status</div>
-                <input
-                  type="text"
-                  name="addStatus"
-                  id="addStatus"
-                  placeholder="Enter the Status"
-                  value={data.Status}
-                  onChange={(e) => setData({ ...data, Status: e.target.value })}
-                />
-              </div>
-              <div className="add-input">
-                <div className="label-add">Contact Number</div>
-                <input
-                  type="text"
-                  name="addContactNumber"
-                  id="addContactNumber"
-                  placeholder="Enter the Contact Number"
-                  value={data.ContactNumber}
-                  onChange={(e) =>
-                    setData({ ...data, ContactNumber: e.target.value })
-                  }
-                />
-              </div>
-              <div className="add-input">
-                <div className="label-add">Email</div>
-                <input
-                  type="email"
-                  name="addEmail"
-                  id="addEmail"
-                  placeholder="Enter the Teacher's Email"
-                  value={data.email}
-                  onChange={(e) => setData({ ...data, email: e.target.value })}
-                />
-              </div>
-            </div>
-            <div className="add-student">
-              <button className="btn-add" type="submit">
-                Save Changes
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
+      </form>
     </div>
   );
 };

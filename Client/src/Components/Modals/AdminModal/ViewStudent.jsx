@@ -9,7 +9,7 @@ import {
 } from "@nextui-org/react";
 import { Link } from "react-router-dom";
 
-const ViewStudent = ({ show, onHide }) => {
+const ViewStudent = ({ show, onHide, student }) => {
   return (
     <Modal
       isOpen={show}
@@ -29,7 +29,7 @@ const ViewStudent = ({ show, onHide }) => {
           <Button color="danger" variant="light" onClick={onHide}>
             Cancel
           </Button>
-          <Link to={`/adminViewStudent`}>
+          <Link to={`/adminViewStudent/${student?._id}`}>
             <Button color="primary">View</Button>
           </Link>
         </ModalFooter>
@@ -41,7 +41,7 @@ const ViewStudent = ({ show, onHide }) => {
 ViewStudent.propTypes = {
   show: PropTypes.bool.isRequired,
   onHide: PropTypes.func.isRequired,
-  user: PropTypes.object,
+  student: PropTypes.object,
 };
 
 export default ViewStudent;

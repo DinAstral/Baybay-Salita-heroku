@@ -15,6 +15,7 @@ const userSchema = new Schema(
     LastName: String,
     password: String,
     role: String,
+    Picture: String,
     verified: Boolean,
   },
   { timestamps: true }

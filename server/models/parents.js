@@ -22,6 +22,7 @@ const parentsSchema = new Schema(
     Gender: String,
     ContactNumber: String,
     role: String,
+    picture: String,
   },
   { timestamps: true }
 );

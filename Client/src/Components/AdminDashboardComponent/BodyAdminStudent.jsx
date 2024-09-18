@@ -22,7 +22,6 @@ import {
 } from "@nextui-org/react";
 import axios from "axios";
 import "../ContentDasboard/Content.css";
-import ContentHeader from "../ContentDasboard/ContentHeader";
 import PrintRecord from "../Modals/PrintRecord";
 import ViewStudent from "../Modals/AdminModal/ViewStudent";
 import AddStudent from "../Modals/AdminModal/AddStudent";
@@ -37,11 +36,12 @@ const BodyAdminStudent = () => {
   const [modalShowDelete, setModalShowDelete] = useState(false);
 
   const [students, setStudents] = useState([]);
+  const [filteredRoles, setFilteredRoles] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [usersPerPage] = useState(10);
-  const [filteredRoles, setFilteredRoles] = useState([]);
   const [selectedRole, setSelectedRole] = useState("");
+  const [searchQuery, setSearchQuery] = useState(""); // Added state for search query
 
   const tableRef = useRef(null);
 
@@ -61,6 +61,26 @@ const BodyAdminStudent = () => {
       .catch((err) => console.log(err));
   }, []);
 
+  useEffect(() => {
+    // Filter students based on search query and selected role
+    let filtered = students;
+
+    if (searchQuery) {
+      filtered = filtered.filter(
+        (student) =>
+          student.FirstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          student.LastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          student.LRN.includes(searchQuery)
+      );
+    }
+
+    if (selectedRole) {
+      filtered = filtered.filter((student) => student.Section === selectedRole);
+    }
+
+    setFilteredRoles(filtered);
+  }, [searchQuery, selectedRole, students]);
+
   const handlePrintClick = () => {
     setModalShowPrint(true);
   };
@@ -69,7 +89,8 @@ const BodyAdminStudent = () => {
     setModalShow(true);
   };
 
-  const handleViewClick = () => {
+  const handleViewClick = (student) => {
+    setSelectedStudent(student);
     setModalShowView(true);
   };
 
@@ -98,201 +119,192 @@ const BodyAdminStudent = () => {
   const handleSectionChange = (e) => {
     const section = e.target.value;
     setSelectedRole(section);
-    if (section === "") {
-      setFilteredRoles(students);
-    } else {
-      const filtered = students.filter(
-        (student) => student.Section === section
-      );
-      setFilteredRoles(filtered);
-    }
   };
 
   return (
-    <div className="content">
-      <ContentHeader />
-      <div className="content-body">
-        <PrintRecord
-          show={modalShowPrint}
-          onHide={() => setModalShowPrint(false)}
-          print={onDownload}
-        />
-        <AddStudent show={modalShow} onHide={() => setModalShow(false)} />
-        <ViewStudent
-          show={modalShowView}
-          onHide={() => setModalShowView(false)}
-        />
-        <UpdateStudent
-          show={modalShowEdit}
-          student={selectedStudent}
-          onHide={() => setModalShowEdit(false)}
-        />
-        <DeleteStudent
-          show={modalShowDelete}
-          onHide={() => setModalShowDelete(false)}
-          student={selectedStudent}
-          onDeleteSuccess={handleDeleteSuccess}
-        />
-        <div className="content-title-header">
-          <div>
-            Admin Manage Student
-            <Tooltip
-              content={
-                <div className="px-1 py-2">
-                  <div className="text-small font-bold">Student Table</div>
-                  <div className="text-tiny">
-                    This function will view the list of the students in each
-                    section.
-                  </div>
+    <div className="content-body">
+      <PrintRecord
+        show={modalShowPrint}
+        onHide={() => setModalShowPrint(false)}
+        print={onDownload}
+      />
+      <AddStudent show={modalShow} onHide={() => setModalShow(false)} />
+      <ViewStudent
+        show={modalShowView}
+        onHide={() => setModalShowView(false)}
+        student={selectedStudent}
+      />
+      <UpdateStudent
+        show={modalShowEdit}
+        student={selectedStudent}
+        onHide={() => setModalShowEdit(false)}
+      />
+      <DeleteStudent
+        show={modalShowDelete}
+        onHide={() => setModalShowDelete(false)}
+        student={selectedStudent}
+        onDeleteSuccess={handleDeleteSuccess}
+      />
+      <div className="content-title-header">
+        <div>
+          Admin Manage Student
+          <Tooltip
+            showArrow={true}
+            content={
+              <div className="px-1 py-2">
+                <div className="text-small font-bold">Student Table</div>
+                <div className="text-tiny">
+                  This function will view the list of the students in each
+                  section.
                 </div>
-              }
-            >
-              <FontAwesomeIcon
-                icon={faCircleInfo}
-                size="1x"
-                className="help-icon"
-              />
-            </Tooltip>
-          </div>
-          <div className="generate-report">
-            <Tooltip
-              content={
-                <div className="px-1 py-2">
-                  <div className="text-small font-bold">Print</div>
-                  <div className="text-tiny">Generate report/Print table</div>
-                </div>
-              }
-            >
-              <FontAwesomeIcon
-                icon={faPrint}
-                size="1x"
-                className="print-icon"
-                onClick={handlePrintClick}
-              />
-            </Tooltip>
-          </div>
+              </div>
+            }
+          >
+            <FontAwesomeIcon
+              icon={faCircleInfo}
+              size="1x"
+              className="help-icon"
+            />
+          </Tooltip>
         </div>
-        <div className="content-container">
-          <div className="row">
-            <div className="col">
-              <div className="card mt-1 border-0">
-                <div className="list-header-drop-score">
-                  <Select
-                    className="w-[20%]"
-                    labelPlacement="outside"
-                    label="Sort by Section"
+        <div className="generate-report">
+          <Tooltip
+            showArrow={true}
+            content={
+              <div className="px-1 py-2">
+                <div className="text-small font-bold">Print</div>
+                <div className="text-tiny">Generate report/Print table</div>
+              </div>
+            }
+          >
+            <FontAwesomeIcon
+              icon={faPrint}
+              size="1x"
+              className="print-icon"
+              onClick={handlePrintClick}
+            />
+          </Tooltip>
+        </div>
+      </div>
+      <div className="content-container">
+        <div className="row">
+          <div className="col">
+            <div className="card mt-1 border-0">
+              <div className="list-header-drop-score">
+                <Select
+                  className="w-[20%]"
+                  labelPlacement="outside"
+                  label="Sort by Section"
+                  variant="bordered"
+                  defaultSelectedKeys={[""]}
+                  onChange={handleSectionChange}
+                  value={selectedRole}
+                >
+                  <SelectItem key="">Select Section</SelectItem>
+                  <SelectItem key="Aster">Aster</SelectItem>
+                  <SelectItem key="Camia">Camia</SelectItem>
+                  <SelectItem key="Dahlia">Dahlia</SelectItem>
+                  <SelectItem key="Iris">Iris</SelectItem>
+                  <SelectItem key="Jasmin">Jasmin</SelectItem>
+                  <SelectItem key="Orchid">Orchid</SelectItem>
+                  <SelectItem key="Rose">Rose</SelectItem>
+                  <SelectItem key="Tulip">Tulip</SelectItem>
+                  <SelectItem key="SSC">SSC</SelectItem>
+                </Select>
+                <div className="w-[40%] flex pt-8">
+                  <Input
+                    type="text"
+                    placeholder="Search Student Name or LRN"
                     variant="bordered"
-                    defaultSelectedKeys={[""]}
-                    onChange={handleSectionChange}
-                    value={selectedRole}
-                  >
-                    <SelectItem key="">Select Section</SelectItem>
-                    <SelectItem key="Aster">Aster</SelectItem>
-                    <SelectItem key="Camia">Camia</SelectItem>
-                    <SelectItem key="Dahlia">Dahlia</SelectItem>
-                    <SelectItem key="Iris">Iris</SelectItem>
-                    <SelectItem key="Jasmin">Jasmin</SelectItem>
-                    <SelectItem key="Orchid">Orchid</SelectItem>
-                    <SelectItem key="Rose">Rose</SelectItem>
-                    <SelectItem key="Tulip">Tulip</SelectItem>
-                    <SelectItem key="SSC">SSC</SelectItem>
-                  </Select>
-                  <div className="w-[40%] flex pt-8">
-                    <Input
-                      type="text"
-                      placeholder="Search Student Name"
-                      variant="bordered"
-                      startContent={
-                        <FontAwesomeIcon
-                          icon={faSearch}
-                          size="1x"
-                          inverse
-                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                        />
-                      }
-                    />
-                  </div>
-                  <div className="back-button-profile">
-                    <Button
-                      auto
-                      color="primary"
-                      className=""
-                      onClick={() => handleAddClick()}
-                    >
-                      Add Student
-                    </Button>
-                  </div>
-                </div>
-                <div className="card-body scrollable-table scrollable-container">
-                  <Table
-                    ref={tableRef}
-                    removeWrapper
-                    color="primary"
-                    selectionMode="single"
-                  >
-                    <TableHeader>
-                      <TableColumn>LRN</TableColumn>
-                      <TableColumn>First Name</TableColumn>
-                      <TableColumn>Last Name</TableColumn>
-                      <TableColumn>Age</TableColumn>
-                      <TableColumn>Section</TableColumn>
-                      <TableColumn>Birthday</TableColumn>
-                      <TableColumn>Mother Tongue</TableColumn>
-                      <TableColumn>Nationality</TableColumn>
-                      <TableColumn>Gender</TableColumn>
-                      <TableColumn className="text-center">Actions</TableColumn>
-                    </TableHeader>
-                    <TableBody>
-                      {currentUsers.map((student) => (
-                        <TableRow key={student.LRN}>
-                          <TableCell>{student.LRN}</TableCell>
-                          <TableCell>{student.FirstName}</TableCell>
-                          <TableCell>{student.LastName}</TableCell>
-                          <TableCell>{student.Age}</TableCell>
-                          <TableCell>{student.Section}</TableCell>
-                          <TableCell>{student.Birthday}</TableCell>
-                          <TableCell>{student.MotherTongue}</TableCell>
-                          <TableCell>{student.Nationality}</TableCell>
-                          <TableCell>{student.Gender}</TableCell>
-                          <TableCell className="text-center">
-                            <div className="table-buttons">
-                              <Button
-                                color="default"
-                                onClick={() => handleViewClick()}
-                              >
-                                View
-                              </Button>
-                              <Button
-                                color="primary"
-                                onClick={() => handleEditClick(student)}
-                              >
-                                Update
-                              </Button>
-                              <Button
-                                color="danger"
-                                onClick={() => handleDeleteClick(student)}
-                              >
-                                Delete
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  <ReactPaginate
-                    previousLabel={"Previous"}
-                    nextLabel={"Next"}
-                    breakLabel={"..."}
-                    breakClassName={"break-me"}
-                    pageCount={Math.ceil(filteredRoles.length / usersPerPage)}
-                    marginPagesDisplayed={2}
-                    pageRangeDisplayed={10}
-                    onPageChange={handlePageClick}
-                    containerClassName={"pagination"}
-                    activeClassName={"active"}
+                    startContent={
+                      <FontAwesomeIcon
+                        icon={faSearch}
+                        size="1x"
+                        inverse
+                        className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                      />
+                    }
+                    onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
+                <div className="back-button-profile">
+                  <Button
+                    auto
+                    color="primary"
+                    className=""
+                    onClick={() => handleAddClick()}
+                  >
+                    Add Student
+                  </Button>
+                </div>
+              </div>
+              <div className="card-body scrollable-table scrollable-container">
+                <Table
+                  ref={tableRef}
+                  removeWrapper
+                  color="primary"
+                  selectionMode="single"
+                >
+                  <TableHeader>
+                    <TableColumn>LRN</TableColumn>
+                    <TableColumn>First Name</TableColumn>
+                    <TableColumn>Last Name</TableColumn>
+                    <TableColumn>Age</TableColumn>
+                    <TableColumn>Section</TableColumn>
+                    <TableColumn>Birthday</TableColumn>
+                    <TableColumn>Mother Tongue</TableColumn>
+                    <TableColumn>Gender</TableColumn>
+                    <TableColumn className="text-center">Actions</TableColumn>
+                  </TableHeader>
+                  <TableBody emptyContent={"No rows to display."}>
+                    {currentUsers.map((student) => (
+                      <TableRow key={student.LRN}>
+                        <TableCell>{student.LRN}</TableCell>
+                        <TableCell>{student.FirstName}</TableCell>
+                        <TableCell>{student.LastName}</TableCell>
+                        <TableCell>{student.Age}</TableCell>
+                        <TableCell>{student.Section}</TableCell>
+                        <TableCell>{student.Birthday}</TableCell>
+                        <TableCell>{student.MotherTongue}</TableCell>
+                        <TableCell>{student.Gender}</TableCell>
+                        <TableCell className="text-center">
+                          <div className="table-buttons">
+                            <Button
+                              color="default"
+                              onClick={() => handleViewClick(student)}
+                            >
+                              View
+                            </Button>
+                            <Button
+                              color="primary"
+                              onClick={() => handleEditClick(student)}
+                            >
+                              Update
+                            </Button>
+                            <Button
+                              color="danger"
+                              onClick={() => handleDeleteClick(student)}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <ReactPaginate
+                  previousLabel={"Previous"}
+                  nextLabel={"Next"}
+                  breakLabel={"..."}
+                  breakClassName={"break-me"}
+                  pageCount={Math.ceil(filteredRoles.length / usersPerPage)}
+                  marginPagesDisplayed={2}
+                  pageRangeDisplayed={10}
+                  onPageChange={handlePageClick}
+                  containerClassName={"pagination"}
+                  activeClassName={"active"}
+                />
               </div>
             </div>
           </div>

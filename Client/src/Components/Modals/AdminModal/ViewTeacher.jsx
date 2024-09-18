@@ -29,7 +29,7 @@ const ViewTeacher = ({ show, onHide, user }) => {
           <Button color="danger" variant="light" onClick={onHide}>
             Cancel
           </Button>
-          <Link to={`/adminViewTeacher/${user?._id}`}>
+          <Link to={`/adminViewTeacher/${user?.UserID}`}>
             <Button color="primary">View</Button>
           </Link>
         </ModalFooter>

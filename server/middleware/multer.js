@@ -8,6 +8,9 @@ const storage = multer.diskStorage({
     let fileName = "";
 
     //Generate new filename
+    if (file.fieldname === "Profile") {
+      fileName = `image_${fileExt}`;
+    }
     if (file.fieldname === "Image") {
       fileName = `image_${fileExt}`;
     }
@@ -36,7 +39,7 @@ const storage = multer.diskStorage({
 
 // Set up file filter
 const fileFilter = (req, file, cb) => {
-  if (file.fieldname === "Image") {
+  if (file.fieldname === "Image" || file.fieldname === "Profile") {
     // Accept only JPEG and PNG files
     if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
       cb(null, true);
@@ -77,9 +80,16 @@ const fileFilter = (req, file, cb) => {
 // Set up limits
 const limits = {
   fileSize: (req, file, cb) => {
-    if (file.fieldname === "Image") {
+    if (file.fieldname === "Image" || file.fieldname === "Profile") {
       return 10 * 1024 * 1024; // 10 MB for images
-    } else if (file.fieldname === "Audio" || file.fieldname === "User") {
+    } else if (
+      file.fieldname === "Audio" ||
+      file.fieldname === "User1" ||
+      file.fieldname === "User2" ||
+      file.fieldname === "User3" ||
+      file.fieldname === "User4" ||
+      file.fieldname === "User5"
+    ) {
       return 100 * 1024 * 1024; // 100 MB for audio files
     }
     return 0; // No limit set for other files, but you can add more logic here
@@ -87,6 +97,14 @@ const limits = {
 };
 
 // Configure the multer upload
+const profileUpload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: limits.fileSize,
+  },
+}).fields([{ name: "Profile", maxCount: 1 }]);
+
 const wordUpload = multer({
   storage: storage,
   fileFilter: fileFilter,
@@ -113,4 +131,4 @@ const UserUpload = multer({
 ]);
 
 // Export the upload handlers
-module.exports = { wordUpload, UserUpload };
+module.exports = { wordUpload, UserUpload, profileUpload };

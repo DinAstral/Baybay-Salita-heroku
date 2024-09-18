@@ -1,6 +1,7 @@
 import "./Hero.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { Button } from "@nextui-org/react";
 
 const Hero = () => {
   return (
@@ -12,10 +13,6 @@ const Hero = () => {
           pahusayin ang kakayahan sa pag-unawa sa pagbasa ng mga estudyanteng
           Grade 1 sa Taytay Elementary School.
         </p>
-        <button className="btn-home img">
-          Tuklasin{" "}
-          <FontAwesomeIcon icon={faArrowRight} inverse className="icon-arrow" />
-        </button>
       </div>
     </div>
   );

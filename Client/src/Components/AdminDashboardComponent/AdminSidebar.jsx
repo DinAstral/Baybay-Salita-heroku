@@ -8,8 +8,9 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import logo from "../../assets/BaybaySalita_Logo.png";
+import logo from "../../assets/Sidebar_Final_Logo.png";
 import { UserContext } from "../../../context/userContext"; // Import UserContext
+import { Button } from "@nextui-org/react";
 
 const AdminSidebar = () => {
   const location = useLocation();
@@ -77,9 +78,13 @@ const AdminSidebar = () => {
       </div>
       <div className="menu-logout">
         <div className="menu-logout-btn">
-          <button className="btn-side" onClick={handleLogout}>
+          <Button
+            color="primary"
+            className="w-[150px] text-md p-4"
+            onClick={handleLogout}
+          >
             Logout
-          </button>
+          </Button>
         </div>
       </div>
     </div>

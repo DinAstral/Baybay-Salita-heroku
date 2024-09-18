@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { Link as LinkScroll } from "react-scroll";
 import "./Navbar.css";
-import logo from "../../../assets/logo1.png";
+import logo from "../../../assets/LogoFinal.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { UserContext } from "../../../../context/userContext"; // Adjust the import path as needed

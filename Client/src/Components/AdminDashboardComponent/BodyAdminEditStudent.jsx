@@ -1,17 +1,15 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useState, useEffect } from "react";
-import { Tooltip } from "@nextui-org/react";
+import { Tooltip, Button, Input, Select, SelectItem } from "@nextui-org/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
-import "../ContentDasboard/Content.css";
 import axios from "axios";
 import toast from "react-hot-toast";
-import ContentHeader from "../ContentDasboard/ContentHeader";
 
 const BodyAdminEditStudent = () => {
   const navigate = useNavigate();
-  const { id } = useParams(); // Corrected to get 'id' from useParams
+  const { id } = useParams();
   const [data, setData] = useState({
     LRN: "",
     FirstName: "",
@@ -30,257 +28,228 @@ const BodyAdminEditStudent = () => {
 
   useEffect(() => {
     axios
-      .get(`getStudent/${id}`) // route to include student ID
+      .get(`/getStudentID/${id}`)
       .then((response) => {
-        console.log("Response:", response.data); // Log response data
-        setData(response.data); // Assuming response.data contains student data
+        setData(response.data);
       })
       .catch((err) => {
         console.error("Error fetching student data:", err);
         toast.error("Failed to fetch student data. Please try again later.");
       });
-  }, [id]); // Added 'id' to dependency array
+  }, [id]);
 
   const editStudent = async (e) => {
     e.preventDefault();
-    const {
-      LRN,
-      FirstName,
-      MiddleName,
-      LastName,
-      Age,
-      Level,
-      Section,
-      Birthday,
-      Address,
-      MotherTongue,
-      Nationality,
-      Gender,
-      ContactNumber,
-    } = data;
     try {
-      const { data } = await axios.patch(`getStudent/${id}`, {
-        LRN,
-        FirstName,
-        MiddleName,
-        LastName,
-        Age,
-        Level,
-        Section,
-        Birthday,
-        Address,
-        MotherTongue,
-        Nationality,
-        Gender,
-        ContactNumber,
-      });
-      if (data.error) {
-        toast.error(data.error);
+      const { data: responseData } = await axios.patch(
+        `/updateStudent/${id}`,
+        data
+      );
+      if (responseData.error) {
+        toast.error(responseData.error);
       } else {
-        setData({});
-        toast.success("Updated Student info Successful.");
-        navigate("/manageStudent");
+        toast.success("Updated Student info Successfully.");
+        navigate("/adminStudents");
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error updating student data:", error);
+      toast.error("Failed to update student. Please try again.");
     }
   };
 
   return (
-    <div className="content">
-      <ContentHeader />
-      <div className="content-body">
-        <div className="content-title-header">
-          <div>
+    <div className="container mx-auto px-6">
+      <div className="max-w-9xl mx-auto bg-white shadow-lg rounded-lg p-8 pt">
+        <div className="flex items-center gap-2 mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">
             Update Student's Information
-            <Tooltip
-              content={
-                <div className="px-1 py-2">
-                  <div className="text-small font-bold">Update Information</div>
-                  <div className="text-tiny">
-                    This function will update the information of the students in
-                    system.
-                  </div>
+          </h2>
+          <Tooltip
+            showArrow={true}
+            content={
+              <div className="px-2 py-1">
+                <div className="text-sm font-bold">Update Information</div>
+                <div className="text-xs">
+                  This function will update the information of the students in
+                  the system.
                 </div>
-              }
-            >
-              <FontAwesomeIcon
-                icon={faCircleInfo}
-                size="1x"
-                className="help-icon"
-              />
-            </Tooltip>
-          </div>
+              </div>
+            }
+          >
+            <FontAwesomeIcon
+              icon={faCircleInfo}
+              size="md"
+              className="text-gray-600"
+            />
+          </Tooltip>
         </div>
         <form onSubmit={editStudent}>
-          <div className="content-container">
-            <div className="back-button-profile">
-              <div className="btn-back" onClick={() => navigate(-1)}>
-                Back
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">LRN</label>
+              <Input
+                underlined
+                clearable
+                value={data.LRN}
+                onChange={(e) => setData({ ...data, LRN: e.target.value })}
+                placeholder="Enter student's LRN"
+                maxLength={12}
+                type="number"
+              />
             </div>
-            <div className="add-inputs">
-              <div className="add-input">
-                <div className="label-add">LRN</div>
-                <input
-                  type="text"
-                  name="addLRN"
-                  id="addLRN"
-                  placeholder="Enter student's LRN"
-                  value={data.LRN}
-                  onChange={(e) => setData({ ...data, LRN: e.target.value })}
-                />
-              </div>
-              <div className="add-input">
-                <div className="label-add">First Name</div>
-                <input
-                  type="text"
-                  name="addFirstName"
-                  id="addFirstName"
-                  placeholder="Enter the First Name"
-                  value={data.FirstName}
-                  onChange={(e) =>
-                    setData({ ...data, FirstName: e.target.value })
-                  }
-                />
-              </div>
-              <div className="add-input">
-                <div className="label-add">Middle Name</div>
-                <input
-                  type="text"
-                  name="addMiddleName"
-                  id="addMiddleName"
-                  placeholder="Enter the Middle Name"
-                  value={data.MiddleName}
-                  onChange={(e) =>
-                    setData({ ...data, MiddleName: e.target.value })
-                  }
-                />
-              </div>
-              <div className="add-input">
-                <div className="label-add">Last Name</div>
-                <input
-                  type="text"
-                  name="addLastName"
-                  id="addLastName"
-                  placeholder="Enter the Last Name"
-                  value={data.LastName}
-                  onChange={(e) =>
-                    setData({ ...data, LastName: e.target.value })
-                  }
-                />
-              </div>
-              <div className="add-input">
-                <div className="label-add">Age</div>
-                <input
-                  type="text"
-                  name="addAge"
-                  id="addAge"
-                  placeholder="Enter student's age"
-                  value={data.Age}
-                  onChange={(e) => setData({ ...data, Age: e.target.value })}
-                />
-              </div>
-              <div className="add-input">
-                <div className="label-add">Grade Level</div>
-                <select
-                  className="select-gender"
-                  value={data.Level}
-                  onChange={(e) => setData({ ...data, Level: e.target.value })}
-                >
-                  <option value="" disabled>
-                    Select Grade Level
-                  </option>
-                  <option value="Grade 1">Grade 1</option>
-                </select>
-              </div>
-              <div className="add-input">
-                <div className="label-add">Section</div>
-                <select
-                  className="select-gender"
-                  value={data.Section}
-                  onChange={(e) =>
-                    setData({ ...data, Section: e.target.value })
-                  }
-                >
-                  <option value="" disabled>
-                    Select Section
-                  </option>
-                  <option value="Camia">Camia</option>
-                  <option value="Daffodil">Daffodil</option>
-                  <option value="Daisy">Daisy</option>
-                  <option value="Gumamela">Gumamela</option>
-                  <option value="Lily">Lily</option>
-                  <option value="Rosal">Rosal</option>
-                  <option value="Rose">Rose</option>
-                  <option value="Santan">Santan</option>
-                  <option value="Speacial">Speacial</option>
-                </select>
-              </div>
-              <div className="add-input">
-                <div className="label-add">Birthday</div>
-                <input
-                  type="date"
-                  value={data.Birthday}
-                  onChange={(e) =>
-                    setData({ ...data, Birthday: e.target.value })
-                  }
-                />
-              </div>
-              <div className="add-input">
-                <div className="label-add">Address</div>
-                <input
-                  type="address"
-                  placeholder="Enter the Address"
-                  value={data.Address}
-                  onChange={(e) =>
-                    setData({ ...data, Address: e.target.value })
-                  }
-                />
-              </div>
-              <div className="add-input">
-                <div className="label-add">Mother Tongue</div>
-                <input
-                  type="text"
-                  placeholder="Enter the Mother Tongue"
-                  value={data.MotherTongue}
-                  onChange={(e) =>
-                    setData({ ...data, MotherTongue: e.target.value })
-                  }
-                />
-              </div>
-              <div className="add-input">
-                <div className="label-add">Nationality</div>
-                <input
-                  type="text"
-                  placeholder="Enter the Nationality"
-                  value={data.Nationality}
-                  onChange={(e) =>
-                    setData({ ...data, Nationality: e.target.value })
-                  }
-                />
-              </div>
-              <div className="add-input">
-                <div className="label-add">Gender</div>
-                <select
-                  className="select-gender"
-                  value={data.Gender}
-                  onChange={(e) => setData({ ...data, Gender: e.target.value })}
-                >
-                  <option value="" disabled>
-                    Select Gender
-                  </option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">First Name</label>
+              <Input
+                underlined
+                clearable
+                value={data.FirstName}
+                onChange={(e) =>
+                  setData({ ...data, FirstName: e.target.value })
+                }
+                placeholder="Enter the First Name"
+              />
             </div>
-            <div className="add-student">
-              <button className="btn-add" type="submit">
-                Save Changes
-              </button>
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">Middle Name</label>
+              <Input
+                underlined
+                clearable
+                value={data.MiddleName}
+                onChange={(e) =>
+                  setData({ ...data, MiddleName: e.target.value })
+                }
+                placeholder="Enter the Middle Name"
+              />
             </div>
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">Last Name</label>
+              <Input
+                underlined
+                clearable
+                value={data.LastName}
+                onChange={(e) => setData({ ...data, LastName: e.target.value })}
+                placeholder="Enter the Last Name"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">Age</label>
+              <Input
+                underlined
+                clearable
+                value={data.Age}
+                onChange={(e) => setData({ ...data, Age: e.target.value })}
+                placeholder="Enter student's age"
+                type="number"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">Grade Level</label>
+              <Select
+                placeholder="Select Grade Level"
+                value={data.Level}
+                onChange={(value) => setData({ ...data, Level: value })}
+              >
+                <SelectItem key="" disabled>
+                  Select Grade Level
+                </SelectItem>
+                <SelectItem key="Grade 1">Grade 1</SelectItem>
+                {/* Add more options as needed */}
+              </Select>
+            </div>
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">Section</label>
+              <Select
+                placeholder="Select Section"
+                value={data.Section}
+                onChange={(value) => setData({ ...data, Section: value })}
+              >
+                <SelectItem key="" disabled>
+                  Select Section
+                </SelectItem>
+                <SelectItem key="Camia">Camia</SelectItem>
+                <SelectItem key="Daffodil">Daffodil</SelectItem>
+                <SelectItem key="Daisy">Daisy</SelectItem>
+                <SelectItem key="Gumamela">Gumamela</SelectItem>
+                <SelectItem key="Lily">Lily</SelectItem>
+                <SelectItem key="Rosal">Rosal</SelectItem>
+                <SelectItem key="Rose">Rose</SelectItem>
+                <SelectItem key="Santan">Santan</SelectItem>
+                <SelectItem key="Special">Special</SelectItem>
+              </Select>
+            </div>
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">Birthday</label>
+              <Input
+                underlined
+                clearable
+                value={data.Birthday}
+                onChange={(e) => setData({ ...data, Birthday: e.target.value })}
+                type="date"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">Address</label>
+              <Input
+                underlined
+                clearable
+                value={data.Address}
+                onChange={(e) => setData({ ...data, Address: e.target.value })}
+                placeholder="Enter the Address"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">Mother Tongue</label>
+              <Input
+                underlined
+                clearable
+                value={data.MotherTongue}
+                onChange={(e) =>
+                  setData({ ...data, MotherTongue: e.target.value })
+                }
+                placeholder="Enter the Mother Tongue"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">Nationality</label>
+              <Input
+                underlined
+                clearable
+                value={data.Nationality}
+                onChange={(e) =>
+                  setData({ ...data, Nationality: e.target.value })
+                }
+                placeholder="Enter the Nationality"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">Gender</label>
+              <Select
+                placeholder="Select Gender"
+                value={data.Gender}
+                onChange={(value) => setData({ ...data, Gender: value })}
+              >
+                <SelectItem key="" disabled>
+                  Select Gender
+                </SelectItem>
+                <SelectItem key="male">Male</SelectItem>
+                <SelectItem key="female">Female</SelectItem>
+                <SelectItem key="other">Other</SelectItem>
+              </Select>
+            </div>
+          </div>
+          <div className="flex justify-end mt-6">
+            <Button type="submit" color="primary" auto>
+              Save Changes
+            </Button>
+            <Button
+              auto
+              flat
+              color="danger"
+              onClick={() => navigate(-1)}
+              className="ml-4"
+            >
+              Cancel
+            </Button>
           </div>
         </form>
       </div>

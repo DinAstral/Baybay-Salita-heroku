@@ -2,6 +2,7 @@ const User = require("../models/users");
 const Admin = require("../models/admin");
 const Teacher = require("../models/teachers");
 const Parent = require("../models/parents");
+const Student = require("../models/student");
 const { hashPassword, comparePassword } = require("../helpers/auth");
 const jwt = require("jsonwebtoken");
 const UserOTPVerification = require("../models/UserOTPVerification");
@@ -792,6 +793,88 @@ const logout = (req, res) => {
   res.status(200).json({ message: "Logged out successfully" });
 };
 
+const { profileUpload } = require("../middleware/multer");
+const { cloudinaryUploaderProfile } = require("../api/cloudinary");
+const multer = require("multer");
+
+const profileUpdate = async (req, res) => {
+  profileUpload(req, res, async function (err) {
+    if (err instanceof multer.MulterError) {
+      return res.json({ error: `Multer Error: ${err.message}` });
+    } else if (err) {
+      return res.json({ error: `Error: ${err.message}` });
+    }
+
+    try {
+      // Extracting Type, Role, and ID from request body
+      const { role, UserID } = req.body;
+      if (!role || !UserID) {
+        return res.json({ error: "Role and User ID are required" });
+      }
+
+      // Uploading to Cloudinary
+      const uploadResponse = await cloudinaryUploaderProfile(req, res);
+      const profileFile = uploadResponse.uploadProfile.url;
+
+      // Finding and updating the existing record based on role
+      let updatedRecord;
+      switch (role) {
+        case "Admin":
+          updatedRecord = await Admin.findOneAndUpdate(
+            { UserID: UserID }, // Filter: Find Admin with this UserID
+            { Picture: profileFile }, // Update: Set new profile picture URL
+            { new: true } // Return the updated document
+          );
+          break;
+        case "Teacher":
+          updatedRecord = await Teacher.findOneAndUpdate(
+            { UserID: UserID }, // Filter: Find Teacher with this UserID
+            { Picture: profileFile }, // Update: Set new profile picture URL
+            { new: true } // Return the updated document
+          );
+          break;
+        case "Parent":
+          updatedRecord = await Parent.findOneAndUpdate(
+            { UserID: UserID }, // Filter: Find Parent with this UserID
+            { Picture: profileFile }, // Update: Set new profile picture URL
+            { new: true } // Return the updated document
+          );
+          break;
+        case "student":
+          updatedRecord = await Student.findOneAndUpdate(
+            { UserID: UserID }, // Filter: Find Student with this UserID
+            { Picture: profileFile }, // Update: Set new profile picture URL
+            { new: true } // Return the updated document
+          );
+          break;
+        default:
+          return res.json({ error: "Invalid role" });
+      }
+
+      // Also update the User collection
+      if (updatedRecord) {
+        await User.findOneAndUpdate(
+          { UserID: UserID }, // Filter: Find User with this UserID
+          { Picture: profileFile }, // Update: Set new profile picture URL
+          { new: true } // Return the updated document
+        );
+      }
+
+      if (!updatedRecord) {
+        return res.json({ error: "User not found or update failed" });
+      }
+
+      return res.json({
+        message: "Profile picture successfully updated",
+        updatedProfileUrl: profileFile,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Server error" });
+    }
+  });
+};
+
 module.exports = {
   registerAdmin,
   registerParent,
@@ -802,4 +885,5 @@ module.exports = {
   forgotPassword,
   resetPassword,
   logout,
+  profileUpdate,
 };

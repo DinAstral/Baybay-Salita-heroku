@@ -29,7 +29,7 @@ const ViewParent = ({ show, onHide, user }) => {
           <Button color="danger" variant="light" onClick={onHide}>
             Cancel
           </Button>
-          <Link to={`/adminViewParent/${user?._id}`}>
+          <Link to={`/adminViewParent/${user?.UserID}`}>
             <Button color="primary">View</Button>
           </Link>
         </ModalFooter>

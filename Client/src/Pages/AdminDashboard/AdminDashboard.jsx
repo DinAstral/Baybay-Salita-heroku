@@ -1,6 +1,7 @@
 import React from "react";
 import AdminSidebar from "../../Components/AdminDashboardComponent/AdminSidebar";
 import BodyAdminDashboard from "../../Components/AdminDashboardComponent/BodyAdminDashboard";
+import ContentHeader from "../../Components/ContentDasboard/ContentHeader";
 
 const AdminDashboard = () => {
   return (
@@ -11,7 +12,8 @@ const AdminDashboard = () => {
       </div>
 
       {/* Main Dashboard Content */}
-      <div className="ml-[15%] w-[85%] h-full bg-[#F2EDE3] p-[2rem] flex flex-col gap-[1.5rem]">
+      <div className="ml-[15%] w-[85%] h-full min-h-[100vh] bg-[#F2EDE3] p-[2rem] flex flex-col gap-[1.5rem]">
+        <ContentHeader />
         <BodyAdminDashboard />
       </div>
     </div>

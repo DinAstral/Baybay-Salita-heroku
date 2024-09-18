@@ -27,7 +27,7 @@ const RegisterSelect = () => {
   };
 
   return (
-    <div className="flex bg-[#f4e7c9] w-full h-screen items-center justify-center p-4">
+    <div className="flex bg-[#f6fbff] w-full h-screen items-center justify-center p-4">
       <div className="w-full max-w-lg flex flex-col items-center justify-center">
         <Card className="w-full p-6 sm:p-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4">

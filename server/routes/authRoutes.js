@@ -6,6 +6,7 @@ const {
   test,
   getUsers,
   getUser,
+  getAdmin,
   addUser,
   updateUser,
   addStudent,
@@ -44,6 +45,7 @@ const {
   forgotPassword,
   resetPassword,
   logout,
+  profileUpdate,
 } = require("../controllers/RegistrationController");
 
 const {
@@ -66,49 +68,51 @@ const { compareAudio } = require("../controllers/CompareController");
 // Configure CORS middleware
 router.use(
   cors({
-    origin: "https://baybay-salita-edu.netlify.app", // Update this with your client's URL
+    origin: "http://192.168.56.1:3000", // Update this with your client's URL
     methods: ["GET", "POST", "DELETE", "PATCH"], // Add the allowed HTTP methods
     credentials: true, // Allow credentials (cookies, authorization headers)
   })
 );
 
 // Mobile route
-router.post("/mobileLogin", mobileLogin);
-router.get("/getStudent/:LRN", getStudentbyLRN);
+router.post("/mobileLogin", mobileLogin); //okay
+router.get("/getStudent/:LRN", getStudentbyLRN); //okay
 
 // Login Routes
-router.get("/", test);
-router.post("/registerParent", registerParent);
-router.post("/registerTeacher", registerTeacher);
-router.post("/verify", verifyOTP);
-router.post("/login", loginUser);
-router.post("/forgotPass", forgotPassword);
-router.post("/reset-password/:id/:token", resetPassword);
-router.post("/logout", logout);
+router.get("/", test); //okay
+router.post("/registerParent", registerParent); //okay
+router.post("/registerTeacher", registerTeacher); //okay
+router.post("/verify", verifyOTP); //okay
+router.post("/login", loginUser); //okay
+router.post("/forgotPass", forgotPassword); //okay
+router.post("/reset-password/:id/:token", resetPassword); //okay
+router.post("/logout", logout); //okay
 
 // Upload Routes
-router.post("/importWord", importWord);
-router.post("/userInput", userInputAudio);
-router.get("/getImportWord", getImportWords);
+router.post("/importWord", importWord); //okay
+router.post("/userInput", userInputAudio); //okay
+router.get("/getImportWord", getImportWords); //okay profileUpdate
+router.post("/profileUpdate", profileUpdate); //okay
 
 // Assessment Routes
-router.post("/submitAssessment", submitAssessment);
-router.get("/getActivity/:ActivityCode", getAssessmentCode);
-router.get("/getPerformance", getPerformance);
+router.post("/submitAssessment", submitAssessment); //okay
+router.get("/getActivity/:ActivityCode", getAssessmentCode); //okay
+router.get("/getPerformance", getPerformance); //okay
 router.delete("/deleteAssessment/:id", deleteAssessment);
 
 // Admin Routes
 router.post("/addUser", addUser);
-router.get("/users", getUsers);
-router.get("/getUser/:id", getUser);
+router.get("/users", getUsers); //okay
+router.get("/getUser/:id", getUser); //okay
+router.get("/getAdmin/:UserID", getAdmin); //okay
 router.patch("/updateUser/:id", updateUser);
-router.delete("/deleteUser/:email", deleteUser);
-router.get("/profile", getProfile);
+router.delete("/deleteUser/:email", deleteUser); //okay
+router.get("/profile", getProfile); //okay
 
 // Student Routes
 router.post("/addStudent", addStudent);
-router.get("/getStudents", getStudents);
-router.get("/getStudent/:id", getStudent);
+router.get("/getStudents", getStudents); //okay
+router.get("/getStudentID/:id", getStudent);
 router.delete("/deleteStudent/:id", deleteStudent);
 router.patch("/updateStudent/:id", updateStudent);
 

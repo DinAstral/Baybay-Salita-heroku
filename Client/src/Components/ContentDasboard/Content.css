@@ -72,12 +72,11 @@
 }
 
 .user1-profile {
-    width: 20%;
+
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 20px;
-    margin-right: 20px;
 }
 
 .user1-profile img {

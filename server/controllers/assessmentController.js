@@ -212,8 +212,8 @@ const userInputAudio = async (req, res) => {
       } = req.body;
 
       const uploadResponse = await cloudinaryUploaderUser(req, res);
-      console.log("Upload Response:", uploadResponse);
 
+      // Ensure all expected files are present in uploadResponse
       const files = ["User1", "User2", "User3", "User4", "User5"];
       const fileUrls = {};
 
@@ -247,16 +247,20 @@ const userInputAudio = async (req, res) => {
 
       if (insert) {
         return res.json({ message: "Audio file uploaded successfully." });
+      } else {
+        // Insert failed, send an appropriate response
+        return res.status(500).json({
+          error: "Upload unsuccessful. Please try again later!",
+        });
       }
-
-      return res.status(500).json({
-        error: "Upload unsuccessful. Please try again later!",
-      });
     } catch (error) {
       console.error("Error during upload process:", error);
-      return res
-        .status(500)
-        .json({ error: "An error occurred during the upload process." });
+      // Ensure no multiple responses are sent
+      if (!res.headersSent) {
+        return res
+          .status(500)
+          .json({ error: "An error occurred during the upload process." });
+      }
     }
   });
 };

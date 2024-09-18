@@ -1,5 +1,27 @@
 const cloudinary = require("cloudinary").v2;
 
+const cloudinaryUploaderProfile = async (req, res) => {
+  const { files } = req;
+  const profileFile = files["Profile"] ? files["Profile"][0] : null;
+
+  if (!profileFile) {
+    return res.json({ error: "File not found" });
+  }
+
+  try {
+    const uploadProfile = await cloudinary.uploader.upload(profileFile.path, {
+      resource_type: "image",
+      public_id: `image/${profileFile.filename}`,
+      folder: "picture",
+    });
+
+    return { uploadProfile };
+  } catch (error) {
+    console.log(error);
+    throw new Error("Cloudinary upload failed");
+  }
+};
+
 const cloudinaryUploader = async (req, res) => {
   const { files } = req;
   const imageFile = files["Image"] ? files["Image"][0] : null;
@@ -114,4 +136,5 @@ const cloudinaryUploaderUser = async (req, res) => {
 module.exports = {
   cloudinaryUploader,
   cloudinaryUploaderUser,
+  cloudinaryUploaderProfile,
 };

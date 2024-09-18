@@ -1,5 +1,6 @@
 const User = require("../models/users");
 const Student = require("../models/student");
+const Admin = require("../models/admin");
 const UserOTPVerification = require("../models/UserOTPVerification");
 const { hashPassword, comparePassword } = require("../helpers/auth");
 const jwt = require("jsonwebtoken");
@@ -178,19 +179,6 @@ const addStudent = async (req, res) => {
         error: "Last Name is required",
       });
     }
-    if (!Age) {
-      return res.json({
-        error: "Age is required",
-      });
-    }
-    if (!isNumber(Age)) {
-      return res.json({ error: "Invalid Age" });
-    }
-    if (!Level) {
-      return res.json({
-        error: "Level is required",
-      });
-    }
     if (!Section) {
       return res.json({
         error: "Section is required",
@@ -337,65 +325,6 @@ const updateStudent = async (req, res) => {
       return res.json({ error: "LRN must 12 numbers long" });
     }
 
-    if (!FirstName) {
-      return res.json({
-        error: "First Name is required",
-      });
-    }
-    if (!MiddleName) {
-      return res.json({
-        error: "Middle Name is required",
-      });
-    }
-    if (!LastName) {
-      return res.json({
-        error: "Last Name is required",
-      });
-    }
-    if (!Age) {
-      return res.json({
-        error: "Age is required",
-      });
-    }
-    if (!isNumber(Age)) {
-      return res.json({ error: "Invalid Age inputted" });
-    }
-    if (!Level) {
-      return res.json({
-        error: "Level is required",
-      });
-    }
-    if (!Section) {
-      return res.json({
-        error: "Section is required",
-      });
-    }
-    if (!Birthday) {
-      return res.json({
-        error: "Birthday is required",
-      });
-    }
-    if (!Address) {
-      return res.json({
-        error: "Address is required",
-      });
-    }
-    if (!MotherTongue) {
-      return res.json({
-        error: "MotherTongue is required",
-      });
-    }
-    if (!Nationality) {
-      return res.json({
-        error: "Nationality is required",
-      });
-    }
-    if (!Gender) {
-      return res.json({
-        error: "Gender is required",
-      });
-    }
-
     const student = await Student.findByIdAndUpdate(
       { _id: id },
       { ...req.body }
@@ -437,6 +366,30 @@ const getUser = async (req, res) => {
     res.status(200).json(user);
   } catch (error) {
     res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+const getAdmin = async (req, res) => {
+  const { UserID } = req.params; // Extract UserID from route parameters
+
+  try {
+    // Find the Admin by UserID
+    const user = await Admin.findOne({ UserID });
+
+    // If no teacher is found, return a 404 status
+    if (!user) {
+      return res.json({
+        message: "No account found",
+      });
+    }
+
+    // Return the found Admin
+    res.json(user);
+  } catch (error) {
+    // Handle any other errors
+    res.json({
       message: error.message,
     });
   }
@@ -641,15 +594,16 @@ const getProfile = (req, res) => {
 };
 
 module.exports = {
-  test,
-  addStudent,
-  getStudents,
-  getStudent,
+  test, //okay
+  addStudent, //okay
+  getStudents, //okay
+  getStudent, //okay
   deleteStudent,
   updateStudent,
   updateParent,
   addUser,
   getUsers,
+  getAdmin,
   getUser,
   updateUser,
   deleteUser,

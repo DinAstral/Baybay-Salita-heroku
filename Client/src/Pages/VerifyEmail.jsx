@@ -36,7 +36,7 @@ const VerifyEmail = () => {
   };
 
   return (
-    <div className="flex bg-[#f4e7c9] w-full h-screen">
+    <div className="flex bg-[#f6fbff] w-full h-screen">
       <div className="w-full flex flex-col items-center justify-center m-3">
         <Card className="w-[50%] flex flex-col p-4">
           <h1 className="text-3xl font-bold items-center justify-center">

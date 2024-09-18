@@ -19,9 +19,19 @@ export default {
     nextui({
       addCommonColors: true,
       layout: {}, // common layout options
+      colors: {
+        primary: {
+          DEFAULT: "#27374d",
+        },
+      },
       themes: {
         light: {},
         dark: {
+          colors: {
+            primary: {
+              DEFAULT: "#27374d",
+            },
+          },
           layout: {}, // dark theme layout options
           // ...
         },

@@ -42,9 +42,9 @@ const DeleteStudent = ({ show, onHide, student, onDeleteSuccess }) => {
 
   const deleteStudent = async () => {
     try {
-      await axios.delete(`/getStudent/${student._id}`); // Ensure this route matches your backend
-      setModalDeleteSuccess(true);
-      onDeleteSuccess(student._id); // Callback to remove student from list
+      await axios.delete(`/deleteStudent/${student._id}`); // Ensure this route matches your backend
+      setModalDeleteSuccess(true); // Show success modal
+      onDeleteSuccess(); // Call to refresh data in parent component
     } catch (err) {
       console.error("Error deleting student:", err);
       toast.error("Failed to delete student. Please try again later.");
@@ -81,7 +81,7 @@ const DeleteStudent = ({ show, onHide, student, onDeleteSuccess }) => {
         show={modalDeleteSuccess}
         onHide={() => {
           setModalDeleteSuccess(false);
-          onHide();
+          onHide(); // Close the delete modal
         }}
       />
     </>
@@ -93,7 +93,7 @@ DeleteStudent.propTypes = {
   show: PropTypes.bool.isRequired,
   onHide: PropTypes.func.isRequired,
   onDeleteSuccess: PropTypes.func.isRequired,
-  student: PropTypes.object,
+  student: PropTypes.object.isRequired, // Assuming student is always provided
 };
 
 export default DeleteStudent;

@@ -13,11 +13,11 @@
     align-items: center;
     display: flex;
     flex-direction: column;
+    padding: px;
 }
 
 .logo-dash img {
-    width: 80%;
-    max-width: 300px;
+    width: 60%;
     cursor: pointer;
 }
 
@@ -46,7 +46,7 @@
     cursor: pointer;
 }
 
-.menu--list .item:hover, 
+.menu--list .item:hover,
 .active {
     background-color: #27374d;
     color: #dde6ed !important;
@@ -100,9 +100,11 @@
     .menu-dash {
         height: auto;
     }
+
     .logo-dash img {
         width: 100%;
     }
+
     .menu--list .item {
         font-size: 0.9rem;
         padding: 8px;
@@ -115,9 +117,11 @@
     .menu-dash {
         height: 90vh;
     }
+
     .logo-dash img {
         width: 90%;
     }
+
     .menu--list .item {
         font-size: 1rem;
         padding: 9px;
@@ -130,9 +134,11 @@
     .menu-dash {
         height: 95vh;
     }
+
     .logo-dash img {
         width: 80%;
     }
+
     .menu--list .item {
         font-size: 1.05rem;
         padding: 9px;
@@ -145,9 +151,11 @@
     .menu-dash {
         height: 96vh;
     }
+
     .logo-dash img {
         width: 300px;
     }
+
     .menu--list .item {
         font-size: 1.1rem;
         padding: 10px;

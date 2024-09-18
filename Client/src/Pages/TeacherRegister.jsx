@@ -201,7 +201,7 @@ const TeacherRegister = () => {
   };
 
   return (
-    <div className="flex bg-[#f4e7c9] w-full items-center min-h-screen p-4 md:p-8">
+    <div className="flex bg-[#f6fbff] w-full items-center min-h-screen p-4 md:p-8">
       <div className="w-full max-w-4xl mx-auto">
         <Card className="w-full flex flex-col p-4">
           <h1 className="text-2xl md:text-3xl font-bold text-center">
@@ -294,8 +294,10 @@ const TeacherRegister = () => {
                   <SelectItem key="Filipino">Filipino</SelectItem>
                 </Select>
                 <Input
+                  className="pt-2"
                   type="date"
-                  placeholder="Ilagay ang iyong Kaarawan"
+                  label="Birthday"
+                  variant="bordered"
                   value={data.Birthday}
                   onChange={(e) =>
                     setData({ ...data, Birthday: e.target.value })
