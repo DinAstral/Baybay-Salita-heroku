@@ -239,13 +239,13 @@ const userInputAudio = async (req, res) => {
       const itemCodes = [Itemcode1, Itemcode2, Itemcode3, Itemcode4, Itemcode5];
 
       // Fetch words and default audio for each ItemCode from the database
-      const materials = await MaterialModel.find({
+      const materials = await Material.find({
         ItemCode: { $in: itemCodes },
       });
 
       // Create an array of items with their corresponding data
       const assessmentItems = itemCodes.map((itemCode, index) => {
-        const material = materials.find((m) => m.ItemCode === itemCode);
+        const material = materials.find((m) => m.Item === itemCode);
         return {
           ItemCode: itemCode,
           Word: material?.Word || "",
