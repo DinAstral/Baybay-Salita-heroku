@@ -50,6 +50,7 @@ const {
 
 const {
   importWord,
+  importSentence,
   submitAssessment,
   getAssessmentCode,
   getImportWords,
@@ -68,7 +69,7 @@ const { compareAudio } = require("../controllers/CompareController");
 // Configure CORS middleware
 router.use(
   cors({
-    origin: "http://192.168.56.1:3000", // Update this with your client's URL
+    origin: "https://baybay-salita-edu.netlify.app", // Update this with your client's URL https://baybay-salita-edu.netlify.app
     methods: ["GET", "POST", "DELETE", "PATCH"], // Add the allowed HTTP methods
     credentials: true, // Allow credentials (cookies, authorization headers)
   })
@@ -93,10 +94,11 @@ router.post("/importWord", importWord); //okay
 router.post("/userInput", userInputAudio); //okay
 router.get("/getImportWord", getImportWords); //okay profileUpdate
 router.post("/profileUpdate", profileUpdate); //okay
+router.post("/importSentence", importSentence); //okay
 
 // Assessment Routes
 router.post("/submitAssessment", submitAssessment); //okay
-router.get("/getActivity/:ActivityCode", getAssessmentCode); //okay
+router.get("/getActivity/:ActivityCode", getAssessmentCode); //okay imporSentence
 router.get("/getPerformance", getPerformance); //okay
 router.get("/getAssessments", getActivities); //okay
 router.get("/getAssessment/:id", getActivity);

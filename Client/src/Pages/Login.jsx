@@ -12,6 +12,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import Image1 from "../assets/Login_baybay.png";
+import Image2 from "../assets/login_blue.png";
 
 const Login = () => {
   const { setUser } = useContext(UserContext);
@@ -73,7 +74,7 @@ const Login = () => {
   return (
     <div className="flex flex-col md:flex-row w-full h-screen">
       {/* Left Image Section */}
-      <div className="w-full md:w-[65%] h-[40vh] md:h-full bg-[#FAFAFA] flex flex-col">
+      <div className="w-full md:w-[65%] h-full flex items-center justify-center bg-[#FAFAFA]">
         <img
           src={Image1}
           className="w-full h-full object-fill"
@@ -82,8 +83,13 @@ const Login = () => {
       </div>
 
       {/* Right Form Section */}
-      <div className="relative w-full md:w-[35%] flex items-center justify-center bg-[#D5E3F0]">
-        <div className="relative z-10 w-full max-w-md bg-white shadow-lg rounded-lg p-8 opacity-80">
+      <div className="relative w-full md:w-[35%] h-full flex items-center justify-center bg-[#FAFAFA]">
+        <img
+          src={Image2}
+          className="absolute inset-0 w-full h-full object-fill opacity-50"
+          alt="Background Image"
+        />
+        <div className="relative z-10 w-full max-w-md bg-white shadow-lg rounded-lg p-8 opacity-90">
           <div className="mb-6">
             <h1 className="text-lg font-semibold text-center text-[#060606] mb-4">
               Taytay Elementary School Baybay Salita

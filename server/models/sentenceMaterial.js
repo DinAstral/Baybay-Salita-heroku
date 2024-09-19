@@ -1,19 +1,27 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const materialSchema = new Schema(
+const materialSentenceSchema = new Schema(
   {
-    SentenceCode: {
+    ItemCode: {
       type: String,
       unique: true,
     },
     Type: String,
-    Story: String,
-    Question: Object,
+    Sentence: String,
+    Questions: [
+      {
+        question: String,
+        answer: String,
+      },
+    ],
   },
   { timestamps: true }
 );
 
-const MaterialModel = mongoose.model("materials", materialSchema);
+const MaterialSentenceModel = mongoose.model(
+  "materials_sentence",
+  materialSentenceSchema
+);
 
-module.exports = MaterialModel;
+module.exports = MaterialSentenceModel;

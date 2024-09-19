@@ -47,7 +47,8 @@ import ProfileUpdate from "./Pages/ParentDashboard/ProfileUpdate";
 import AdminViewPerformance from "./Pages/AdminDashboard/AdminViewPerformance";
 import TestPage from "./Pages/testpage";
 
-axios.defaults.baseURL = "http://192.168.56.1:8000"; // SERVER_URL
+axios.defaults.baseURL =
+  "https://baybay-salita-heroku-8c328f3ddd0f.herokuapp.com"; // SERVER_URL https://baybay-salita-heroku-8c328f3ddd0f.herokuapp.com/
 axios.defaults.withCredentials = true;
 
 const App = () => {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Table,
   TableHeader,
@@ -30,8 +30,9 @@ const BodyAdminStudentAssessment = () => {
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [activities, setActivities] = useState([]);
   const [filteredActivities, setFilteredActivities] = useState([]);
-  const [selectedPeriod, setSelectedPeriod] = useState("");
+  const [selectedRole, setSelectedRole] = useState("");
   const [modalShowSubmit, setModalShowSubmit] = useState(false);
+  const [selectedType, setSelectedType] = useState("");
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -75,18 +76,44 @@ const BodyAdminStudentAssessment = () => {
     setModalShowSubmit(true);
   };
 
-  const handlePeriodChange = (e) => {
-    const period = e.target.value;
-    setSelectedPeriod(period);
-    if (period === "") {
-      setFilteredActivities(activities);
-    } else {
-      const filtered = activities.filter(
-        (activity) => activity.Period === period
-      );
+  const handleFilterChange = useCallback(
+    (e, filterType) => {
+      const value = e.target.value;
+
+      if (filterType === "period") {
+        setSelectedRole(value);
+      } else if (filterType === "type") {
+        setSelectedType(value);
+      }
+
+      let filtered = activities;
+
+      if (value === "") {
+        filtered = activities;
+      } else {
+        filtered = activities.filter((activity) =>
+          filterType === "period"
+            ? activity.Period === value
+            : activity.Type === value
+        );
+      }
+
+      if (selectedRole && filterType === "type") {
+        filtered = filtered.filter(
+          (activity) => activity.Period === selectedRole
+        );
+      }
+
+      if (selectedType && filterType === "period") {
+        filtered = filtered.filter(
+          (activity) => activity.Type === selectedType
+        );
+      }
+
       setFilteredActivities(filtered);
-    }
-  };
+    },
+    [activities, selectedRole, selectedType]
+  );
 
   return (
     <div className="px-9">
@@ -160,21 +187,39 @@ const BodyAdminStudentAssessment = () => {
           <div className="col">
             <div className="card mt-1 border-0">
               <div className="list-header-drop-score">
-                <Select
-                  labelPlacement="outside"
-                  label="Sort by Grading Period"
-                  variant="bordered"
-                  defaultSelectedKeys={[""]}
-                  className="bg-transparent w-[20%]"
-                  onChange={handlePeriodChange}
-                  value={selectedPeriod}
-                >
-                  <SelectItem key="">Select Grading Period</SelectItem>
-                  <SelectItem key="1">Grading Period 1</SelectItem>
-                  <SelectItem key="2">Grading Period 2</SelectItem>
-                  <SelectItem key="3">Grading Period 3</SelectItem>
-                  <SelectItem key="4">Grading Period 4</SelectItem>
-                </Select>
+                <div className="flex flex-row gap-5 justify-start w-[100%]">
+                  <Select
+                    labelPlacement="outside"
+                    label="Sort by Grading Period"
+                    variant="bordered"
+                    defaultSelectedKeys={[""]}
+                    className="bg-transparent w-[20%]"
+                    onChange={(e) => handleFilterChange(e, "period")}
+                    value={selectedRole}
+                  >
+                    <SelectItem key="">Select Grading Period</SelectItem>
+                    <SelectItem key="1">Grading Period 1</SelectItem>
+                    <SelectItem key="2">Grading Period 2</SelectItem>
+                    <SelectItem key="3">Grading Period 3</SelectItem>
+                    <SelectItem key="4">Grading Period 4</SelectItem>
+                  </Select>
+
+                  <Select
+                    className="w-[20%]"
+                    labelPlacement="outside"
+                    label="Sort by Type"
+                    variant="bordered"
+                    defaultSelectedKeys={[""]}
+                    onChange={(e) => handleFilterChange(e, "type")}
+                    value={selectedType}
+                  >
+                    <SelectItem key="">Select Type of Assessment:</SelectItem>
+                    <SelectItem key="Pagbabaybay">Assessment 1</SelectItem>
+                    <SelectItem key="Pantig">Assessment 2</SelectItem>
+                    <SelectItem key="Salita">Assessment 3</SelectItem>
+                    <SelectItem key="Pagbabasa">Assessment 4</SelectItem>
+                  </Select>
+                </div>
                 <div className="flex flex-row gap-5 justify-end mt-3">
                   <Button
                     auto

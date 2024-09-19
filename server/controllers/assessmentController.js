@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Material = require("../models/materials");
+const SentenceModel = require("../models/sentenceMaterial");
 const Performance = require("../models/performance");
 const AssessmentModel = require("../models/assessment");
 const cloudinary = require("cloudinary").v2;
@@ -23,6 +24,15 @@ cloudinary.config({
 function generateRandomCodeItem(length) {
   const characters = "0123456789";
   let result = "item_";
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}
+
+function generateRandomCodeSentence(length) {
+  const characters = "0123456789";
+  let result = "sentence_";
   for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
@@ -189,6 +199,42 @@ const importWord = async (req, res) => {
   });
 };
 
+const importSentence = async (req, res) => {
+  const itemID = generateRandomCodeSentence(6);
+
+  try {
+    // Extracting Type, Word, and Questions from request body
+    const { Type, Sentence, Questions } = req.body;
+    if (!Type || !Sentence || !Questions) {
+      return res.json({ error: "Type, Word, and Questions are required" });
+    }
+
+    // Parse questions from JSON string
+    let questions = [];
+    try {
+      questions = JSON.parse(Questions);
+    } catch (e) {
+      return res.json({ error: "Invalid Questions format" });
+    }
+
+    // Creating a new Material object
+    const material = new SentenceModel({
+      ItemCode: itemID,
+      Type,
+      Sentence,
+      Questions: questions, // Assuming you have a `Questions` field in your schema
+    });
+
+    // Saving material to the database
+    await material.save();
+
+    return res.json({ message: "Sentence successfully uploaded" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
 const { runComparisonAndSaveResult } = require("../api/STT-TC-AC"); // Import the helper function for comparison
 
 // Upload user input audio
@@ -269,6 +315,7 @@ const userInputAudio = async (req, res) => {
           UserAudioURL: item.UserAudioURL,
           DefaultAudio: item.Audio,
         })),
+        Result: "Sumbitted",
       };
 
       // Insert data into the Performance model
@@ -314,6 +361,7 @@ const getImportWords = (req, res) => {
 
 module.exports = {
   importWord,
+  importSentence,
   submitAssessment,
   getAssessmentCode,
   getImportWords,

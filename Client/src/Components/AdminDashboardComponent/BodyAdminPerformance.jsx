@@ -35,6 +35,7 @@ const BodyAdminPerformance = () => {
   const [usersPerPage] = useState(10);
   const [filteredRoles, setFilteredRoles] = useState([]);
   const [selectedRole, setSelectedRole] = useState("");
+  const [selectedType, setSelectedType] = useState(""); // New state for type filter
 
   const tableRef = useRef(null);
 
@@ -62,20 +63,43 @@ const BodyAdminPerformance = () => {
     setCurrentPage(event.selected);
   }, []);
 
-  const handleSectionChange = useCallback(
-    (e) => {
-      const section = e.target.value;
-      setSelectedRole(section);
+  const handleFilterChange = useCallback(
+    (e, filterType) => {
+      const value = e.target.value;
 
-      if (section === "") {
-        setFilteredRoles(performances);
+      if (filterType === "section") {
+        setSelectedRole(value);
+      } else if (filterType === "type") {
+        setSelectedType(value);
+      }
+
+      let filtered = performances;
+
+      if (value === "") {
+        filtered = performances;
       } else {
-        setFilteredRoles(
-          performances.filter((performance) => performance.Section === section)
+        filtered = performances.filter((performance) =>
+          filterType === "section"
+            ? performance.Section === value
+            : performance.Type === value
         );
       }
+
+      if (selectedRole && filterType === "type") {
+        filtered = filtered.filter(
+          (performance) => performance.Section === selectedRole
+        );
+      }
+
+      if (selectedType && filterType === "section") {
+        filtered = filtered.filter(
+          (performance) => performance.Type === selectedType
+        );
+      }
+
+      setFilteredRoles(filtered);
     },
-    [performances]
+    [performances, selectedRole, selectedType]
   );
 
   const handlePrintClick = useCallback(() => {
@@ -194,7 +218,7 @@ const BodyAdminPerformance = () => {
                   label="Sort by Section"
                   variant="bordered"
                   defaultSelectedKeys={[""]}
-                  onChange={handleSectionChange}
+                  onChange={(e) => handleFilterChange(e, "section")}
                   value={selectedRole}
                 >
                   <SelectItem key="">Select Section</SelectItem>
@@ -215,8 +239,8 @@ const BodyAdminPerformance = () => {
                   label="Sort by Type"
                   variant="bordered"
                   defaultSelectedKeys={[""]}
-                  onChange={handleSectionChange}
-                  value={selectedRole}
+                  onChange={(e) => handleFilterChange(e, "type")}
+                  value={selectedType}
                 >
                   <SelectItem key="">Select Type of Assessment:</SelectItem>
                   <SelectItem key="Pagbabaybay">Assessment 1</SelectItem>
@@ -238,11 +262,7 @@ const BodyAdminPerformance = () => {
                     <TableColumn>Section</TableColumn>
                     <TableColumn>Activity Code</TableColumn>
                     <TableColumn>Type</TableColumn>
-                    <TableColumn>Audio1</TableColumn>
-                    <TableColumn>Audio2</TableColumn>
-                    <TableColumn>Audio3</TableColumn>
-                    <TableColumn>Audio4</TableColumn>
-                    <TableColumn>Audio5</TableColumn>
+                    <TableColumn>Submitted</TableColumn>
                     <TableColumn className="text-center">Actions</TableColumn>
                   </TableHeader>
                   <TableBody emptyContent={"No rows to display."}>
@@ -253,11 +273,7 @@ const BodyAdminPerformance = () => {
                         <TableCell>{performance.Section}</TableCell>
                         <TableCell>{performance.ActivityCode}</TableCell>
                         <TableCell>{performance.Type}</TableCell>
-                        <TableCell>{performance.Audio1}</TableCell>
-                        <TableCell>{performance.Audio2}</TableCell>
-                        <TableCell>{performance.Audio3}</TableCell>
-                        <TableCell>{performance.Audio4}</TableCell>
-                        <TableCell>{performance.Audio5}</TableCell>
+                        <TableCell>{performance.Result}</TableCell>
                         <TableCell className="text-center">
                           <div className="table-buttons">
                             <Button

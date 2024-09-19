@@ -20,29 +20,27 @@ import {
   faBook,
   faComment,
   faQuestion,
-  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 
 const ImportSentenceSucess = ({ show, onHide }) => {
   const handleSuccessClick = () => {
     onHide();
-    window.location.reload(); // You might want to change this to a more efficient state update instead of reloading the page.
   };
 
   return (
     <Modal
       isOpen={show}
       onClose={onHide}
-      aria-labelledby="contained-modal-title-vcenter"
+      aria-labelledby="success-modal-title"
       isDismissable={false}
       isKeyboardDismissDisabled={true}
     >
       <ModalContent>
-        <ModalHeader id="contained-modal-title-vcenter">
-          Sentence imported Successfully!
+        <ModalHeader id="success-modal-title">
+          Sentence Imported Successfully!
         </ModalHeader>
         <ModalBody>
-          <p>You have imported a sentence for your students!</p>
+          <p>You have successfully imported a sentence for your students!</p>
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={handleSuccessClick}>
@@ -58,30 +56,54 @@ const ImportSentence = ({ show, onHide }) => {
   const [modalShow, setModalShow] = useState(false);
   const [data, setData] = useState({
     Type: "",
-    Word: "",
-    Image: null,
-    Audio: null,
+    Sentence: "",
+    Question1: "",
+    Question2: "",
+    Question3: "",
+    Question4: "",
+    Question5: "",
+    Answer1: "",
+    Answer2: "",
+    Answer3: "",
+    Answer4: "",
+    Answer5: "",
   });
 
   const importSentence = async (e) => {
     e.preventDefault();
-    const { Type, Word, Image, Audio } = data;
+    const {
+      Type,
+      Sentence,
+      Question1,
+      Question2,
+      Question3,
+      Question4,
+      Question5,
+      Answer1,
+      Answer2,
+      Answer3,
+      Answer4,
+      Answer5,
+    } = data;
 
-    if (!Type || !Word || !Image || !Audio) {
+    if (!Type || !Sentence) {
       return toast.error("All fields are required.");
     }
 
-    const formData = new FormData();
-    formData.append("Type", Type);
-    formData.append("Word", Word);
-    formData.append("Image", Image);
-    formData.append("Audio", Audio);
-
     try {
-      const response = await axios.post("/importWord", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      const response = await axios.post("/importSentence", {
+        Type,
+        Sentence,
+        Question1,
+        Question2,
+        Question3,
+        Question4,
+        Question5,
+        Answer1,
+        Answer2,
+        Answer3,
+        Answer4,
+        Answer5,
       });
 
       if (response.data.error) {
@@ -102,24 +124,20 @@ const ImportSentence = ({ show, onHide }) => {
         isOpen={show}
         onClose={onHide}
         size="2xl"
-        aria-labelledby="contained-modal-title-vcenter"
+        aria-labelledby="import-modal-title"
         isDismissable={false}
         isKeyboardDismissDisabled={true}
-        scrollBehavior={"inside"}
+        scrollBehavior="inside" // The prop remains
       >
         <ModalContent>
-          <ModalHeader id="contained-modal-title-vcenter">
-            Import New Sentence
-          </ModalHeader>
+          <ModalHeader id="import-modal-title">Import New Sentence</ModalHeader>
           <form onSubmit={importSentence}>
             <ModalBody>
               <div className="text-sm">
-                <p>Please add an information to your assessment.</p>
+                <p>Please provide the information for your assessment.</p>
               </div>
               <Select
                 labelPlacement="outside"
-                defaultSelectedKeys={"1"}
-                disabledKeys={"0"}
                 label="Select type of Word Assessment"
                 aria-label="Select activity type"
                 value={data.Type}
@@ -127,19 +145,18 @@ const ImportSentence = ({ show, onHide }) => {
                 className="bg-transparent py-1 my-1"
                 onChange={(e) => setData({ ...data, Type: e.target.value })}
               >
-                <SelectItem key="0">Select Type of Assessment:</SelectItem>
+                <SelectItem key="">Select Type of Assessment:</SelectItem>
                 <SelectItem key="1">Assessment 4: Pagbabasa</SelectItem>
               </Select>
 
               <Textarea
-                type="textfield"
                 placeholder="Input sentence"
                 labelPlacement="outside"
-                label="Add a filipino short reading story"
+                label="Add a Filipino short reading story"
                 variant="bordered"
                 className="bg-transparent py-1 my-1"
-                value={data.Word}
-                onChange={(e) => setData({ ...data, Word: e.target.value })}
+                value={data.Sentence}
+                onChange={(e) => setData({ ...data, Sentence: e.target.value })}
                 endContent={
                   <FontAwesomeIcon
                     icon={faBook}
@@ -147,159 +164,222 @@ const ImportSentence = ({ show, onHide }) => {
                   />
                 }
               />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Input
-                  type="text"
-                  label="Question 1"
-                  placeholder="Write a question"
-                  labelPlacement="outside"
-                  variant="bordered"
-                  className="bg-transparent py-1 my-1"
-                  onChange={(e) => setData({ ...data, Image: e.target.value })}
-                  endContent={
-                    <FontAwesomeIcon
-                      icon={faQuestion}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                    />
-                  }
-                />
-                <Input
-                  type="text"
-                  label="Answer 1"
-                  placeholder="Input the answer"
-                  labelPlacement="outside"
-                  variant="bordered"
-                  className="bg-transparent py-1 my-1"
-                  onChange={(e) => setData({ ...data, Audio: e.target.value })}
-                  endContent={
-                    <FontAwesomeIcon
-                      icon={faComment}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                    />
-                  }
-                />
 
-                <Input
-                  type="text"
-                  label="Question 2"
-                  placeholder="Write a question"
-                  labelPlacement="outside"
-                  variant="bordered"
-                  className="bg-transparent py-1 my-1"
-                  onChange={(e) => setData({ ...data, Image: e.target.value })}
-                  endContent={
-                    <FontAwesomeIcon
-                      icon={faQuestion}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+              <div className="flex flex-col gap-6 overflow-y-auto max-h-96">
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Question 1`}
+                      placeholder="Write a question"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Question1}
+                      onChange={(e) =>
+                        setData({ ...data, Question1: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faQuestion}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
                     />
-                  }
-                />
-                <Input
-                  type="text"
-                  label="Answer 2"
-                  placeholder="Input the answer"
-                  labelPlacement="outside"
-                  variant="bordered"
-                  className="bg-transparent py-1 my-1"
-                  onChange={(e) => setData({ ...data, Audio: e.target.value })}
-                  endContent={
-                    <FontAwesomeIcon
-                      icon={faComment}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                  </div>
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Answer 1`}
+                      placeholder="Input the answer"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Answer1}
+                      onChange={(e) =>
+                        setData({ ...data, Answer1: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faComment}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
                     />
-                  }
-                />
+                  </div>
+                </div>
 
-                <Input
-                  type="text"
-                  label="Question 3"
-                  placeholder="Write a question"
-                  labelPlacement="outside"
-                  variant="bordered"
-                  className="bg-transparent py-1 my-1"
-                  onChange={(e) => setData({ ...data, Image: e.target.value })}
-                  endContent={
-                    <FontAwesomeIcon
-                      icon={faQuestion}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Question 2`}
+                      placeholder="Write a question"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Question2}
+                      onChange={(e) =>
+                        setData({ ...data, Question2: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faQuestion}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
                     />
-                  }
-                />
-                <Input
-                  type="text"
-                  label="Answer 3"
-                  placeholder="Input the answer"
-                  labelPlacement="outside"
-                  variant="bordered"
-                  className="bg-transparent py-1 my-1"
-                  onChange={(e) => setData({ ...data, Audio: e.target.value })}
-                  endContent={
-                    <FontAwesomeIcon
-                      icon={faComment}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                  </div>
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Answer 2`}
+                      placeholder="Input the answer"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Answer2}
+                      onChange={(e) =>
+                        setData({ ...data, Answer2: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faComment}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
                     />
-                  }
-                />
-                <Input
-                  type="text"
-                  label="Question 4"
-                  placeholder="Write a question"
-                  labelPlacement="outside"
-                  variant="bordered"
-                  className="bg-transparent py-1 my-1"
-                  onChange={(e) => setData({ ...data, Image: e.target.value })}
-                  endContent={
-                    <FontAwesomeIcon
-                      icon={faQuestion}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Question 3`}
+                      placeholder="Write a question"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Question3}
+                      onChange={(e) =>
+                        setData({ ...data, Question3: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faQuestion}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
                     />
-                  }
-                />
-                <Input
-                  type="text"
-                  label="Answer 4"
-                  placeholder="Input the answer"
-                  labelPlacement="outside"
-                  variant="bordered"
-                  className="bg-transparent py-1 my-1"
-                  onChange={(e) => setData({ ...data, Audio: e.target.value })}
-                  endContent={
-                    <FontAwesomeIcon
-                      icon={faComment}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                  </div>
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Answer 3`}
+                      placeholder="Input the answer"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Answer3}
+                      onChange={(e) =>
+                        setData({ ...data, Answer3: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faComment}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
                     />
-                  }
-                />
-                <Input
-                  type="text"
-                  label="Question 5"
-                  placeholder="Write a question"
-                  labelPlacement="outside"
-                  variant="bordered"
-                  className="bg-transparent py-1 my-1"
-                  onChange={(e) => setData({ ...data, Image: e.target.value })}
-                  endContent={
-                    <FontAwesomeIcon
-                      icon={faQuestion}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Question 4`}
+                      placeholder="Write a question"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Question4}
+                      onChange={(e) =>
+                        setData({ ...data, Question4: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faQuestion}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
                     />
-                  }
-                />
-                <Input
-                  type="text"
-                  label="Answer 5"
-                  placeholder="Input the answer"
-                  labelPlacement="outside"
-                  variant="bordered"
-                  className="bg-transparent py-1 my-1"
-                  onChange={(e) => setData({ ...data, Audio: e.target.value })}
-                  endContent={
-                    <FontAwesomeIcon
-                      icon={faComment}
-                      className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                  </div>
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Answer 4`}
+                      placeholder="Input the answer"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Answer4}
+                      onChange={(e) =>
+                        setData({ ...data, Answer4: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faComment}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
                     />
-                  }
-                />
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Question 5`}
+                      placeholder="Write a question"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Question5}
+                      onChange={(e) =>
+                        setData({ ...data, Question5: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faQuestion}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
+                    />
+                  </div>
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Answer 5`}
+                      placeholder="Input the answer"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Answer5}
+                      onChange={(e) =>
+                        setData({ ...data, Answer5: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faComment}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
+                    />
+                  </div>
+                </div>
               </div>
             </ModalBody>
             <ModalFooter>
