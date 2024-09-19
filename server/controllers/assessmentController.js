@@ -80,7 +80,8 @@ const submitAssessment = async (req, res) => {
       ActivityCode: randomCode,
       Period,
       Type,
-      Items: assessmentItems, // Save items with image and audio
+      Items: assessmentItems, // Save items with image and audio]
+      Assessment: "Submitted",
     });
 
     return res.json(act);
@@ -189,7 +190,6 @@ const importWord = async (req, res) => {
 };
 
 // Upload user input audio
-// Upload user input audio
 const userInputAudio = async (req, res) => {
   const InputID = generateRandomCodeUser(6);
 
@@ -261,13 +261,12 @@ const userInputAudio = async (req, res) => {
         LRN,
         Section,
         Type,
-        PerformanceItem: assessmentItems.map((item, index) => ({
+        AssessmentItems: assessmentItems.map((item, index) => ({
           ItemCode: item.ItemCode,
           Word: item.Word,
           UserAudioURL: item.UserAudioURL,
-          DefaultAudioURL: item.DefaultAudio,
+          DefaultAudio: item.DefaultAudio,
         })),
-        Result: "Submitted",
       };
 
       // Insert data into the database

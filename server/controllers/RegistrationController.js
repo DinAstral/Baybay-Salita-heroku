@@ -672,11 +672,13 @@ const loginUser = async (req, res) => {
       return res.json({
         error: "Email and Password are required.",
       });
-    } else if (!email) {
+    }
+    if (!email) {
       return res.json({
         error: "Email is Required.",
       });
-    } else if (!password) {
+    }
+    if (!password) {
       return res.json({
         error: "Password is Required",
       });
@@ -734,7 +736,7 @@ const forgotPassword = async (req, res) => {
       const token = jwt.sign({ email: userEmail, id: userEmail._id }, secret, {
         expiresIn: "30m",
       });
-      const link = `http://localhost:5173/reset-password/${userEmail._id}/${token}`;
+      const link = `https://baybay-salita-edu.netlify.app/reset-password/${userEmail._id}/${token}`;
       console.log(link);
       sendForgotPasswordEmail({ email, link }, res);
     }

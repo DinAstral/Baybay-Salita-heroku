@@ -12,6 +12,7 @@ const assessSchema = new Schema(
     },
     Type: String,
     Items: Object,
+    Assessment: String,
   },
 
   { timestamps: true }
