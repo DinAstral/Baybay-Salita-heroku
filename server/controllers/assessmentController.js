@@ -261,7 +261,7 @@ const userInputAudio = async (req, res) => {
         LRN,
         Section,
         Type,
-        AssessmentItems: assessmentItems.map((item, index) => ({
+        PerformanceItems: assessmentItems.map((item, index) => ({
           ItemCode: item.ItemCode,
           Word: item.Word,
           UserAudioURL: item.UserAudioURL,
