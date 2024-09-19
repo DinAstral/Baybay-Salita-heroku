@@ -113,7 +113,6 @@ const BodyTeacherDashboard = () => {
             ]}
             yAxis={[
               {
-                label: "Number of Students",
                 label: "Sections",
                 scaleType: "band",
                 data: Object.keys(sectionCounts),

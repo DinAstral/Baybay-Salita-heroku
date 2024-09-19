@@ -20,10 +20,12 @@ import PrintRecord from "../Modals/PrintRecord";
 import CreateAssessment from "../Modals/CreateAssessment";
 import ImportWord from "../Modals/importWord";
 import DeleteAssessment from "../Modals/DeleteAssessment";
+import ImportSentence from "../Modals/importSentence";
 
 const BodyAdminStudentAssessment = () => {
   const [show, setShow] = useState(false);
   const [modalShowImport, setModalShowImport] = useState(false);
+  const [modalShowImportSentence, setModalShowImportSentence] = useState(false);
   const [modalShowPrint, setModalShowPrint] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [activities, setActivities] = useState([]);
@@ -64,6 +66,10 @@ const BodyAdminStudentAssessment = () => {
     setModalShowImport(true);
   };
 
+  const handleImportClickSentence = () => {
+    setModalShowImportSentence(true);
+  };
+
   const handleShowSubmit = (activity) => {
     setSelectedActivity(activity);
     setModalShowSubmit(true);
@@ -97,6 +103,10 @@ const BodyAdminStudentAssessment = () => {
       <ImportWord
         show={modalShowImport}
         onHide={() => setModalShowImport(false)}
+      />
+      <ImportSentence
+        show={modalShowImportSentence}
+        onHide={() => setModalShowImportSentence(false)}
       />
       <DeleteAssessment
         show={modalShowSubmit}
@@ -166,6 +176,13 @@ const BodyAdminStudentAssessment = () => {
                   <SelectItem key="4">Grading Period 4</SelectItem>
                 </Select>
                 <div className="flex flex-row gap-5 justify-end mt-3">
+                  <Button
+                    auto
+                    onClick={handleImportClickSentence}
+                    color="default"
+                  >
+                    Import Sentence
+                  </Button>
                   <Button auto onClick={handleImportClick} color="default">
                     Import Word
                   </Button>
@@ -186,11 +203,7 @@ const BodyAdminStudentAssessment = () => {
                     <TableColumn>Activity Code</TableColumn>
                     <TableColumn>Grading Period</TableColumn>
                     <TableColumn>Type</TableColumn>
-                    <TableColumn>Item 1</TableColumn>
-                    <TableColumn>Item 2</TableColumn>
-                    <TableColumn>Item 3</TableColumn>
-                    <TableColumn>Item 4</TableColumn>
-                    <TableColumn>Item 5</TableColumn>
+                    <TableColumn>Status</TableColumn>
                     <TableColumn className="text-center">Actions</TableColumn>
                   </TableHeader>
                   <TableBody emptyContent={"No rows to display."}>
@@ -199,11 +212,7 @@ const BodyAdminStudentAssessment = () => {
                         <TableCell>{activity.ActivityCode}</TableCell>
                         <TableCell>{activity.Period}</TableCell>
                         <TableCell>{activity.Type}</TableCell>
-                        <TableCell>{activity.Item1}</TableCell>
-                        <TableCell>{activity.Item2}</TableCell>
-                        <TableCell>{activity.Item3}</TableCell>
-                        <TableCell>{activity.Item4}</TableCell>
-                        <TableCell>{activity.Item5}</TableCell>
+                        <TableCell>{activity.Assessment}</TableCell>
                         <TableCell className="text-center">
                           <div className="table-buttons">
                             <Button
@@ -213,7 +222,7 @@ const BodyAdminStudentAssessment = () => {
                                 handleModalStateChange("editUser", true)
                               }
                             >
-                              Update
+                              View
                             </Button>
                             <Button
                               color="danger"

@@ -8,17 +8,7 @@ const comparisonSchema = new Schema(
     Section: String,
     ActivityCode: String,
     Type: String,
-    Itemcode1: String,
-    Result1: Object,
-    Itemcode2: String,
-    Result2: Object,
-    Itemcode3: String,
-    Result3: Object,
-    Itemcode4: String,
-    Result4: Object,
-    Itemcode5: String,
-    Result5: Object,
-    AverageResult: Object,
+    Results: Object,
   },
   { timestamps: true }
 );

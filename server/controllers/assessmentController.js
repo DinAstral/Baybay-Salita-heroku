@@ -189,6 +189,8 @@ const importWord = async (req, res) => {
   });
 };
 
+const { runComparisonAndSaveResult } = require("../api/STT-TC-AC"); // Import the helper function for comparison
+
 // Upload user input audio
 const userInputAudio = async (req, res) => {
   const InputID = generateRandomCodeUser(6);
@@ -269,12 +271,24 @@ const userInputAudio = async (req, res) => {
         })),
       };
 
-      // Insert data into the database
+      // Insert data into the Performance model
       const insert = await Performance.create(performanceData);
 
       if (insert) {
+        // Run audio comparison and save the results to the database
+        await runComparisonAndSaveResult(
+          InputID,
+          ActivityCode,
+          LRN,
+          Section,
+          Type,
+          fileUrls,
+          assessmentItems.map((item) => item.Audio) // Extract default audios
+        );
+
         return res.json({
-          message: "Audio files uploaded and data stored successfully.",
+          message:
+            "Audio files uploaded, data stored, and comparison results saved successfully.",
         });
       } else {
         return res.status(500).json({

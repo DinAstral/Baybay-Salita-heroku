@@ -1,7 +1,3 @@
-const Material = require("../models/materials");
-const Performance = require("../models/performance");
-
-const { AssemblyAI } = require("assemblyai");
 const axios = require("axios");
 const Meyda = require("meyda");
 const fs = require("fs");
@@ -198,20 +194,22 @@ const stentWeightedAudioSimilarity = (
   );
 };
 
-// Main function to orchestrate the process
-const run = async () => {
+// Main comparison function that accepts dynamic audio URLs
+const run = async (defaultAudioUrl, userAudioUrl) => {
   try {
+    // Local file paths for downloaded audio files
+    const audioFile1 = "audio1.wav"; // For the default audio
+    const audioFile2 = "audio2.wav"; // For the user-uploaded audio
+
     // Download the audio files locally
-    const audioFile1 = "audio1.wav";
-    const audioFile2 = "audio2.wav";
-    await downloadAudio(audioUrl1, audioFile1);
-    await downloadAudio(audioUrl2, audioFile2);
+    await downloadAudio(defaultAudioUrl, audioFile1);
+    await downloadAudio(userAudioUrl, audioFile2);
 
-    // Extract audio features
-    const features1 = await extractAudioFeatures(audioFile1);
-    const features2 = await extractAudioFeatures(audioFile2);
+    // Extract audio features from both files
+    const features1 = await extractAudioFeatures(audioFile1); // Default audio
+    const features2 = await extractAudioFeatures(audioFile2); // User audio
 
-    // Compare audio features
+    // Compare the extracted audio features
     const audioComparison = compareAudioFeatures(features1, features2);
     console.log("Audio Feature Comparison:", audioComparison);
 
@@ -227,12 +225,63 @@ const run = async () => {
     console.log("Mfcc Distance:", audioComparison.mfccDistance);
     console.log("Stent Weighted Audio Similarity:", weightedSimilarity);
 
-    // You can also add transcription code here if needed...
+    // Return the comparison results
+    return {
+      audioComparison,
+      weightedSimilarity,
+    };
   } catch (error) {
-    console.error("Error:", error.message);
+    console.error("Error during audio comparison:", error.message);
+    throw error; // Ensure errors are caught and handled
+  }
+};
+
+const runComparisonAndSaveResult = async (
+  UserInputId,
+  ActivityCode,
+  LRN,
+  Section,
+  Type,
+  fileUrls,
+  defaultAudios
+) => {
+  try {
+    const comparisonResults = [];
+
+    for (let i = 0; i < defaultAudios.length; i++) {
+      const userAudioUrl = fileUrls[`AudioURL${i + 1}`];
+      const defaultAudioUrl = defaultAudios[i];
+
+      // Run the comparison using the main comparison function
+      const result = await run(defaultAudioUrl, userAudioUrl);
+
+      // Save the detailed result for each audio comparison
+      comparisonResults.push({
+        ItemCode: `Itemcode${i + 1}`,
+        mfccDistance: result.audioComparison.mfccDistance,
+        chromaDistance: result.audioComparison.chromaDistance,
+        spectralCentroidDistance:
+          result.audioComparison.spectralCentroidDistance,
+        zcr: result.audioComparison.zcr,
+        perceptualSpread: result.audioComparison.perceptualSpread,
+        stentWeightedSimilarity: result.weightedSimilarity,
+      });
+    }
+
+    // Save the comparison results in the database
+    await ComparisonModel.create({
+      UserInputId,
+      ActivityCode,
+      LRN,
+      Section,
+      Type,
+      Results: comparisonResults,
+    });
+  } catch (error) {
+    console.error("Error during audio comparison:", error);
   }
 };
 
 module.exports = {
-  run,
+  runComparisonAndSaveResult,
 };

@@ -234,7 +234,7 @@ const CreateAssessment = ({ show, handleClose }) => {
                 <SelectItem key="Pagbabasa">Assessment 4: Pagbabasa</SelectItem>
               </Select>
               <div className="text-sm">
-                <p>Please add aan item to your assessment.</p>
+                <p>Please add an item to your assessment.</p>
               </div>
 
               {["Item1", "Item2", "Item3", "Item4", "Item5"].map(
