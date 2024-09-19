@@ -245,11 +245,11 @@ const userInputAudio = async (req, res) => {
 
       // Create an array of items with their corresponding data
       const assessmentItems = itemCodes.map((itemCode, index) => {
-        const material = materials.find((m) => m.Item === itemCode);
+        const material = materials.find((m) => m.ItemCode === itemCode);
         return {
           ItemCode: itemCode,
           Word: material?.Word || "",
-          DefaultAudio: material?.Audio || "",
+          Audio: material?.Audio || "",
           UserAudioURL: fileUrls[`AudioURL${index + 1}`],
         };
       });
@@ -265,7 +265,7 @@ const userInputAudio = async (req, res) => {
           ItemCode: item.ItemCode,
           Word: item.Word,
           UserAudioURL: item.UserAudioURL,
-          DefaultAudio: item.DefaultAudio,
+          DefaultAudio: item.Audio,
         })),
       };
 
