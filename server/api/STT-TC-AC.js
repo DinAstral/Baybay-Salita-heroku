@@ -3,6 +3,8 @@ const Meyda = require("meyda");
 const fs = require("fs");
 const ffmpeg = require("fluent-ffmpeg");
 const wav = require("wav-decoder");
+const mongoose = require("mongoose");
+const CompareModel = require("../models/ComparisonResult");
 
 // URLs to the audio files
 const audioUrl1 =
@@ -269,7 +271,7 @@ const runComparisonAndSaveResult = async (
     }
 
     // Save the comparison results in the database
-    await ComparisonModel.create({
+    await CompareModel.create({
       UserInputId,
       ActivityCode,
       LRN,
