@@ -70,6 +70,7 @@ const submitAssessment = async (req, res) => {
       const material = materials.find((m) => m.ItemCode === itemCode);
       return {
         ItemCode: itemCode,
+        Word: material?.Word || "",
         Image: material?.Image || "",
         Audio: material?.Audio || "",
       };
@@ -188,6 +189,7 @@ const importWord = async (req, res) => {
 };
 
 // Upload user input audio
+// Upload user input audio
 const userInputAudio = async (req, res) => {
   const InputID = generateRandomCodeUser(6);
 
@@ -203,7 +205,7 @@ const userInputAudio = async (req, res) => {
         Type,
         LRN,
         Section,
-        AssessmentID,
+        ActivityCode,
         Itemcode1,
         Itemcode2,
         Itemcode3,
@@ -211,51 +213,77 @@ const userInputAudio = async (req, res) => {
         Itemcode5,
       } = req.body;
 
+      // Upload user input audio files to cloudinary
       const uploadResponse = await cloudinaryUploaderUser(req, res);
 
-      // Ensure all expected files are present in uploadResponse
-      const files = ["User1", "User2", "User3", "User4", "User5"];
-      const fileUrls = {};
+      // Get uploaded URLs for each user input audio
+      const fileUrls = {
+        AudioURL1: uploadResponse.uploadAudioUser1
+          ? uploadResponse.uploadAudioUser1.url
+          : "",
+        AudioURL2: uploadResponse.uploadAudioUser2
+          ? uploadResponse.uploadAudioUser2.url
+          : "",
+        AudioURL3: uploadResponse.uploadAudioUser3
+          ? uploadResponse.uploadAudioUser3.url
+          : "",
+        AudioURL4: uploadResponse.uploadAudioUser4
+          ? uploadResponse.uploadAudioUser4.url
+          : "",
+        AudioURL5: uploadResponse.uploadAudioUser5
+          ? uploadResponse.uploadAudioUser5.url
+          : "",
+      };
 
-      files.forEach((fileKey, index) => {
-        const fileUpload = uploadResponse[`uploadAudioUser${index + 1}`];
-        fileUrls[`AudioURL${index + 1}`] = fileUpload ? fileUpload.url : "";
+      // Group item codes for fetching from the database
+      const itemCodes = [Itemcode1, Itemcode2, Itemcode3, Itemcode4, Itemcode5];
+
+      // Fetch words and default audio for each ItemCode from the database
+      const materials = await MaterialModel.find({
+        ItemCode: { $in: itemCodes },
       });
 
-      const insert = await Performance.create({
+      // Create an array of items with their corresponding data
+      const assessmentItems = itemCodes.map((itemCode, index) => {
+        const material = materials.find((m) => m.ItemCode === itemCode);
+        return {
+          ItemCode: itemCode,
+          Word: material?.Word || "",
+          DefaultAudio: material?.Audio || "",
+          UserAudioURL: fileUrls[`AudioURL${index + 1}`],
+        };
+      });
+
+      // Prepare the data for insertion into the Performance model
+      const performanceData = {
         UserInputId: InputID,
-        AssessmentID: AssessmentID,
-        LRN: LRN,
-        Section: Section,
-        Type: Type,
-        Itemcode1: Itemcode1,
-        Audio1: "Submitted",
-        AudioURL1: fileUrls.AudioURL1,
-        Itemcode2: Itemcode2,
-        Audio2: "Submitted",
-        AudioURL2: fileUrls.AudioURL2,
-        Itemcode3: Itemcode3,
-        Audio3: "Submitted",
-        AudioURL3: fileUrls.AudioURL3,
-        Itemcode4: Itemcode4,
-        Audio4: "Submitted",
-        AudioURL4: fileUrls.AudioURL4,
-        Itemcode5: Itemcode5,
-        Audio5: "Submitted",
-        AudioURL5: fileUrls.AudioURL5,
-      });
+        ActivityCode,
+        LRN,
+        Section,
+        Type,
+        PerformanceItem: assessmentItems.map((item, index) => ({
+          ItemCode: item.ItemCode,
+          Word: item.Word,
+          UserAudioURL: item.UserAudioURL,
+          DefaultAudioURL: item.DefaultAudio,
+        })),
+        Result: "Submitted",
+      };
+
+      // Insert data into the database
+      const insert = await Performance.create(performanceData);
 
       if (insert) {
-        return res.json({ message: "Audio file uploaded successfully." });
+        return res.json({
+          message: "Audio files uploaded and data stored successfully.",
+        });
       } else {
-        // Insert failed, send an appropriate response
         return res.status(500).json({
           error: "Upload unsuccessful. Please try again later!",
         });
       }
     } catch (error) {
       console.error("Error during upload process:", error);
-      // Ensure no multiple responses are sent
       if (!res.headersSent) {
         return res
           .status(500)
