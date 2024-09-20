@@ -203,10 +203,11 @@ const importSentence = async (req, res) => {
   const itemID = generateRandomCodeSentence(6);
 
   try {
-    // Extracting Type, Word, and Questions from request body
+    // Extracting Type, Sentence, and Questions from request body
     const { Type, Sentence, Questions } = req.body;
+
     if (!Type || !Sentence || !Questions) {
-      return res.json({ error: "Type, Word, and Questions are required" });
+      return res.json({ error: "Type, Sentence, and Questions are required" });
     }
 
     // Parse questions from JSON string
@@ -217,15 +218,21 @@ const importSentence = async (req, res) => {
       return res.json({ error: "Invalid Questions format" });
     }
 
-    // Creating a new Material object
+    // Ensure each question has both a question and an answer
+    const formattedQuestions = questions.map((q) => ({
+      Question: q.Question,
+      Answer: q.Answer,
+    }));
+
+    // Creating a new SentenceModel object
     const material = new SentenceModel({
       ItemCode: itemID,
       Type,
       Sentence,
-      Questions: questions, // Assuming you have a `Questions` field in your schema
+      Questions: formattedQuestions, // Saving questions as an array of objects
     });
 
-    // Saving material to the database
+    // Saving the material to the database
     await material.save();
 
     return res.json({ message: "Sentence successfully uploaded" });
@@ -309,13 +316,13 @@ const userInputAudio = async (req, res) => {
         LRN,
         Section,
         Type,
+        Result: "Sumbitted",
         PerformanceItems: assessmentItems.map((item, index) => ({
           ItemCode: item.ItemCode,
           Word: item.Word,
           UserAudioURL: item.UserAudioURL,
           DefaultAudio: item.Audio,
         })),
-        Result: "Sumbitted",
       };
 
       // Insert data into the Performance model
