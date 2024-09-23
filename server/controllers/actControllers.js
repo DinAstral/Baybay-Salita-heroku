@@ -272,31 +272,6 @@ const createAssessment = async (req, res) => {
         error: "Type of Assessment is required",
       });
     }
-    if (!Word1) {
-      return res.json({
-        error: "Answer 1 is required",
-      });
-    }
-    if (!Word2) {
-      return res.json({
-        error: "Answer 2 is required",
-      });
-    }
-    if (!Word3) {
-      return res.json({
-        error: "Answer 3 is required",
-      });
-    }
-    if (!Word4) {
-      return res.json({
-        error: "Answer 4 is required",
-      });
-    }
-    if (!Word5) {
-      return res.json({
-        error: "Answer 5 is required",
-      });
-    }
 
     // Create user in database (Table)
     const act = await Activity.create({
@@ -304,6 +279,7 @@ const createAssessment = async (req, res) => {
       ActivityNumber,
       Period,
       Type,
+      Title,
       Word1,
       Word2,
       Word3,

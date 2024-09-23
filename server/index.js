@@ -32,7 +32,7 @@ app.use(express.json({ limit: "100mb" })); // Limit for incoming JSON payload
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 
-// Serve static files from the dist directory
+/*/ Serve static files from the dist directory
 app.use(express.static(path.join(__dirname, "../Client/dist")));
 
 // Fallback to serving index.html for any route not handled by the API
@@ -45,7 +45,7 @@ app.get("/*", function (req, res) {
       }
     }
   );
-});
+});*/
 
 // Routes
 app.use("/", require("./routes/authRoutes"));

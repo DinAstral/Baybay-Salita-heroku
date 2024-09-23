@@ -57,6 +57,7 @@ const {
   getPerformance,
   deleteAssessment,
   userInputAudio,
+  getSentence,
 } = require("../controllers/assessmentController");
 
 const {
@@ -100,6 +101,7 @@ router.post("/importSentence", importSentence); //okay
 router.post("/submitAssessment", submitAssessment); //okay
 router.get("/getActivity/:ActivityCode", getAssessmentCode); //okay imporSentence
 router.get("/getPerformance", getPerformance); //okay
+router.get("/getSentence", getSentence); //okay
 router.get("/getAssessments", getActivities); //okay
 router.get("/getAssessment/:id", getActivity);
 router.delete("/deleteAssessment/:id", deleteAssessment);

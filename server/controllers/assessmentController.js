@@ -61,9 +61,9 @@ function generateRandomCode(length) {
 const submitAssessment = async (req, res) => {
   const randomCode = generateRandomCode(6);
   try {
-    const { Period, Type, Item1, Item2, Item3, Item4, Item5 } = req.body;
+    const { Period, Type, Title, Item1, Item2, Item3, Item4, Item5 } = req.body;
 
-    if (!Period || !Type || !Item1 || !Item2 || !Item3 || !Item4 || !Item5) {
+    if (!Period || !Type) {
       return res.json({ error: "All fields are required" });
     }
 
@@ -72,7 +72,7 @@ const submitAssessment = async (req, res) => {
       return res.json({ error: "ActivityCode is already taken" });
     }
 
-    // Fetch image and audio for each item
+    // Fetch materials for each item
     const items = [Item1, Item2, Item3, Item4, Item5];
     const materials = await Material.find({ ItemCode: { $in: items } });
 
@@ -86,11 +86,54 @@ const submitAssessment = async (req, res) => {
       };
     });
 
+    // Fetch the corresponding sentence for Pagbabasa type assessment
+    let questions = [];
+    let sentenceText = ""; // Initialize the sentence to save later
+
+    if (Type === "Pagbabasa") {
+      const sentence = await SentenceModel.findOne({ Title }); // Fetch the sentence based on the Title
+
+      if (sentence) {
+        sentenceText = sentence.Sentence; // Store the Sentence for saving
+
+        questions = [
+          {
+            ItemCode: sentence.ItemCode,
+            Question: sentence.Question1,
+            Answer: sentence.Answer1,
+          },
+          {
+            ItemCode: sentence.ItemCode,
+            Question: sentence.Question2,
+            Answer: sentence.Answer2,
+          },
+          {
+            ItemCode: sentence.ItemCode,
+            Question: sentence.Question3,
+            Answer: sentence.Answer3,
+          },
+          {
+            ItemCode: sentence.ItemCode,
+            Question: sentence.Question4,
+            Answer: sentence.Answer4,
+          },
+          {
+            ItemCode: sentence.ItemCode,
+            Question: sentence.Question5,
+            Answer: sentence.Answer5,
+          },
+        ];
+      }
+    }
+
     const act = await AssessmentModel.create({
       ActivityCode: randomCode,
       Period,
       Type,
-      Items: assessmentItems, // Save items with image and audio]
+      Title,
+      Sentence: sentenceText, // Save the sentence if Pagbabasa is selected
+      Questions: questions, // Saving grouped questions and answers
+      Items: assessmentItems, // Save items with image and audio
       Assessment: "Submitted",
     });
 
@@ -128,6 +171,13 @@ const getAssessmentCode = async (req, res) => {
 // Get performance data
 const getPerformance = (req, res) => {
   Performance.find()
+    .then((users) => res.json(users))
+    .catch((err) => res.json(err));
+};
+
+// Get Sentence data
+const getSentence = (req, res) => {
+  SentenceModel.find()
     .then((users) => res.json(users))
     .catch((err) => res.json(err));
 };
@@ -177,7 +227,9 @@ const importWord = async (req, res) => {
       // Uploading to Cloudinary
       const uploadResponse = await cloudinaryUploader(req, res);
       const imageFile = uploadResponse.uploadImage.url;
+      const securedImageFile = uploadResponse.uploadImage.secure_url;
       const audioFile = uploadResponse.uploadAudio.url;
+      const securedAudioFile = uploadResponse.uploadImage.secure_url;
 
       // Creating a new Material object
       const material = new Material({
@@ -185,7 +237,9 @@ const importWord = async (req, res) => {
         Type,
         Word,
         Image: imageFile,
+        SecureImage: securedImageFile,
         Audio: audioFile,
+        SecureAudio: securedAudioFile,
       });
 
       // Saving material to the database
@@ -200,39 +254,49 @@ const importWord = async (req, res) => {
 };
 
 const importSentence = async (req, res) => {
-  const itemID = generateRandomCodeSentence(6);
+  const itemID = generateRandomCodeSentence(6); // Generate unique item code
 
   try {
     // Extracting Type, Sentence, and Questions from request body
-    const { Type, Sentence, Questions } = req.body;
+    const {
+      Type,
+      Title,
+      Sentence,
+      Question1,
+      Question2,
+      Question3,
+      Question4,
+      Question5,
+      Answer1,
+      Answer2,
+      Answer3,
+      Answer4,
+      Answer5,
+    } = req.body;
 
-    if (!Type || !Sentence || !Questions) {
+    if (!Type || !Sentence || !Question1 || !Title) {
       return res.json({ error: "Type, Sentence, and Questions are required" });
     }
 
-    // Parse questions from JSON string
-    let questions = [];
-    try {
-      questions = JSON.parse(Questions);
-    } catch (e) {
-      return res.json({ error: "Invalid Questions format" });
-    }
-
-    // Ensure each question has both a question and an answer
-    const formattedQuestions = questions.map((q) => ({
-      Question: q.Question,
-      Answer: q.Answer,
-    }));
-
-    // Creating a new SentenceModel object
+    // Create a new SentenceModel object
     const material = new SentenceModel({
       ItemCode: itemID,
       Type,
+      Title,
       Sentence,
-      Questions: formattedQuestions, // Saving questions as an array of objects
+      Question1,
+      Question2,
+      Question3,
+      Question4,
+      Question5,
+      Answer1,
+      Answer2,
+      Answer3,
+      Answer4,
+      Answer5,
     });
 
-    // Saving the material to the database
+    // Save the material to the database
     await material.save();
 
     return res.json({ message: "Sentence successfully uploaded" });
@@ -274,19 +338,19 @@ const userInputAudio = async (req, res) => {
       // Get uploaded URLs for each user input audio
       const fileUrls = {
         AudioURL1: uploadResponse.uploadAudioUser1
-          ? uploadResponse.uploadAudioUser1.url
+          ? uploadResponse.uploadAudioUser1.secure_url
           : "",
         AudioURL2: uploadResponse.uploadAudioUser2
-          ? uploadResponse.uploadAudioUser2.url
+          ? uploadResponse.uploadAudioUser2.secure_url
           : "",
         AudioURL3: uploadResponse.uploadAudioUser3
-          ? uploadResponse.uploadAudioUser3.url
+          ? uploadResponse.uploadAudioUser3.secure_url
           : "",
         AudioURL4: uploadResponse.uploadAudioUser4
-          ? uploadResponse.uploadAudioUser4.url
+          ? uploadResponse.uploadAudioUser4.secure_url
           : "",
         AudioURL5: uploadResponse.uploadAudioUser5
-          ? uploadResponse.uploadAudioUser5.url
+          ? uploadResponse.uploadAudioUser5.secure_url
           : "",
       };
 
@@ -373,6 +437,7 @@ module.exports = {
   getAssessmentCode,
   getImportWords,
   getPerformance,
+  getSentence,
   deleteAssessment,
   userInputAudio,
 };

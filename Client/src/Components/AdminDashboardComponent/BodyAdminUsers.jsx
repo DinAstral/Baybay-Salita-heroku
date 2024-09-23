@@ -199,12 +199,10 @@ const BodyAdminUsers = () => {
                   labelPlacement="outside"
                   label="Sort by Role"
                   variant="bordered"
-                  defaultSelectedKeys={[""]}
                   className="bg-transparent w-[20%]"
                   onChange={(e) => setSelectedRole(e.target.value)}
                   value={selectedRole}
                 >
-                  <SelectItem key="">Select Role</SelectItem>
                   <SelectItem key="default">All</SelectItem>
                   <SelectItem key="Admin">Admin</SelectItem>
                   <SelectItem key="Parent">Parent</SelectItem>

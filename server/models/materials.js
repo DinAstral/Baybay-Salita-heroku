@@ -10,7 +10,9 @@ const materialSchema = new Schema(
     Type: String,
     Word: String,
     Image: String,
+    SecureImage: String,
     Audio: String,
+    SecureAudio: String,
   },
   { timestamps: true }
 );

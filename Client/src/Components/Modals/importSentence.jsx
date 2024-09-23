@@ -19,6 +19,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBook,
   faComment,
+  faPen,
   faQuestion,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -56,19 +57,37 @@ const ImportSentence = ({ show, onHide }) => {
   const [modalShow, setModalShow] = useState(false);
   const [data, setData] = useState({
     Type: "",
+    Title: "",
     Sentence: "",
-    Questions: [
-      { Question: "", Answer: "" },
-      { Question: "", Answer: "" },
-      { Question: "", Answer: "" },
-      { Question: "", Answer: "" },
-      { Question: "", Answer: "" },
-    ],
+    Question1: "",
+    Question2: "",
+    Question3: "",
+    Question4: "",
+    Question5: "",
+    Answer1: "",
+    Answer2: "",
+    Answer3: "",
+    Answer4: "",
+    Answer5: "",
   });
 
   const importSentence = async (e) => {
     e.preventDefault();
-    const { Type, Sentence, Questions } = data;
+    const {
+      Type,
+      Title,
+      Sentence,
+      Question1,
+      Question2,
+      Question3,
+      Question4,
+      Question5,
+      Answer1,
+      Answer2,
+      Answer3,
+      Answer4,
+      Answer5,
+    } = data;
 
     if (!Type || !Sentence) {
       return toast.error("All fields are required.");
@@ -77,8 +96,18 @@ const ImportSentence = ({ show, onHide }) => {
     try {
       const response = await axios.post("/importSentence", {
         Type,
+        Title,
         Sentence,
-        Questions: JSON.stringify(Questions),
+        Question1,
+        Question2,
+        Question3,
+        Question4,
+        Question5,
+        Answer1,
+        Answer2,
+        Answer3,
+        Answer4,
+        Answer5,
       });
 
       if (response.data.error) {
@@ -93,18 +122,6 @@ const ImportSentence = ({ show, onHide }) => {
     }
   };
 
-  const handleQuestionChange = (index, value) => {
-    const updatedQuestions = [...data.Questions];
-    updatedQuestions[index].Question = value;
-    setData({ ...data, Questions: updatedQuestions });
-  };
-
-  const handleAnswerChange = (index, value) => {
-    const updatedQuestions = [...data.Questions];
-    updatedQuestions[index].Answer = value;
-    setData({ ...data, Questions: updatedQuestions });
-  };
-
   return (
     <>
       <Modal
@@ -114,7 +131,7 @@ const ImportSentence = ({ show, onHide }) => {
         aria-labelledby="import-modal-title"
         isDismissable={false}
         isKeyboardDismissDisabled={true}
-        scrollBehavior="inside" // The prop remains
+        scrollBehavior="inside"
       >
         <ModalContent>
           <ModalHeader id="import-modal-title">Import New Sentence</ModalHeader>
@@ -125,16 +142,34 @@ const ImportSentence = ({ show, onHide }) => {
               </div>
               <Select
                 labelPlacement="outside"
-                label="Select type of Word Assessment"
+                label="Select type of Assessment"
                 aria-label="Select activity type"
+                defaultSelectedKeys={[" "]}
                 value={data.Type}
                 variant="bordered"
                 className="bg-transparent py-1 my-1"
                 onChange={(e) => setData({ ...data, Type: e.target.value })}
               >
-                <SelectItem key="">Select Type of Assessment:</SelectItem>
+                <SelectItem key=" ">Select Type of Assessment:</SelectItem>
                 <SelectItem key="1">Assessment 4: Pagbabasa</SelectItem>
               </Select>
+
+              <Input
+                type="text"
+                label={`Title`}
+                placeholder="Enter a title"
+                labelPlacement="outside"
+                variant="bordered"
+                className="bg-transparent py-1 my-1"
+                value={data.Title}
+                onChange={(e) => setData({ ...data, Title: e.target.value })}
+                endContent={
+                  <FontAwesomeIcon
+                    icon={faBook}
+                    className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                  />
+                }
+              />
 
               <Textarea
                 placeholder="Input sentence"
@@ -146,57 +181,227 @@ const ImportSentence = ({ show, onHide }) => {
                 onChange={(e) => setData({ ...data, Sentence: e.target.value })}
                 endContent={
                   <FontAwesomeIcon
-                    icon={faBook}
+                    icon={faPen}
                     className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
                   />
                 }
               />
 
               <div className="flex flex-col gap-6 overflow-y-auto max-h-96">
-                {data.Questions.map((qa, index) => (
-                  <div className="flex flex-wrap gap-4" key={index}>
-                    <div className="flex flex-1">
-                      <Input
-                        type="text"
-                        label={`Question ${index + 1}`}
-                        placeholder="Write a question"
-                        labelPlacement="outside"
-                        variant="bordered"
-                        className="bg-transparent py-1 my-1"
-                        value={qa.Question}
-                        onChange={(e) =>
-                          handleQuestionChange(index, e.target.value)
-                        }
-                        endContent={
-                          <FontAwesomeIcon
-                            icon={faQuestion}
-                            className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                          />
-                        }
-                      />
-                    </div>
-                    <div className="flex flex-1">
-                      <Input
-                        type="text"
-                        label={`Answer ${index + 1}`}
-                        placeholder="Input the answer"
-                        labelPlacement="outside"
-                        variant="bordered"
-                        className="bg-transparent py-1 my-1"
-                        value={qa.Answer}
-                        onChange={(e) =>
-                          handleAnswerChange(index, e.target.value)
-                        }
-                        endContent={
-                          <FontAwesomeIcon
-                            icon={faComment}
-                            className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                          />
-                        }
-                      />
-                    </div>
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Question 1`}
+                      placeholder="Write a question"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Question1}
+                      onChange={(e) =>
+                        setData({ ...data, Question1: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faQuestion}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
+                    />
                   </div>
-                ))}
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Answer 1`}
+                      placeholder="Input the answer"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Answer1}
+                      onChange={(e) =>
+                        setData({ ...data, Answer1: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faComment}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Question 1`}
+                      placeholder="Write a question"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Question2}
+                      onChange={(e) =>
+                        setData({ ...data, Question2: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faQuestion}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
+                    />
+                  </div>
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Answer 1`}
+                      placeholder="Input the answer"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Answer2}
+                      onChange={(e) =>
+                        setData({ ...data, Answer2: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faComment}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Question 3`}
+                      placeholder="Write a question"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Question3}
+                      onChange={(e) =>
+                        setData({ ...data, Question3: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faQuestion}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
+                    />
+                  </div>
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Answer 3`}
+                      placeholder="Input the answer"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Answer3}
+                      onChange={(e) =>
+                        setData({ ...data, Answer3: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faComment}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Question 4`}
+                      placeholder="Write a question"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Question4}
+                      onChange={(e) =>
+                        setData({ ...data, Question4: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faQuestion}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
+                    />
+                  </div>
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Answer 4`}
+                      placeholder="Input the answer"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Answer4}
+                      onChange={(e) =>
+                        setData({ ...data, Answer4: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faComment}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Question 5`}
+                      placeholder="Write a question"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Question5}
+                      onChange={(e) =>
+                        setData({ ...data, Question5: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faQuestion}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
+                    />
+                  </div>
+                  <div className="flex flex-1">
+                    <Input
+                      type="text"
+                      label={`Answer 5`}
+                      placeholder="Input the answer"
+                      labelPlacement="outside"
+                      variant="bordered"
+                      className="bg-transparent py-1 my-1"
+                      value={data.Answer5}
+                      onChange={(e) =>
+                        setData({ ...data, Answer5: e.target.value })
+                      }
+                      endContent={
+                        <FontAwesomeIcon
+                          icon={faComment}
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
+                    />
+                  </div>
+                </div>
               </div>
             </ModalBody>
             <ModalFooter>

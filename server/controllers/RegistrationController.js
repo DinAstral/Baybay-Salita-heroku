@@ -816,7 +816,7 @@ const profileUpdate = async (req, res) => {
 
       // Uploading to Cloudinary
       const uploadResponse = await cloudinaryUploaderProfile(req, res);
-      const profileFile = uploadResponse.uploadProfile.url;
+      const profileFile = uploadResponse.uploadProfile.secure_url;
 
       // Finding and updating the existing record based on role
       let updatedRecord;

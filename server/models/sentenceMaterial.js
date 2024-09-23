@@ -8,13 +8,18 @@ const materialSentenceSchema = new Schema(
       unique: true,
     },
     Type: String,
+    Title: String,
     Sentence: String,
-    Questions: [
-      {
-        question: String,
-        answer: String,
-      },
-    ],
+    Question1: String,
+    Question2: String,
+    Question3: String,
+    Question4: String,
+    Question5: String,
+    Answer1: String,
+    Answer2: String,
+    Answer3: String,
+    Answer4: String,
+    Answer5: String,
   },
   { timestamps: true }
 );

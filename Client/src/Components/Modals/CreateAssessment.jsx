@@ -17,7 +17,7 @@ import {
 const CreateSuccess = ({ show, onHide }) => {
   const handleSuccessClick = () => {
     onHide();
-    window.location.reload(); // You might want to change this to a more efficient state update instead of reloading the page.
+    window.location.reload(); // Consider updating state instead of reloading.
   };
   return (
     <Modal
@@ -47,17 +47,12 @@ const CreateSuccess = ({ show, onHide }) => {
 const CreateAssessment = ({ show, handleClose }) => {
   const [modalShow, setModalShow] = useState(false);
   const [words, setWords] = useState([]);
+  const [sentences, setSentences] = useState([]); // Changed from sentence to sentences
   const [filteredWords, setFilteredWords] = useState([]);
-  const [selectedWords, setSelectedWords] = useState({
-    Item1: "",
-    Item2: "",
-    Item3: "",
-    Item4: "",
-    Item5: "",
-  });
   const [data, setData] = useState({
     Period: "",
     Type: "",
+    Title: "",
     Item1: "",
     Item2: "",
     Item3: "",
@@ -74,12 +69,21 @@ const CreateAssessment = ({ show, handleClose }) => {
       .catch((err) => console.log(err));
   };
 
+  const fetchImportSentence = () => {
+    axios
+      .get("/getSentence")
+      .then((response) => {
+        setSentences(response.data); // Set sentences data
+      })
+      .catch((err) => console.log(err));
+  };
+
   useEffect(() => {
     fetchImportWord();
+    fetchImportSentence(); // Fetch sentences on mount
   }, []);
 
   useEffect(() => {
-    // Filter words based on selected type
     if (data.Type) {
       const filtered = words.filter((word) => word.Type === data.Type);
       setFilteredWords(filtered);
@@ -88,59 +92,28 @@ const CreateAssessment = ({ show, handleClose }) => {
     }
   }, [data.Type, words]);
 
-  useEffect(() => {
-    console.log("Filtered Words:", filteredWords); // Debugging
-  }, [filteredWords]);
-
   const handleWordChange = (itemKey, selectedWord) => {
     const selectedItem = filteredWords.find(
       (word) => word.ItemCode === selectedWord
     );
 
-    // Debugging the selected word and corresponding item
-    console.log("Selected ItemCode:", selectedWord);
-    console.log(
-      "Selected Word:",
-      selectedItem ? selectedItem.Word : "Not found"
-    );
-
-    setSelectedWords({ ...selectedWords, [itemKey]: selectedWord });
     setData({ ...data, [itemKey]: selectedItem ? selectedItem.ItemCode : "" });
   };
-  const createAct = async (e) => {
-    console.log("Selected Words State:", selectedWords); // Debugging
-    console.log("Data being submitted:", data); // Debugging
 
+  const createAct = async (e) => {
     e.preventDefault();
-    const {
-      Period,
-      Type,
-      Item1,
-      ItemCode1,
-      Item2,
-      ItemCode2,
-      Item3,
-      ItemCode3,
-      Item4,
-      ItemCode4,
-      Item5,
-      ItemCode5,
-    } = data;
+    const { Period, Type, Title } = data; // Use Title in the submission
 
     try {
       const response = await axios.post(`/submitAssessment`, {
         Period,
         Type,
-        Item1,
-        ItemCode1,
-        Item2,
-        ItemCode2,
-        Item3,
-        ItemCode3,
-        Item4,
-        ItemCode4,
-        Item5,
-        ItemCode5,
+        Title,
+        Item1: data.Item1,
+        Item2: data.Item2,
+        Item3: data.Item3,
+        Item4: data.Item4,
+        Item5: data.Item5,
       });
       if (response.data.error) {
         toast.error(response.data.error);
@@ -148,18 +121,7 @@ const CreateAssessment = ({ show, handleClose }) => {
         setData({
           Period: "",
           Type: "",
-          Item1: "",
-          ItemCode1: "",
-          Item2: "",
-          ItemCode2: "",
-          Item3: "",
-          ItemCode3: "",
-          Item4: "",
-          ItemCode4: "",
-          Item5: "",
-          ItemCode5: "",
-        });
-        setSelectedWords({
+          Title: "",
           Item1: "",
           Item2: "",
           Item3: "",
@@ -197,7 +159,7 @@ const CreateAssessment = ({ show, handleClose }) => {
                 label="Grading Period"
                 defaultSelectedKeys={"0"}
                 disabledKeys={"0"}
-                aria-label="Select activity type"
+                aria-label="Select grading period"
                 variant="bordered"
                 className="bg-transparent py-1 my-1"
                 value={data.Period}
@@ -215,14 +177,14 @@ const CreateAssessment = ({ show, handleClose }) => {
               <Select
                 labelPlacement="outside"
                 label="Type of Assessment"
-                aria-label="Select activity type"
+                aria-label="Select type of assessment"
                 defaultSelectedKeys={"0"}
                 disabledKeys={"0"}
                 variant="bordered"
                 className="bg-transparent py-1 my-1"
                 value={data.Type}
                 onChange={(e) => {
-                  setData({ ...data, Type: e.target.value });
+                  setData({ ...data, Type: e.target.value, Title: "" }); // Reset Title when type changes
                 }}
               >
                 <SelectItem key="0">Select Type of Assessment:</SelectItem>
@@ -233,32 +195,56 @@ const CreateAssessment = ({ show, handleClose }) => {
                 <SelectItem key="Salita">Assessment 3: Salita</SelectItem>
                 <SelectItem key="Pagbabasa">Assessment 4: Pagbabasa</SelectItem>
               </Select>
-              <div className="text-sm">
-                <p>Please add an item to your assessment.</p>
-              </div>
 
-              {["Item1", "Item2", "Item3", "Item4", "Item5"].map(
-                (item, index) => (
-                  <Select
-                    key={item}
-                    labelPlacement="outside"
-                    placeholder="Select a word:"
-                    label={`Item ${index + 1}`}
-                    variant="bordered"
-                    className="bg-transparent py-1 my-1"
-                    value={data.Item1} // This should be the word, not the ItemCode
-                    onChange={(e) => {
-                      handleWordChange(item, e.target.value);
-                    }}
-                  >
-                    <SelectItem key="0">Select Word:</SelectItem>
-                    {filteredWords.map((word) => (
-                      <SelectItem key={word.ItemCode} value={word.Word}>
-                        {word.Word}
-                      </SelectItem>
-                    ))}
-                  </Select>
-                )
+              {data.Type === "Pagbabasa" ? (
+                <Select
+                  labelPlacement="outside"
+                  placeholder="Select a Title"
+                  label="Title"
+                  aria-label="Select title"
+                  variant="bordered"
+                  className="bg-transparent py-1 my-1"
+                  value={data.Title}
+                  onChange={(e) => {
+                    setData({ ...data, Title: e.target.value });
+                  }}
+                >
+                  <SelectItem key="0">Select a Title:</SelectItem>
+                  {sentences.map((sentence) => (
+                    <SelectItem key={sentence.Title} value={sentence.Title}>
+                      {sentence.Title}
+                    </SelectItem>
+                  ))}
+                </Select>
+              ) : (
+                <>
+                  <div className="text-sm">
+                    <p>Please add items to your assessment.</p>
+                  </div>
+                  {["Item1", "Item2", "Item3", "Item4", "Item5"].map(
+                    (item, index) => (
+                      <Select
+                        key={item}
+                        labelPlacement="outside"
+                        placeholder="Select a word:"
+                        label={`Item ${index + 1}`}
+                        variant="bordered"
+                        className="bg-transparent py-1 my-1"
+                        value={data[item]}
+                        onChange={(e) => {
+                          handleWordChange(item, e.target.value);
+                        }}
+                      >
+                        <SelectItem key="0">Select Word:</SelectItem>
+                        {filteredWords.map((word) => (
+                          <SelectItem key={word.ItemCode} value={word.Word}>
+                            {word.Word}
+                          </SelectItem>
+                        ))}
+                      </Select>
+                    )
+                  )}
+                </>
               )}
             </ModalBody>
             <ModalFooter>
