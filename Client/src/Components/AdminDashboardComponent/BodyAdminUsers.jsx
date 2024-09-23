@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef } from "react";
 import "../ContentDasboard/Content.css";
 import PrintRecord from "../Modals/PrintRecord";
 import AddUser from "../Modals/AdminModal/AddUserModal";
@@ -31,6 +31,25 @@ import {
   faPrint,
 } from "@fortawesome/free-solid-svg-icons";
 
+// Utility functions for filtering and paginating users
+const getFilteredUsers = (users, selectedRole, searchQuery) => {
+  let filtered = users;
+  if (selectedRole !== "default") {
+    filtered = filtered.filter((user) => user.role === selectedRole);
+  }
+  if (searchQuery) {
+    filtered = filtered.filter((user) =>
+      user.email.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }
+  return filtered;
+};
+
+const getCurrentUsers = (filteredUsers, currentPage, usersPerPage) => {
+  const offset = currentPage * usersPerPage;
+  return filteredUsers.slice(offset, offset + usersPerPage);
+};
+
 const BodyAdminUsers = () => {
   const [modalState, setModalState] = useState({
     add: false,
@@ -56,6 +75,7 @@ const BodyAdminUsers = () => {
     sheet: "Users",
   });
 
+  // Fetch users data
   const fetchUsers = async () => {
     try {
       const response = await axios.get("/users");
@@ -69,23 +89,13 @@ const BodyAdminUsers = () => {
     fetchUsers();
   }, []);
 
-  const filteredUsers = useMemo(() => {
-    let filtered = users;
-    if (selectedRole !== "default") {
-      filtered = filtered.filter((user) => user.role === selectedRole);
-    }
-    if (searchQuery) {
-      filtered = filtered.filter((user) =>
-        user.email.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    return filtered;
-  }, [users, selectedRole, searchQuery]);
-
-  const currentUsers = useMemo(() => {
-    const offset = currentPage * usersPerPage;
-    return filteredUsers.slice(offset, offset + usersPerPage);
-  }, [currentPage, usersPerPage, filteredUsers]);
+  // Apply filters and pagination
+  const filteredUsers = getFilteredUsers(users, selectedRole, searchQuery);
+  const currentUsers = getCurrentUsers(
+    filteredUsers,
+    currentPage,
+    usersPerPage
+  );
 
   const handleModalStateChange = (modalType, value) => {
     setModalState((prev) => ({ ...prev, [modalType]: value }));
@@ -287,18 +297,14 @@ const BodyAdminUsers = () => {
                     ))}
                   </TableBody>
                 </Table>
-
-                <ReactPaginate
-                  previousLabel={"Previous"}
-                  nextLabel={"Next"}
-                  breakLabel={"..."}
-                  pageCount={Math.ceil(filteredUsers.length / usersPerPage)}
-                  onPageChange={handlePageClick}
-                  containerClassName={"pagination"}
-                  activeClassName={"active"}
-                />
               </div>
             </div>
+            <ReactPaginate
+              pageCount={Math.ceil(filteredUsers.length / usersPerPage)}
+              onPageChange={handlePageClick}
+              containerClassName={"pagination"}
+              activeClassName={"active"}
+            />
           </div>
         </div>
       </div>
