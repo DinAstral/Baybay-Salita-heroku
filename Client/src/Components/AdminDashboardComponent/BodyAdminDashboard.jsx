@@ -4,7 +4,6 @@ import {
   faChalkboardTeacher,
   faChildReaching,
   faCircleInfo,
-  faHomeUser,
   faHouse,
 } from "@fortawesome/free-solid-svg-icons";
 import { Tooltip } from "@nextui-org/react";
@@ -32,10 +31,6 @@ const BodyAdminDashboard = () => {
     SSC: 0,
   });
 
-  const [marginCount, setMarginCount] = useState({
-    count: 0,
-  });
-
   const [activityCounts, setActivityCounts] = useState({
     Aster: 0,
     Camia: 0,
@@ -49,10 +44,8 @@ const BodyAdminDashboard = () => {
         const response = await axios.get("/users");
         const data = response.data;
         setUsers(data);
-
-        // Count teachers and parents
-        setTeachersCount(data.filter((user) => user.role === "Teacher").length);
-        setParentsCount(data.filter((user) => user.role === "Parent").length);
+        setTeachersCount(countByRole(data, "Teacher"));
+        setParentsCount(countByRole(data, "Parent"));
       } catch (err) {
         console.error(err);
       }
@@ -63,27 +56,7 @@ const BodyAdminDashboard = () => {
         const response = await axios.get("/getStudents");
         const data = response.data;
         setStudents(data);
-
-        const sections = [
-          "Aster",
-          "Camia",
-          "Dahlia",
-          "Iris",
-          "Jasmin",
-          "Orchid",
-          "Rose",
-          "Tulip",
-          "SSC",
-        ];
-        const counts = sections.reduce((acc, section) => {
-          acc[section] = data.filter(
-            (student) => student.Section === section
-          ).length;
-          return acc;
-        }, {});
-
-        setSectionCounts(counts);
-        setMarginCount(counts);
+        setSectionCounts(countStudentsBySection(data));
       } catch (err) {
         console.error(err);
       }
@@ -94,14 +67,7 @@ const BodyAdminDashboard = () => {
         const response = await axios.get("/getAssessments");
         const data = response.data;
         setAssessment(data);
-
-        const activities = ["Pagbabaybay", "Pantig", "Salita", "Pagbabasa"];
-        const counts = activities.reduce((acc, activity) => {
-          acc[activity] = data.filter((type) => type.Type === activity).length;
-          return acc;
-        }, {});
-
-        setActivityCounts(counts);
+        setActivityCounts(countAssessmentsByType(data));
       } catch (err) {
         console.error(err);
       }
@@ -111,6 +77,40 @@ const BodyAdminDashboard = () => {
     fetchStudents();
     fetchAssessment();
   }, []);
+
+  const countByRole = (data, role) => {
+    return data.filter((user) => user.role === role).length;
+  };
+
+  const countStudentsBySection = (students) => {
+    const sections = [
+      "Aster",
+      "Camia",
+      "Dahlia",
+      "Iris",
+      "Jasmin",
+      "Orchid",
+      "Rose",
+      "Tulip",
+      "SSC",
+    ];
+    return sections.reduce((acc, section) => {
+      acc[section] = students.filter(
+        (student) => student.Section === section
+      ).length;
+      return acc;
+    }, {});
+  };
+
+  const countAssessmentsByType = (assessments) => {
+    const activities = ["Pagbabaybay", "Pantig", "Salita", "Pagbabasa"];
+    return activities.reduce((acc, activity) => {
+      acc[activity] = assessments.filter(
+        (assessment) => assessment.Type === activity
+      ).length;
+      return acc;
+    }, {});
+  };
 
   return (
     <div className="">

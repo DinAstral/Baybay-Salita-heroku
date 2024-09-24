@@ -28,6 +28,7 @@ const Sidebar = () => {
       "/manageStudent",
       "/addStudent",
       "/viewAssessment",
+      "/managePerformance",
     ];
     const index = menuItem.findIndex((item) => item === location.pathname);
     setActiveIndex(index);
@@ -48,6 +49,11 @@ const Sidebar = () => {
           { icon: faUser, text: "Manage Student", link: "/manageStudent" },
           { icon: faSquarePlus, text: "Add Student", link: "/addStudent" },
           { icon: faEye, text: "Manage Assessment", link: "/viewAssessment" },
+          {
+            icon: faEye,
+            text: "Manage Performance",
+            link: "/managePerformance",
+          },
         ].map((item, index) => (
           <Link
             key={index}

@@ -93,7 +93,7 @@ DeleteStudent.propTypes = {
   show: PropTypes.bool.isRequired,
   onHide: PropTypes.func.isRequired,
   onDeleteSuccess: PropTypes.func.isRequired,
-  student: PropTypes.object.isRequired, // Assuming student is always provided
+  student: PropTypes.object, // Assuming student is always provided
 };
 
 export default DeleteStudent;

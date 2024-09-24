@@ -1,9 +1,9 @@
 import React from "react";
 import ContentHeader from "../../Components/ContentDasboard/ContentHeader";
 import Sidebar from "../../Components/TeacherDashboardComponent/Sidebar";
-import BodyManageStudent from "../../Components/TeacherDashboardComponent/BodyManageStudent";
+import BodyManagePerformance from "../../Components/TeacherDashboardComponent/BodyManagePerformance";
 
-const ManageStudent = () => {
+const ManagePerformance = () => {
   return (
     <div className="w-full h-full flex">
       {/* Sidebar */}
@@ -14,10 +14,10 @@ const ManageStudent = () => {
       {/* Main Dashboard Content */}
       <div className="ml-[15%] w-[85%] h-full min-h-[100vh] bg-[#F2EDE3] p-[2rem] flex flex-col gap-[1.5rem]">
         <ContentHeader />
-        <BodyManageStudent />
+        <BodyManagePerformance />
       </div>
     </div>
   );
 };
 
-export default ManageStudent;
+export default ManagePerformance;

@@ -21,9 +21,9 @@ const DeleteActivitySuccess = ({ show, onHide }) => (
     isKeyboardDismissDisabled={true}
   >
     <ModalContent>
-      <ModalHeader>Delete Activity Successfully</ModalHeader>
+      <ModalHeader>Delete Student Performance Successfully</ModalHeader>
       <ModalBody>
-        <p>You have deleted the activity for the student successfully.</p>
+        <p>You have deleted the performance for the student successfully.</p>
       </ModalBody>
       <ModalFooter>
         <Button color="primary" onClick={onHide}>
@@ -34,16 +34,22 @@ const DeleteActivitySuccess = ({ show, onHide }) => (
   </Modal>
 );
 
-const DeleteAssessment = ({ show, onHide, activity }) => {
+const DeletePerformance = ({
+  show,
+  onHide,
+  performance,
+  refreshActivities,
+}) => {
   const [modalSubmitSuccess, setModalSubmitSuccess] = useState(false);
 
   const deleteActivity = async () => {
     try {
-      await axios.delete(`/deleteAssessment/${activity._id}`);
+      await axios.delete(`/deletePerformance/${performance._id}`);
       setModalSubmitSuccess(true);
+      refreshActivities(); // Automatically refresh activities
     } catch (err) {
-      console.error("Error deleting activity:", err);
-      toast.error("Failed to delete activity. Please try again later.");
+      console.error("Error deleting performance:", err);
+      toast.error("Failed to delete performance. Please try again later.");
     }
   };
 
@@ -58,10 +64,10 @@ const DeleteAssessment = ({ show, onHide, activity }) => {
       >
         <ModalContent>
           <ModalHeader className="flex flex-col">
-            Delete The Activity
+            Delete The Student Performance
           </ModalHeader>
           <ModalBody>
-            <p>Do you want to delete the current activity?</p>
+            <p>Do you want to delete the current performance?</p>
           </ModalBody>
           <ModalFooter>
             <Button color="danger" variant="light" onClick={onHide}>
@@ -85,10 +91,10 @@ const DeleteAssessment = ({ show, onHide, activity }) => {
 };
 
 // Add prop types validation
-DeleteAssessment.propTypes = {
+DeletePerformance.propTypes = {
   show: PropTypes.bool.isRequired,
   onHide: PropTypes.func.isRequired,
-  activity: PropTypes.object, // Add activity prop type validation
+  performance: PropTypes.object, // Add activity prop type validation
 };
 
-export default DeleteAssessment;
+export default DeletePerformance;

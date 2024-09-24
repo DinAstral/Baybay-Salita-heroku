@@ -34,6 +34,7 @@ const {
   getParentUsers,
   getParentUser,
   getStudentUser,
+  submitFeedback,
 } = require("../controllers/parentController");
 
 const {
@@ -55,7 +56,10 @@ const {
   getAssessmentCode,
   getImportWords,
   getPerformance,
+  getOnePerformance,
+  getAssessmentID,
   deleteAssessment,
+  deletePerformance,
   userInputAudio,
   getSentence,
 } = require("../controllers/assessmentController");
@@ -70,7 +74,7 @@ const { compareAudio } = require("../controllers/CompareController");
 // Configure CORS middleware
 router.use(
   cors({
-    origin: "https://baybay-salita-heroku-8c328f3ddd0f.herokuapp.com", // Update this with your client's URL https://baybay-salita-edu.netlify.app
+    origin: "https://baybay-salita-edu.netlify.app", // Update this with your client's URL https://baybay-salita-edu.netlify.app
     methods: ["GET", "POST", "DELETE", "PATCH"], // Add the allowed HTTP methods
     credentials: true, // Allow credentials (cookies, authorization headers)
   })
@@ -99,15 +103,18 @@ router.post("/importSentence", importSentence); //okay
 
 // Assessment Routes
 router.post("/submitAssessment", submitAssessment); //okay
-router.get("/getActivity/:ActivityCode", getAssessmentCode); //okay imporSentence
+router.get("/getActivity/:ActivityCode", getAssessmentCode); //okay imporSentence deletePerformance
+router.get("/getActivity/:UserID", getAssessmentID);
 router.get("/getPerformance", getPerformance); //okay
+router.get("/getPerformance/:UserInputId", getOnePerformance);
 router.get("/getSentence", getSentence); //okay
 router.get("/getAssessments", getActivities); //okay
-router.get("/getAssessment/:id", getActivity);
-router.delete("/deleteAssessment/:id", deleteAssessment);
+router.get("/getAssessment/:id", getActivity); //okay
+router.delete("/deleteAssessment/:id", deleteAssessment); //Okay
+router.delete("/deletePerformance/:id", deletePerformance); //okay
 
 // Admin Routes
-router.post("/addUser", addUser);
+router.post("/addUser", addUser); //okay
 router.get("/users", getUsers); //okay
 router.get("/getUser/:id", getUser); //okay
 router.get("/getAdmin/:UserID", getAdmin); //okay
@@ -116,11 +123,11 @@ router.delete("/deleteUser/:email", deleteUser); //okay
 router.get("/profile", getProfile); //okay
 
 // Student Routes
-router.post("/addStudent", addStudent);
+router.post("/addStudent", addStudent); // okay
 router.get("/getStudents", getStudents); //okay
-router.get("/getStudentID/:id", getStudent);
-router.delete("/deleteStudent/:id", deleteStudent);
-router.patch("/updateStudent/:id", updateStudent);
+router.get("/getStudentID/:id", getStudent); //okay
+router.delete("/deleteStudent/:id", deleteStudent); //okay
+router.patch("/updateStudent/:id", updateStudent); //okay
 
 // Parent Routes
 router.get("/getParent", getParentUsers);
@@ -130,9 +137,10 @@ router.patch("/updateParent/:id", updateParent);
 
 // Teacher Routes
 router.patch("/updateTeacher/:id", updateTeacher);
-router.post("/createAssessment", createAssessment);
+router.post("/createAssessment", createAssessment); //okay
 router.patch("/updateAssessment/:id", updateActivity);
-router.get("/getTeacher", getTeacherUsers);
-router.get("/getTeacher/:UserID", getTeacherUser);
+router.get("/getTeacher", getTeacherUsers); //okay
+router.get("/getTeacher/:UserID", getTeacherUser); //okay
+router.post("/submitFeedback", submitFeedback); //okay
 
 module.exports = router;

@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 
 const assessSchema = new Schema(
   {
+    UserID: String,
     ActivityCode: {
       type: String,
       unique: true,

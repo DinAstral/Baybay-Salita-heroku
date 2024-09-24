@@ -5,7 +5,6 @@ const FeedbackSchema = new Schema(
   {
     UserID: {
       type: String,
-      unique: true,
     },
     FeedbackID: {
       type: String,
@@ -13,11 +12,11 @@ const FeedbackSchema = new Schema(
     },
     email: {
       type: String,
-      unique: true,
     },
     Title: String,
-    ActivityNumber: String,
+    ActivityCode: String,
     Type: String,
+    Feedback_Date: String,
     Context: String,
   },
   { timestamps: true }

@@ -44,7 +44,7 @@ const CreateSuccess = ({ show, onHide }) => {
   );
 };
 
-const CreateAssessment = ({ show, handleClose }) => {
+const CreateAssessment = ({ show, handleClose, userId }) => {
   const [modalShow, setModalShow] = useState(false);
   const [words, setWords] = useState([]);
   const [sentences, setSentences] = useState([]); // Changed from sentence to sentences
@@ -106,6 +106,7 @@ const CreateAssessment = ({ show, handleClose }) => {
 
     try {
       const response = await axios.post(`/submitAssessment`, {
+        UserID: userId,
         Period,
         Type,
         Title,

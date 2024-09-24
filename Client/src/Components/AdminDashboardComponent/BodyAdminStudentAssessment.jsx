@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Table,
   TableHeader,
@@ -21,10 +21,12 @@ import CreateAssessment from "../Modals/CreateAssessment";
 import ImportWord from "../Modals/importWord";
 import DeleteAssessment from "../Modals/DeleteAssessment";
 import ImportSentence from "../Modals/importSentence";
+import ViewAssessment from "../Modals/ViewAssessment";
 
 const BodyAdminStudentAssessment = () => {
   const [show, setShow] = useState(false);
   const [modalShowImport, setModalShowImport] = useState(false);
+  const [modalShowView, setModalShowView] = useState(false);
   const [modalShowImportSentence, setModalShowImportSentence] = useState(false);
   const [modalShowPrint, setModalShowPrint] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
@@ -76,44 +78,37 @@ const BodyAdminStudentAssessment = () => {
     setModalShowSubmit(true);
   };
 
-  const handleFilterChange = useCallback(
-    (e, filterType) => {
-      const value = e.target.value;
+  const handleFilterChange = (e, filterType) => {
+    const value = e.target.value;
 
-      if (filterType === "period") {
-        setSelectedRole(value);
-      } else if (filterType === "type") {
-        setSelectedType(value);
-      }
+    if (filterType === "period") {
+      setSelectedRole(value);
+    } else if (filterType === "type") {
+      setSelectedType(value);
+    }
 
-      let filtered = activities;
+    let filtered = activities;
 
-      if (value === "") {
-        filtered = activities;
-      } else {
-        filtered = activities.filter((activity) =>
-          filterType === "period"
-            ? activity.Period === value
-            : activity.Type === value
-        );
-      }
+    if (value !== "") {
+      filtered = activities.filter((activity) =>
+        filterType === "period"
+          ? activity.Period === value
+          : activity.Type === value
+      );
+    }
 
-      if (selectedRole && filterType === "type") {
-        filtered = filtered.filter(
-          (activity) => activity.Period === selectedRole
-        );
-      }
+    if (selectedRole && filterType === "type") {
+      filtered = filtered.filter(
+        (activity) => activity.Period === selectedRole
+      );
+    }
 
-      if (selectedType && filterType === "period") {
-        filtered = filtered.filter(
-          (activity) => activity.Type === selectedType
-        );
-      }
+    if (selectedType && filterType === "period") {
+      filtered = filtered.filter((activity) => activity.Type === selectedType);
+    }
 
-      setFilteredActivities(filtered);
-    },
-    [activities, selectedRole, selectedType]
-  );
+    setFilteredActivities(filtered);
+  };
 
   return (
     <div className="px-9">
@@ -135,11 +130,15 @@ const BodyAdminStudentAssessment = () => {
         show={modalShowImportSentence}
         onHide={() => setModalShowImportSentence(false)}
       />
+      <ViewAssessment
+        show={modalShowView}
+        activity={selectedActivity}
+        onHide={() => setModalShowView(false)}
+      />
       <DeleteAssessment
         show={modalShowSubmit}
         activity={selectedActivity}
         onHide={() => setModalShowSubmit(false)}
-        refreshActivities={refreshActivities}
       />
       <div className="content-title-header">
         <div>
@@ -192,7 +191,6 @@ const BodyAdminStudentAssessment = () => {
                     labelPlacement="outside"
                     label="Sort by Grading Period"
                     variant="bordered"
-                    defaultSelectedKeys={[""]}
                     className="bg-transparent w-[20%]"
                     onChange={(e) => handleFilterChange(e, "period")}
                     value={selectedRole}
@@ -209,7 +207,6 @@ const BodyAdminStudentAssessment = () => {
                     labelPlacement="outside"
                     label="Sort by Type"
                     variant="bordered"
-                    defaultSelectedKeys={[""]}
                     onChange={(e) => handleFilterChange(e, "type")}
                     value={selectedType}
                   >
@@ -262,19 +259,19 @@ const BodyAdminStudentAssessment = () => {
                           <div className="table-buttons">
                             <Button
                               color="primary"
-                              onClick={() =>
-                                setSelectedUser(user) ||
-                                handleModalStateChange("editUser", true)
-                              }
+                              onClick={() => {
+                                setSelectedActivity(activity);
+                                setModalShowView(true);
+                              }}
                             >
                               View
                             </Button>
                             <Button
                               color="danger"
-                              onClick={() =>
-                                setSelectedUser(user) ||
-                                handleModalStateChange("delete", true)
-                              }
+                              onClick={() => {
+                                setSelectedActivity(activity);
+                                setModalShowSubmit(true);
+                              }}
                             >
                               Delete
                             </Button>

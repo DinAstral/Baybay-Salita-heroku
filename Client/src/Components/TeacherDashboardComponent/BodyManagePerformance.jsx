@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import { useDownloadExcel } from "react-export-table-to-excel";
 import ReactPaginate from "react-paginate";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo, faPrint } from "@fortawesome/free-solid-svg-icons";
+import { UserContext } from "../../../context/userContext";
 import {
   Table,
   TableHeader,
@@ -19,25 +20,25 @@ import axios from "axios";
 import "../ContentDasboard/Content.css";
 
 import PrintRecord from "../Modals/PrintRecord";
-import ViewStudent from "../Modals/AdminModal/ViewStudent";
-import UpdateStudent from "../Modals/AdminModal/UpdateStudent";
 import DeletePerformance from "../Modals/DeletePerformance";
-import ViewPerformance from "../Modals/ViewPerformance";
+import TeacherViewPerformance from "../Modals/TeacherViewPerformance";
 
-const BodyAdminPerformance = () => {
+const BodyManagePerformance = () => {
   const [modalShowPrint, setModalShowPrint] = useState(false);
   const [modalShowView, setModalShowView] = useState(false);
   const [modalShowDelete, setModalShowDelete] = useState(false);
 
-  const [performances, setPerformance] = useState([]);
+  const [performances, setPerformances] = useState([]);
   const [selectedPerformance, setSelectedPerformance] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [usersPerPage] = useState(10);
-  const [filteredRoles, setFilteredRoles] = useState([]);
-  const [selectedRole, setSelectedRole] = useState("");
+  const [filteredPerformances, setFilteredPerformances] = useState([]);
+  const [selectedSection, setSelectedSection] = useState("");
   const [selectedType, setSelectedType] = useState("");
 
   const tableRef = useRef(null);
+  const { user } = useContext(UserContext);
+  const [teacherSection, setTeacherSection] = useState(""); // Store teacher's section
 
   const { onDownload } = useDownloadExcel({
     currentTableRef: tableRef.current,
@@ -45,56 +46,66 @@ const BodyAdminPerformance = () => {
     sheet: "Performance",
   });
 
-  const refreshActivities = () => {
-    axios
-      .get("/getPerformance")
-      .then((response) => {
-        setPerformance(response.data);
-        setFilteredRoles(response.data);
-      })
-      .catch((err) => console.log(err));
-  };
-
+  // Fetch the teacher's section data
   useEffect(() => {
-    refreshActivities();
-  }, []);
+    if (user && user.UserID) {
+      axios
+        .get(`/getTeacher/${user.UserID}`) // API endpoint to fetch teacher data
+        .then((response) => {
+          setTeacherSection(response.data.Section); // Assuming the response contains the teacher's section as a string
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [user]);
 
+  // Fetch all performances and filter by teacher's section
+  useEffect(() => {
+    if (teacherSection) {
+      axios
+        .get("/getPerformance")
+        .then((response) => {
+          // Filter performances based on the logged-in teacher's section
+          const filteredPerformances = response.data.filter(
+            (performance) => performance.Section === teacherSection
+          );
+          setPerformances(filteredPerformances); // Store filtered performances
+          setFilteredPerformances(filteredPerformances); // Set initial filtered data
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [teacherSection]); // Trigger this useEffect when teacherSection is set
+
+  // Handle page click for pagination
   const handlePageClick = (event) => {
     setCurrentPage(event.selected);
   };
 
+  // Handle filtering by section or type
   const handleFilterChange = (e, filterType) => {
     const value = e.target.value;
 
     if (filterType === "section") {
-      setSelectedRole(value);
+      setSelectedSection(value);
     } else if (filterType === "type") {
       setSelectedType(value);
     }
 
+    // Apply filtering based on selected section and type
     let filtered = performances;
 
-    if (value) {
-      filtered = performances.filter((performance) =>
-        filterType === "section"
-          ? performance.Section === value
-          : performance.Type === value
-      );
-    }
-
-    if (selectedRole && filterType === "type") {
+    if (selectedSection) {
       filtered = filtered.filter(
-        (performance) => performance.Section === selectedRole
+        (performance) => performance.Section === selectedSection
       );
     }
 
-    if (selectedType && filterType === "section") {
+    if (selectedType) {
       filtered = filtered.filter(
         (performance) => performance.Type === selectedType
       );
     }
 
-    setFilteredRoles(filtered);
+    setFilteredPerformances(filtered); // Update filtered performances
   };
 
   const handlePrintClick = () => {
@@ -111,13 +122,15 @@ const BodyAdminPerformance = () => {
     setModalShowDelete(true);
   };
 
+  // Get current set of performances for the current page
   const currentUsers = () => {
     const offset = currentPage * usersPerPage;
-    return filteredRoles.slice(offset, offset + usersPerPage);
+    return filteredPerformances.slice(offset, offset + usersPerPage);
   };
 
+  // Calculate total pages for pagination
   const pageCount = () => {
-    return Math.ceil(filteredRoles.length / usersPerPage);
+    return Math.ceil(filteredPerformances.length / usersPerPage);
   };
 
   return (
@@ -127,7 +140,7 @@ const BodyAdminPerformance = () => {
         onHide={() => setModalShowPrint(false)}
         print={onDownload}
       />
-      <ViewPerformance
+      <TeacherViewPerformance
         show={modalShowView}
         onHide={() => setModalShowView(false)}
         performance={selectedPerformance}
@@ -192,7 +205,7 @@ const BodyAdminPerformance = () => {
                   variant="bordered"
                   defaultSelectedKeys={[""]}
                   onChange={(e) => handleFilterChange(e, "section")}
-                  value={selectedRole}
+                  value={selectedSection}
                 >
                   <SelectItem key="">Select Section</SelectItem>
                   <SelectItem key="Aster">Aster</SelectItem>
@@ -289,4 +302,4 @@ const BodyAdminPerformance = () => {
   );
 };
 
-export default BodyAdminPerformance;
+export default BodyManagePerformance;

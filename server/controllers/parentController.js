@@ -1,6 +1,16 @@
 const Parent = require("../models/parents");
 const Student = require("../models/student");
 const mongoose = require("mongoose");
+const Feedback = require("../models/feedback");
+
+function generateRandomCodeFeed(length) {
+  const characters = "0123456789";
+  let result = "feedbackID_";
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}
 
 const getParentUsers = (req, res) => {
   Parent.find()
@@ -56,8 +66,37 @@ const getStudentUser = async (req, res) => {
   }
 };
 
+// Submit feedback
+const submitFeedback = async (req, res) => {
+  const randomCode = generateRandomCodeFeed(6);
+  try {
+    const { UserID, Title, ActivityCode, Type, Feedback_Date, Context } =
+      req.body;
+
+    if (!Title || !Type) {
+      return res.json({ error: "All fields are required" });
+    }
+
+    const feed = await Feedback.create({
+      FeedbackID: randomCode,
+      UserID,
+      Title,
+      ActivityCode,
+      Type,
+      Feedback_Date,
+      Context,
+    });
+
+    return res.json(feed);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
 module.exports = {
   getParentUsers,
   getParentUser,
   getStudentUser,
+  submitFeedback,
 };

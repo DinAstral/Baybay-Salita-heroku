@@ -366,6 +366,7 @@ const TeacherRegister = () => {
                   type="text"
                   name="ContactNumber"
                   label="Contact Number"
+                  maxLength={11}
                   variant="bordered"
                   className="bg-transparent py-1 my-1"
                   value={data.ContactNumber}

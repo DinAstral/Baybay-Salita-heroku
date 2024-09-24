@@ -30,10 +30,8 @@ import ResetPassword from "./Pages/ResetPassword";
 import Dashboard from "./Pages/TeacherDashboard/Dashboard";
 import TeacherProfile from "./Pages/TeacherDashboard/TeacherProfile";
 import UpdateProfileTeacher from "./Pages/TeacherDashboard/UpdateProfileTeacher";
-import TeacherProfileEducation from "./Pages/TeacherDashboard/TeacherProfileEducation";
 import ManageStudent from "./Pages/TeacherDashboard/ManageStudent";
 import AddStudent from "./Pages/TeacherDashboard/AddStudent";
-import ViewScore from "./Pages/TeacherDashboard/ViewScore";
 import EditStudent from "./Pages/TeacherDashboard/EditStudent";
 import ViewAssessment from "./Pages/TeacherDashboard/ViewAssessment";
 import ViewStudent from "./Pages/TeacherDashboard/ViewStudent";
@@ -46,9 +44,13 @@ import ParentProfile from "./Pages/ParentDashboard/ParentProfile";
 import ProfileUpdate from "./Pages/ParentDashboard/ProfileUpdate";
 import AdminViewPerformance from "./Pages/AdminDashboard/AdminViewPerformance";
 import TestPage from "./Pages/testpage";
+import AdminViewAssessment from "./Pages/AdminDashboard/AdminViewAssessment";
+import AdminViewStudentPerformance from "./Pages/AdminDashboard/AdminViewStudentPerformance";
+import ManagePerformance from "./Pages/TeacherDashboard/ManagePerformance";
+import ViewStudentAssessment from "./Pages/TeacherDashboard/ViewStudentAssessment";
+import ViewStudentPerformance from "./Pages/TeacherDashboard/ViewStudentPerformance";
 
-axios.defaults.baseURL =
-  "https://baybay-salita-heroku-8c328f3ddd0f.herokuapp.com"; // SERVER_URL https://baybay-salita-heroku-8c328f3ddd0f.herokuapp.com/
+axios.defaults.baseURL = "http://192.168.56.1:8000"; // SERVER_URL https://baybay-salita-heroku-8c328f3ddd0f.herokuapp.com/
 axios.defaults.withCredentials = true;
 
 const App = () => {
@@ -77,7 +79,6 @@ const App = () => {
             />
             <Route path="/verifyEmail" element={<VerifyEmail />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
-
             {/* Teacher Dashboard Routes*/}
             <Route
               path="/teacherDashboard"
@@ -104,14 +105,6 @@ const App = () => {
               }
             />
             <Route
-              path="/teacherProfileEduc"
-              element={
-                <RoleBasedRoute allowedRoles={["Teacher"]}>
-                  <TeacherProfileEducation />
-                </RoleBasedRoute>
-              }
-            />
-            <Route
               path="/manageStudent"
               element={
                 <RoleBasedRoute allowedRoles={["Teacher"]}>
@@ -128,7 +121,7 @@ const App = () => {
               }
             />
             <Route
-              path="/viewStudent"
+              path="/viewStudent/:id"
               element={
                 <RoleBasedRoute allowedRoles={["Teacher"]}>
                   <ViewStudent />
@@ -152,15 +145,30 @@ const App = () => {
               }
             />
             <Route
-              path="/viewScore"
+              path="/managePerformance"
               element={
                 <RoleBasedRoute allowedRoles={["Teacher"]}>
-                  <ViewScore />
+                  <ManagePerformance />
                 </RoleBasedRoute>
               }
             />
-
-            {/* Parent Dashboard Routes */}
+            <Route
+              path="/ViewActivityAssessment/:ActivityCode"
+              element={
+                <RoleBasedRoute allowedRoles={["Teacher"]}>
+                  <ViewStudentAssessment />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/ViewStudentPerformance/:UserInputId"
+              element={
+                <RoleBasedRoute allowedRoles={["Teacher"]}>
+                  <ViewStudentPerformance />
+                </RoleBasedRoute>
+              }
+            />
+            v{/* Parent Dashboard Routes */}
             <Route
               path="/parentDashboard"
               element={
@@ -201,7 +209,6 @@ const App = () => {
                 </RoleBasedRoute>
               }
             />
-
             {/* Admin Dashboard Routes */}
             <Route
               path="/AdminDashboard"
@@ -328,6 +335,22 @@ const App = () => {
               element={
                 <RoleBasedRoute allowedRoles={["Admin"]}>
                   <AdminProfile />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/adminViewAssessment/:ActivityCode"
+              element={
+                <RoleBasedRoute allowedRoles={["Admin"]}>
+                  <AdminViewAssessment />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/adminViewPerformance/:UserInputId"
+              element={
+                <RoleBasedRoute allowedRoles={["Admin"]}>
+                  <AdminViewStudentPerformance />
                 </RoleBasedRoute>
               }
             />

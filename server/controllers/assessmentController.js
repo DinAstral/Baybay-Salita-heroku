@@ -61,7 +61,8 @@ function generateRandomCode(length) {
 const submitAssessment = async (req, res) => {
   const randomCode = generateRandomCode(6);
   try {
-    const { Period, Type, Title, Item1, Item2, Item3, Item4, Item5 } = req.body;
+    const { UserID, Period, Type, Title, Item1, Item2, Item3, Item4, Item5 } =
+      req.body;
 
     if (!Period || !Type) {
       return res.json({ error: "All fields are required" });
@@ -127,6 +128,7 @@ const submitAssessment = async (req, res) => {
     }
 
     const act = await AssessmentModel.create({
+      UserID,
       ActivityCode: randomCode,
       Period,
       Type,
@@ -155,6 +157,54 @@ const getAssessmentCode = async (req, res) => {
     if (!activity) {
       return res.json({
         message: "No activity found",
+      });
+    }
+
+    // Return the found parent
+    res.json(activity);
+  } catch (error) {
+    // Handle any other errors
+    res.json({
+      message: error.message,
+    });
+  }
+};
+
+// get assessment based on Activitycode
+const getAssessmentID = async (req, res) => {
+  const { UserID } = req.params;
+
+  try {
+    const activity = await AssessmentModel.findOne({ UserID });
+
+    // If no parent is found, return a 404 status
+    if (!activity) {
+      return res.json({
+        message: "No activity found",
+      });
+    }
+
+    // Return the found parent
+    res.json(activity);
+  } catch (error) {
+    // Handle any other errors
+    res.json({
+      message: error.message,
+    });
+  }
+};
+
+// get performance based on input ID
+const getOnePerformance = async (req, res) => {
+  const { UserInputId } = req.params;
+
+  try {
+    const activity = await Performance.findOne({ UserInputId });
+
+    // If no parent is found, return a 404 status
+    if (!activity) {
+      return res.json({
+        message: "No user input found",
       });
     }
 
@@ -204,6 +254,33 @@ const deleteAssessment = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Error deleting activity", error: error.message });
+  }
+};
+
+// Delete performance
+const deletePerformance = async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid performance ID format" });
+  }
+
+  try {
+    const activity = await Performance.findByIdAndDelete(id);
+
+    if (!activity) {
+      return res.status(404).json({ message: "No student performance found" });
+    }
+
+    return res.status(200).json({
+      message: "Student performance deleted successfully",
+      data: activity,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error deleting Student performance",
+      error: error.message,
+    });
   }
 };
 
@@ -369,6 +446,7 @@ const userInputAudio = async (req, res) => {
           ItemCode: itemCode,
           Word: material?.Word || "",
           Audio: material?.Audio || "",
+          SecureAudio: material?.SecureAudio || "",
           UserAudioURL: fileUrls[`AudioURL${index + 1}`],
         };
       });
@@ -386,6 +464,7 @@ const userInputAudio = async (req, res) => {
           Word: item.Word,
           UserAudioURL: item.UserAudioURL,
           DefaultAudio: item.Audio,
+          SecureAudio: item.SecureAudio,
         })),
       };
 
@@ -435,9 +514,12 @@ module.exports = {
   importSentence,
   submitAssessment,
   getAssessmentCode,
+  getAssessmentID,
   getImportWords,
+  getOnePerformance,
   getPerformance,
   getSentence,
   deleteAssessment,
+  deletePerformance,
   userInputAudio,
 };
