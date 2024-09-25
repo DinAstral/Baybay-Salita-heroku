@@ -44,11 +44,6 @@ const ParentSidebar = () => {
             link: "/parentDashboard",
           },
           {
-            icon: faEye,
-            text: "Student Performance",
-            link: "/parentFeedbackTeacher",
-          },
-          {
             icon: faComment,
             text: "Feedback of Teacher",
             link: "/parentFeedbackTeacher",
@@ -73,7 +68,7 @@ const ParentSidebar = () => {
 
       <div className="menu-logout">
         <div className="menu-logout-btn">
-        <button className="btn-side" onClick={handleLogout}>
+          <button className="btn-side" onClick={handleLogout}>
             Logout
           </button>
         </div>
