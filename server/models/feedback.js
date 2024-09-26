@@ -13,6 +13,7 @@ const FeedbackSchema = new Schema(
     email: {
       type: String,
     },
+    LRN: String,
     Title: String,
     ActivityCode: String,
     Type: String,

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from "react";
-import "./../ContentDasboard/Sidebar.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBookOpenReader,
@@ -7,8 +6,9 @@ import {
   faEye,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import logo from "../../assets/Sidebar_Final_Logo.png";
 import { UserContext } from "../../../context/userContext"; // Import UserContext
-import logo from "../../assets/BaybaySalita_Logo.png";
+import { Button } from "@nextui-org/react";
 
 const ParentSidebar = () => {
   const location = useLocation();
@@ -25,55 +25,64 @@ const ParentSidebar = () => {
     const menuItem = [
       "/parentDashboard",
       "/parentFeedbackTeacher",
-      "/parentFeedbackTeacher",
+      "/parentStudentProgress",
     ];
     const index = menuItem.findIndex((item) => item === location.pathname);
     setActiveIndex(index);
   }, [location.pathname]);
 
   return (
-    <div className="menu-dash">
-      <div className="logo-dash">
-        <img src={logo} alt="" />
-      </div>
-      <div className="menu--list">
-        {[
-          {
-            icon: faBookOpenReader,
-            text: "Information of Kid",
-            link: "/parentDashboard",
-          },
-          {
-            icon: faComment,
-            text: "Feedback of Teacher",
-            link: "/parentFeedbackTeacher",
-          },
-        ].map((item, index) => (
-          <Link
-            key={index}
-            to={item.link}
-            className={`item ${index === activeIndex ? "active" : ""}`}
-          >
-            <div>
-              <FontAwesomeIcon
-                icon={item.icon}
-                size="1x"
-                className="dash-icon"
-              />
+    <>
+      <div className="flex flex-col gap-10 px-4 h-11 justify-between">
+        <div className="logo-dash pr-1">
+          <img src={logo} alt="Baybay Salita Logo" />
+        </div>
+        <div className="flex flex-col gap-3 p-3">
+          {[
+            {
+              icon: faBookOpenReader,
+              text: "Information of Kid",
+              link: "/parentDashboard",
+            },
+            {
+              icon: faComment,
+              text: "Feedback of Teacher",
+              link: "/parentFeedbackTeacher",
+            },
+            {
+              icon: faEye,
+              text: "Student Progress",
+              link: "/parentStudentProgress",
+            },
+          ].map((item, index) => (
+            <Link
+              key={index}
+              to={item.link}
+              className={`flex items-center p-3 font-semibold text-md rounded-lg transition-all duration-200 ${
+                index === activeIndex
+                  ? "bg-blue-500 text-white shadow-lg"
+                  : "text-gray-700 hover:bg-blue-100 hover:text-blue-700"
+              }`}
+              onClick={() => setActiveIndex(index)}
+            >
+              <FontAwesomeIcon icon={item.icon} size="lg" className="mr-3" />
               {item.text}
-            </div>
-          </Link>
-        ))}
-      </div>
+            </Link>
+          ))}
+        </div>
 
-      <div className="menu-logout">
-        <div className="menu-logout-btn">
-          <button className="btn-side" onClick={handleLogout}>
+        {/* Logout Button */}
+        <div className="flex flex-col px-5">
+          <Button
+            color="error"
+            className="w-full text-md font-semibold py-3 rounded-lg shadow-md transition-all duration-150 hover:bg-red-600"
+            onClick={handleLogout}
+          >
             Logout
-          </button>
+          </Button>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

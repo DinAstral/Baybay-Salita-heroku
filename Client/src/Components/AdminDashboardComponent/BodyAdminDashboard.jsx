@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useDownloadExcel } from "react-export-table-to-excel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChalkboardTeacher,
@@ -6,7 +7,16 @@ import {
   faCircleInfo,
   faHouse,
 } from "@fortawesome/free-solid-svg-icons";
-import { Tooltip } from "@nextui-org/react";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableColumn,
+  TableRow,
+  TableCell,
+  Button,
+  Tooltip,
+} from "@nextui-org/react";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { LineChart } from "@mui/x-charts/LineChart";
@@ -18,6 +28,11 @@ const BodyAdminDashboard = () => {
   const [assessments, setAssessment] = useState([]);
   const [teachersCount, setTeachersCount] = useState(0);
   const [parentsCount, setParentsCount] = useState(0);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(0);
+  const [usersPerPage] = useState(10); // Number of users per page
+  const [filteredRoles, setFilteredRoles] = useState([]);
 
   const [sectionCounts, setSectionCounts] = useState({
     Aster: 0,
@@ -38,6 +53,14 @@ const BodyAdminDashboard = () => {
     Iris: 0,
   });
 
+  const tableRef = useRef(null);
+
+  const { onDownload } = useDownloadExcel({
+    currentTableRef: tableRef.current,
+    filename: "Student_List_Report_table",
+    sheet: "Students",
+  });
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -56,6 +79,7 @@ const BodyAdminDashboard = () => {
         const response = await axios.get("/getStudents");
         const data = response.data;
         setStudents(data);
+        setFilteredRoles(data);
         setSectionCounts(countStudentsBySection(data));
       } catch (err) {
         console.error(err);
@@ -110,6 +134,16 @@ const BodyAdminDashboard = () => {
       ).length;
       return acc;
     }, {});
+  };
+
+  // Calculate the number of users to display based on the current page
+  const offset = currentPage * usersPerPage;
+  const currentUsers = filteredRoles.slice(offset, offset + usersPerPage);
+
+  const totalPages = Math.ceil(filteredRoles.length / usersPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
   return (
@@ -215,6 +249,79 @@ const BodyAdminDashboard = () => {
         </div>
 
         <div className="mt-6">
+          <h2 className="text-2xl font-semibold mb-4">
+            Status of the Students
+          </h2>
+          <div className="bg-white rounded-lg shadow p-4">
+            <Table
+              ref={tableRef}
+              removeWrapper
+              color="primary"
+              selectionMode="single"
+            >
+              <TableHeader>
+                <TableColumn>LRN</TableColumn>
+                <TableColumn>First Name</TableColumn>
+                <TableColumn>Last Name</TableColumn>
+                <TableColumn>Age</TableColumn>
+                <TableColumn>Section</TableColumn>
+                <TableColumn>Mother Tongue</TableColumn>
+                <TableColumn>Gender</TableColumn>
+                <TableColumn>Status</TableColumn>
+              </TableHeader>
+              <TableBody emptyContent={"No rows to display."}>
+                {currentUsers.map((student) => (
+                  <TableRow key={student.LRN}>
+                    <TableCell>{student.LRN}</TableCell>
+                    <TableCell>{student.FirstName}</TableCell>
+                    <TableCell>{student.LastName}</TableCell>
+                    <TableCell>{student.Age}</TableCell>
+                    <TableCell>{student.Section}</TableCell>
+                    <TableCell>{student.MotherTongue}</TableCell>
+                    <TableCell>{student.Gender}</TableCell>
+                    <TableCell>{student.Status}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            {/* Pagination Controls */}
+            <div className="flex justify-between mt-4">
+              <Button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 0}
+              >
+                Previous
+              </Button>
+              <div>
+                Page {currentPage + 1} of {totalPages}
+              </div>
+              <Button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage >= totalPages - 1}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <h2 className="text-2xl font-semibold mb-4">
+            Score Rating of Students
+          </h2>
+          <div className="bg-white rounded-lg shadow p-4">
+            <LineChart
+              xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
+              series={[{ data: [1, 1, 4, 6, 3, 10] }]}
+              height={300}
+              margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
+              grid={{ vertical: true, horizontal: true }}
+            />
+          </div>
+        </div>
+
+        <div className="mt-6">
           <h2 className="text-2xl font-semibold mb-4">Assessment Created</h2>
           <div className="bg-white rounded-lg shadow p-4">
             <BarChart
@@ -265,19 +372,6 @@ const BodyAdminDashboard = () => {
               ]}
               width={1500}
               height={300}
-            />
-          </div>
-        </div>
-
-        <div className="mt-6">
-          <h2 className="text-2xl font-semibold mb-4">Compared Result</h2>
-          <div className="bg-white rounded-lg shadow p-4">
-            <LineChart
-              xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
-              series={[{ data: [1, 1, 4, 6, 3, 10] }]}
-              height={300}
-              margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
-              grid={{ vertical: true, horizontal: true }}
             />
           </div>
         </div>

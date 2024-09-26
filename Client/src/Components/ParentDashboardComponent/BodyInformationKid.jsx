@@ -1,22 +1,22 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useContext } from "react";
-import ContentHeader from "../ContentDasboard/ContentHeader";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
+import { Button, Tooltip } from "@nextui-org/react";
 import profile from "./../../assets/profile.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAddressCard, faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import { UserContext } from "../../../context/userContext";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const BodyInformationKid = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeIndex, setActiveIndex] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(0);
   const { user } = useContext(UserContext);
+  const [parent, setParent] = useState([]);
+
   const [student, setStudent] = useState({
     FirstName: "",
     LastName: "",
@@ -29,25 +29,14 @@ const BodyInformationKid = () => {
     Address: "",
     ContactNumber: "",
   });
-  const [parent, setParent] = useState(null);
 
-  // Set active index based on current location
-  useEffect(() => {
-    const menuItem = ["/parentKidTab", "/parentStudentProgress"];
-    const index = menuItem.findIndex((item) => item === location.pathname);
-    setActiveIndex(index);
-  }, [location.pathname]);
-
-  // Fetch parent data
   useEffect(() => {
     axios
       .get(`getParent/${user.UserID}`)
       .then((response) => {
-        console.log("Parent Response:", response.data);
         setParent(response.data);
       })
       .catch((err) => {
-        console.error("Error fetching parent data:", err);
         setError("Failed to load parent data.");
       })
       .finally(() => {
@@ -55,18 +44,15 @@ const BodyInformationKid = () => {
       });
   }, [user.UserID]);
 
-  // Fetch student data once parent data is available
   useEffect(() => {
     if (parent && parent.LRN) {
       setLoading(true);
       axios
         .get(`getStudentParent/${parent.LRN}`)
         .then((response) => {
-          console.log("Student Response:", response.data);
           setStudent(response.data);
         })
         .catch((err) => {
-          console.error("Error fetching student data:", err);
           setError("Failed to load student data.");
         })
         .finally(() => {
@@ -74,12 +60,6 @@ const BodyInformationKid = () => {
         });
     }
   }, [parent]);
-
-  const renderTooltip = (props) => (
-    <Tooltip id="button-tooltip" {...props}>
-      This function will view your profile.
-    </Tooltip>
-  );
 
   const toggleActive = (index) => {
     setActiveIndex(index);
@@ -94,147 +74,106 @@ const BodyInformationKid = () => {
   }
 
   return (
-    <div className="content">
-      <ContentHeader />
-      <div className="content-body">
-        <div className="content-title-header">
-          <div>
-            Information of the Student
-            <OverlayTrigger
-              placement="bottom"
-              delay={{ show: 250, hide: 400 }}
-              overlay={renderTooltip}
-            >
-              <FontAwesomeIcon
-                icon={faCircleInfo}
-                size="1x"
-                className="help-icon"
-              />
-            </OverlayTrigger>
+    <div className="p-10">
+      <div className="flex items-center justify-start gap-2 mb-5">
+        <h1 className="text-3xl font-semibold">Student Information</h1>
+        <Tooltip
+          showArrow={true}
+          content={
+            <div className="p-2">
+              <div className="text-sm font-bold">View Information</div>
+              <div className="text-xs">
+                This function allows you to view the student's information in
+                the system.
+              </div>
+            </div>
+          }
+        >
+          <FontAwesomeIcon icon={faCircleInfo} className="text-gray-600" />
+        </Tooltip>
+      </div>
+
+      <div className="w-full max-w-8xl mx-auto bg-white shadow-lg rounded-lg p-8">
+        {/* Profile Header */}
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+          <img src={profile} className="w-32 h-32 rounded-full" alt="Profile" />
+          <div className="flex-1">
+            <h2 className="text-2xl font-bold">
+              {`${student.FirstName} ${student.LastName}`}
+            </h2>
+            <h4>{`Section: ${student.Section}`}</h4>
+            <div className="flex flex-col mt-4 text-gray-700">
+              <div className="flex items-center gap-2">
+                <FontAwesomeIcon
+                  icon={faAddressCard}
+                  className="text-gray-600"
+                />
+                <span>Learner Reference Number: {student.LRN}</span>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="content-container">
-          <div className="Profile-body">
-            <img src={profile} alt="Profile" />
-            <div className="profile-detail">
-              <h2>
-                {student.FirstName} {student.LastName}
-              </h2>
-              <h4>{student.Section}</h4>
-              <div className="profile-detail-info">
-                <div className="profile-number">
-                  <FontAwesomeIcon
-                    icon={faAddressCard}
-                    size="1x"
-                    className="profile-icon"
-                  />
-                  Learner Reference Number: {student.LRN}
+
+        {/* Tabs */}
+        <div className="mt-8">
+          <div className="flex gap-6 border-b pb-2">
+            <Button
+              variant="light"
+              radius="none"
+              className={`text-md font-medium ${
+                activeIndex === 0 ? "border-b-4 border-blue-500" : ""
+              }`}
+              onClick={() => toggleActive(0)}
+            >
+              Basic Information
+            </Button>
+          </div>
+
+          {/* Content Based on Active Tab */}
+          {activeIndex === 0 && (
+            <div className="mt-6 bg-[#faf9f4] p-6 rounded-lg shadow">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <span className="block text-sm text-gray-600">
+                    First Name:
+                  </span>
+                  <p className="text-gray-800">{student.FirstName || "N/A"}</p>
+                </div>
+                <div>
+                  <span className="block text-sm text-gray-600">
+                    Last Name:
+                  </span>
+                  <p className="text-gray-800">{student.LastName || "N/A"}</p>
+                </div>
+                <div>
+                  <span className="block text-sm text-gray-600">
+                    Civil Status:
+                  </span>
+                  <p className="text-gray-800">{student.Status || "N/A"}</p>
+                </div>
+                <div>
+                  <span className="block text-sm text-gray-600">Gender:</span>
+                  <p className="text-gray-800">{student.Gender || "N/A"}</p>
+                </div>
+                <div>
+                  <span className="block text-sm text-gray-600">Birthday:</span>
+                  <p className="text-gray-800">{student.Birthday || "N/A"}</p>
+                </div>
+                <div>
+                  <span className="block text-sm text-gray-600">Address:</span>
+                  <p className="text-gray-800">{student.Address || "N/A"}</p>
+                </div>
+                <div>
+                  <span className="block text-sm text-gray-600">
+                    Contact Number:
+                  </span>
+                  <p className="text-gray-800">
+                    {student.ContactNumber || "N/A"}
+                  </p>
                 </div>
               </div>
             </div>
-          </div>
-          <div className="profile-information">
-            <div className="profile-nav">
-              {[
-                { text: "Basic Information", link: "/parentKidTab" },
-                { text: "Student Progress", link: "/parentStudentProgress" },
-              ].map((item, index) => (
-                <Link
-                  key={index}
-                  to={item.link}
-                  className={`profile-nav-item ${
-                    index === activeIndex ? "active" : ""
-                  }`}
-                >
-                  <div onClick={() => toggleActive(index)}>{item.text}</div>
-                </Link>
-              ))}
-            </div>
-            <div className="profile-info-details">
-              <div className="profile-deets">
-                <div className="input-profile">
-                  <div className="input-profile-text">First Name:</div>
-                  <input
-                    type="text"
-                    placeholder={student.FirstName || "Name"}
-                    readOnly
-                  />
-                </div>
-                <div className="input-profile">
-                  <div className="input-profile-text">Nationality:</div>
-                  <input
-                    type="text"
-                    placeholder={student.Nationality || "Nationality"}
-                    readOnly
-                  />
-                </div>
-                <div className="input-profile">
-                  <div className="input-profile-text">Middle Name:</div>
-                  <input
-                    type="text"
-                    placeholder={student.MiddleName || "Middle Name"}
-                    readOnly
-                  />
-                </div>
-                <div className="input-profile">
-                  <div className="input-profile-text">Civil Status:</div>
-                  <input
-                    type="text"
-                    placeholder={student.Status || "Civil Status"}
-                    readOnly
-                  />
-                </div>
-                <div className="input-profile">
-                  <div className="input-profile-text">Last Name:</div>
-                  <input
-                    type="text"
-                    placeholder={student.LastName || "Last Name"}
-                    readOnly
-                  />
-                </div>
-                <div className="input-profile">
-                  <div className="input-profile-text">Gender:</div>
-                  <input
-                    type="text"
-                    placeholder={student.Gender || "Gender"}
-                    readOnly
-                  />
-                </div>
-                <div className="input-profile">
-                  <div className="input-profile-text">Birthday:</div>
-                  <input
-                    type="text"
-                    placeholder={student.Birthday || "Birthday"}
-                    readOnly
-                  />
-                </div>
-                <div className="input-profile">
-                  <div className="input-profile-text">Address:</div>
-                  <input
-                    type="text"
-                    placeholder={student.Address || "Address"}
-                    readOnly
-                  />
-                </div>
-                <div className="input-profile">
-                  <div className="input-profile-text">Contact Number:</div>
-                  <input
-                    type="text"
-                    placeholder={student.ContactNumber || "Contact Number"}
-                    readOnly
-                  />
-                </div>
-                <div className="input-profile">
-                  <div className="input-profile-text">Number of Section:</div>
-                  <input
-                    type="text"
-                    placeholder={student.Section || "Section"}
-                    readOnly
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

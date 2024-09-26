@@ -32,6 +32,21 @@ const storage = multer.diskStorage({
     if (file.fieldname === "User5") {
       fileName = `user_${fileExt}`;
     }
+    if (file.fieldname === "User6") {
+      fileName = `user_${fileExt}`;
+    }
+    if (file.fieldname === "User7") {
+      fileName = `user_${fileExt}`;
+    }
+    if (file.fieldname === "User8") {
+      fileName = `user_${fileExt}`;
+    }
+    if (file.fieldname === "User9") {
+      fileName = `user_${fileExt}`;
+    }
+    if (file.fieldname === "User10") {
+      fileName = `user_${fileExt}`;
+    }
 
     cb(null, fileName);
   },
@@ -56,7 +71,12 @@ const fileFilter = (req, file, cb) => {
     file.fieldname === "User2" ||
     file.fieldname === "User3" ||
     file.fieldname === "User4" ||
-    file.fieldname === "User5"
+    file.fieldname === "User5" ||
+    file.fieldname === "User6" ||
+    file.fieldname === "User7" ||
+    file.fieldname === "User8" ||
+    file.fieldname === "User9" ||
+    file.fieldname === "User10"
   ) {
     // Accept only audio files
     if (file.mimetype.startsWith("audio/")) {
@@ -88,7 +108,12 @@ const limits = {
       file.fieldname === "User2" ||
       file.fieldname === "User3" ||
       file.fieldname === "User4" ||
-      file.fieldname === "User5"
+      file.fieldname === "User5" ||
+      file.fieldname === "User6" ||
+      file.fieldname === "User7" ||
+      file.fieldname === "User8" ||
+      file.fieldname === "User9" ||
+      file.fieldname === "User10"
     ) {
       return 100 * 1024 * 1024; // 100 MB for audio files
     }
@@ -128,6 +153,11 @@ const UserUpload = multer({
   { name: "User3", maxCount: 1 },
   { name: "User4", maxCount: 1 },
   { name: "User5", maxCount: 1 },
+  { name: "User6", maxCount: 1 },
+  { name: "User7", maxCount: 1 },
+  { name: "User8", maxCount: 1 },
+  { name: "User9", maxCount: 1 },
+  { name: "User10", maxCount: 1 },
 ]);
 
 // Export the upload handlers

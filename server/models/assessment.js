@@ -8,6 +8,7 @@ const assessSchema = new Schema(
       type: String,
       unique: true,
     },
+    Section: String,
     Period: {
       type: String,
     },

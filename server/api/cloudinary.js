@@ -59,6 +59,11 @@ const cloudinaryUploaderUser = async (req, res) => {
     User3: files["User3"] ? files["User3"][0] : null,
     User4: files["User4"] ? files["User4"][0] : null,
     User5: files["User5"] ? files["User5"][0] : null,
+    User6: files["User6"] ? files["User6"][0] : null,
+    User7: files["User7"] ? files["User7"][0] : null,
+    User8: files["User8"] ? files["User8"][0] : null,
+    User9: files["User9"] ? files["User9"][0] : null,
+    User10: files["User10"] ? files["User10"][0] : null,
   };
 
   // Check if at least one file exists
@@ -83,6 +88,11 @@ const cloudinaryUploaderUser = async (req, res) => {
       uploadAudioUser3,
       uploadAudioUser4,
       uploadAudioUser5,
+      uploadAudioUser6,
+      uploadAudioUser7,
+      uploadAudioUser8,
+      uploadAudioUser9,
+      uploadAudioUser10,
     ] = await Promise.all(uploadPromises);
 
     return {
@@ -91,6 +101,11 @@ const cloudinaryUploaderUser = async (req, res) => {
       uploadAudioUser3,
       uploadAudioUser4,
       uploadAudioUser5,
+      uploadAudioUser6,
+      uploadAudioUser7,
+      uploadAudioUser8,
+      uploadAudioUser9,
+      uploadAudioUser10,
     };
   } catch (error) {
     console.log(error);

@@ -126,6 +126,7 @@ const BodyAssessment = () => {
         show={show}
         handleClose={handleClose}
         userId={user.UserID}
+        section={user.section}
       />
       <ImportWord
         show={modalShowImport}

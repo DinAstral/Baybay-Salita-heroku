@@ -61,8 +61,23 @@ function generateRandomCode(length) {
 const submitAssessment = async (req, res) => {
   const randomCode = generateRandomCode(6);
   try {
-    const { UserID, Period, Type, Title, Item1, Item2, Item3, Item4, Item5 } =
-      req.body;
+    const {
+      UserID,
+      Period,
+      Section,
+      Type,
+      Title,
+      Item1,
+      Item2,
+      Item3,
+      Item4,
+      Item5,
+      Item6,
+      Item7,
+      Item8,
+      Item9,
+      Item10,
+    } = req.body;
 
     if (!Period || !Type) {
       return res.json({ error: "All fields are required" });
@@ -74,7 +89,18 @@ const submitAssessment = async (req, res) => {
     }
 
     // Fetch materials for each item
-    const items = [Item1, Item2, Item3, Item4, Item5];
+    const items = [
+      Item1,
+      Item2,
+      Item3,
+      Item4,
+      Item5,
+      Item6,
+      Item7,
+      Item8,
+      Item9,
+      Item10,
+    ];
     const materials = await Material.find({ ItemCode: { $in: items } });
 
     const assessmentItems = items.map((itemCode) => {
@@ -130,6 +156,7 @@ const submitAssessment = async (req, res) => {
     const act = await AssessmentModel.create({
       UserID,
       ActivityCode: randomCode,
+      Section,
       Period,
       Type,
       Title,
@@ -407,6 +434,11 @@ const userInputAudio = async (req, res) => {
         Itemcode3,
         Itemcode4,
         Itemcode5,
+        Itemcode6,
+        Itemcode7,
+        Itemcode8,
+        Itemcode9,
+        Itemcode10,
       } = req.body;
 
       // Upload user input audio files to cloudinary
@@ -429,10 +461,36 @@ const userInputAudio = async (req, res) => {
         AudioURL5: uploadResponse.uploadAudioUser5
           ? uploadResponse.uploadAudioUser5.secure_url
           : "",
+        AudioURL6: uploadResponse.uploadAudioUser6
+          ? uploadResponse.uploadAudioUser6.secure_url
+          : "",
+        AudioURL7: uploadResponse.uploadAudioUser7
+          ? uploadResponse.uploadAudioUser7.secure_url
+          : "",
+        AudioURL8: uploadResponse.uploadAudioUser8
+          ? uploadResponse.uploadAudioUser8.secure_url
+          : "",
+        AudioURL9: uploadResponse.uploadAudioUser9
+          ? uploadResponse.uploadAudioUser9.secure_url
+          : "",
+        AudioURL10: uploadResponse.uploadAudioUser10
+          ? uploadResponse.uploadAudioUser10.secure_url
+          : "",
       };
 
       // Group item codes for fetching from the database
-      const itemCodes = [Itemcode1, Itemcode2, Itemcode3, Itemcode4, Itemcode5];
+      const itemCodes = [
+        Itemcode1,
+        Itemcode2,
+        Itemcode3,
+        Itemcode4,
+        Itemcode5,
+        Itemcode6,
+        Itemcode7,
+        Itemcode8,
+        Itemcode9,
+        Itemcode10,
+      ];
 
       // Fetch words and default audio for each ItemCode from the database
       const materials = await Material.find({

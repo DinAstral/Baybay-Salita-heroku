@@ -44,7 +44,7 @@ const CreateSuccess = ({ show, onHide }) => {
   );
 };
 
-const CreateAssessment = ({ show, handleClose, userId }) => {
+const CreateAssessment = ({ show, handleClose, userId, section }) => {
   const [modalShow, setModalShow] = useState(false);
   const [words, setWords] = useState([]);
   const [sentences, setSentences] = useState([]); // Changed from sentence to sentences
@@ -58,6 +58,11 @@ const CreateAssessment = ({ show, handleClose, userId }) => {
     Item3: "",
     Item4: "",
     Item5: "",
+    Item6: "",
+    Item7: "",
+    Item8: "",
+    Item9: "",
+    Item10: "",
   });
 
   const fetchImportWord = () => {
@@ -107,6 +112,7 @@ const CreateAssessment = ({ show, handleClose, userId }) => {
     try {
       const response = await axios.post(`/submitAssessment`, {
         UserID: userId,
+        Section: section,
         Period,
         Type,
         Title,
@@ -115,6 +121,11 @@ const CreateAssessment = ({ show, handleClose, userId }) => {
         Item3: data.Item3,
         Item4: data.Item4,
         Item5: data.Item5,
+        Item6: data.Item6,
+        Item7: data.Item7,
+        Item8: data.Item8,
+        Item9: data.Item9,
+        Item10: data.Item10,
       });
       if (response.data.error) {
         toast.error(response.data.error);
@@ -128,6 +139,11 @@ const CreateAssessment = ({ show, handleClose, userId }) => {
           Item3: "",
           Item4: "",
           Item5: "",
+          Item6: "",
+          Item7: "",
+          Item8: "",
+          Item9: "",
+          Item10: "",
         });
         toast.success("Created Activity Successfully.");
         setModalShow(true);
@@ -219,11 +235,22 @@ const CreateAssessment = ({ show, handleClose, userId }) => {
                 </Select>
               ) : (
                 <>
-                  <div className="text-sm">
+                  <div className="text-sm mb-4">
                     <p>Please add items to your assessment.</p>
                   </div>
-                  {["Item1", "Item2", "Item3", "Item4", "Item5"].map(
-                    (item, index) => (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[
+                      "Item1",
+                      "Item2",
+                      "Item3",
+                      "Item4",
+                      "Item5",
+                      "Item6",
+                      "Item7",
+                      "Item8",
+                      "Item9",
+                      "Item10",
+                    ].map((item, index) => (
                       <Select
                         key={item}
                         labelPlacement="outside"
@@ -243,8 +270,8 @@ const CreateAssessment = ({ show, handleClose, userId }) => {
                           </SelectItem>
                         ))}
                       </Select>
-                    )
-                  )}
+                    ))}
+                  </div>
                 </>
               )}
             </ModalBody>

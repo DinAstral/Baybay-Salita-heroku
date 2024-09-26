@@ -52,13 +52,6 @@
     color: #dde6ed !important;
 }
 
-.menu-logout {
-    margin-top: auto;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-}
-
 .menu-help {
     display: flex;
     align-items: center;

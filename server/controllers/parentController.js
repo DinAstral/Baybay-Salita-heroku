@@ -70,7 +70,7 @@ const getStudentUser = async (req, res) => {
 const submitFeedback = async (req, res) => {
   const randomCode = generateRandomCodeFeed(6);
   try {
-    const { UserID, Title, ActivityCode, Type, Feedback_Date, Context } =
+    const { UserID, LRN, Title, ActivityCode, Type, Feedback_Date, Context } =
       req.body;
 
     if (!Title || !Type) {
@@ -80,6 +80,7 @@ const submitFeedback = async (req, res) => {
     const feed = await Feedback.create({
       FeedbackID: randomCode,
       UserID,
+      LRN,
       Title,
       ActivityCode,
       Type,
@@ -94,9 +95,16 @@ const submitFeedback = async (req, res) => {
   }
 };
 
+const getFeedbacks = (req, res) => {
+  Feedback.find()
+    .then((users) => res.json(users))
+    .catch((err) => res.json(err));
+};
+
 module.exports = {
   getParentUsers,
   getParentUser,
   getStudentUser,
   submitFeedback,
+  getFeedbacks,
 };

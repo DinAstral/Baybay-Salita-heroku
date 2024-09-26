@@ -52,6 +52,8 @@ const BodyViewPerformnace = () => {
         onHide={() => setModalShowView(false)}
         actCode={data.ActivityCode}
         userid={user.UserID}
+        lrn={data.LRN}
+        section={data.Section}
       />
       <div className="flex items-center justify-start gap-2 mb-5">
         <h1 className="text-3xl font-semibold">View Performance</h1>

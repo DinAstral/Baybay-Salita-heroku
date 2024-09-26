@@ -47,7 +47,7 @@ const AddSuccess = ({ show, onHide }) => {
   );
 };
 
-const AddFeedback = ({ show, onHide, actCode, userid }) => {
+const AddFeedback = ({ show, onHide, actCode, userid, lrn, section }) => {
   const [modalShow, setModalShow] = useState(false);
   const [data, setData] = useState({
     Title: "",
@@ -63,6 +63,8 @@ const AddFeedback = ({ show, onHide, actCode, userid }) => {
     try {
       const response = await axios.post(`/submitFeedback`, {
         UserID: userid,
+        LRN: lrn,
+        Section: section,
         Title,
         ActivityCode: actCode,
         Type,
@@ -118,11 +120,12 @@ const AddFeedback = ({ show, onHide, actCode, userid }) => {
               <Select
                 labelPlacement="outside"
                 label="Type of Assessment"
+                placeholder="Select Type of Assessment"
                 aria-label="Select type of assessment"
                 variant="bordered"
                 className="bg-transparent py-1 my-1"
                 value={data.Type}
-                onChange={(value) => setData({ ...data, Type: value })}
+                onChange={(e) => setData({ ...data, Type: e.target.value })}
               >
                 <SelectItem key="">Select Type of Assessment</SelectItem>
                 <SelectItem key="Pagbabaybay">
@@ -177,6 +180,8 @@ AddFeedback.propTypes = {
   onHide: PropTypes.func.isRequired,
   actCode: PropTypes.string.isRequired,
   userid: PropTypes.string.isRequired,
+  lrn: PropTypes.string.isRequired,
+  section: PropTypes.string.isRequired,
 };
 
 AddSuccess.propTypes = {
