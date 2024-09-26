@@ -176,11 +176,6 @@ const stentWeightedAudioSimilarity = (mfccDistance, chromaDistance, zcr) => {
   // Calculate the weighted sum
   let similarityScore =
     weightMfcc * mfccDistance + weightChroma * chromaDistance + weightZcr * zcr;
-
-  // Scale the score to the 0-100 range
-  similarityScore *= 100;
-
-  return similarityScore;
 };
 
 // Main comparison function that accepts dynamic audio URLs
