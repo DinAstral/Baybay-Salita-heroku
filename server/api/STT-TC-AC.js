@@ -6,7 +6,7 @@ const wav = require("wav-decoder");
 const mongoose = require("mongoose");
 const CompareModel = require("../models/ComparisonResult");
 
-// URLs to the audio files
+// URLs to the audio files (you can replace these with dynamic URLs)
 const audioUrl1 =
   "http://res.cloudinary.com/dvcqnbkwb/video/upload/v1726210673/user_audio/audioUser/user_hello1.wav.wav";
 const audioUrl2 =
@@ -167,33 +167,20 @@ const compareAudioFeatures = (features1, features2) => {
   };
 };
 
-// Function to compute Stent Weighted Audio Similarity with NaN handling
-const stentWeightedAudioSimilarity = (
-  mfccDistance,
-  chromaDistance,
-  spectralCentroidDistance,
-  zcr,
-  perceptualSpread
-) => {
-  const weightMfcc = 0.4;
-  const weightChroma = 0.3;
-  const weightSpectralCentroid = 0.15;
-  const weightZcr = 0.1;
-  const weightPerceptualSpread = 0.05;
+// Function to compute Stent Weighted Audio Similarity with NaN handling and scaling to 0-100
+const stentWeightedAudioSimilarity = (mfccDistance, chromaDistance, zcr) => {
+  const weightMfcc = 0.4; // Adjust weights as needed
+  const weightChroma = 0.4;
+  const weightZcr = 0.2;
 
-  // Handle NaN values by setting them to 0
-  const safeSpectralCentroidDistance = isNaN(spectralCentroidDistance)
-    ? 0
-    : spectralCentroidDistance;
-  const safePerceptualSpread = isNaN(perceptualSpread) ? 0 : perceptualSpread;
+  // Calculate the weighted sum
+  let similarityScore =
+    weightMfcc * mfccDistance + weightChroma * chromaDistance + weightZcr * zcr;
 
-  return (
-    weightMfcc * mfccDistance +
-    weightChroma * chromaDistance +
-    weightSpectralCentroid * safeSpectralCentroidDistance +
-    weightZcr * zcr +
-    weightPerceptualSpread * safePerceptualSpread
-  );
+  // Scale the score to the 0-100 range
+  similarityScore *= 100;
+
+  return similarityScore;
 };
 
 // Main comparison function that accepts dynamic audio URLs
@@ -219,9 +206,7 @@ const run = async (defaultAudioUrl, userAudioUrl) => {
     const weightedSimilarity = stentWeightedAudioSimilarity(
       audioComparison.mfccDistance,
       audioComparison.chromaDistance,
-      audioComparison.spectralCentroidDistance,
-      audioComparison.zcr,
-      audioComparison.perceptualSpread
+      audioComparison.zcr
     );
 
     console.log("Mfcc Distance:", audioComparison.mfccDistance);
@@ -249,6 +234,7 @@ const runComparisonAndSaveResult = async (
 ) => {
   try {
     const comparisonResults = [];
+    let totalScore = 0;
 
     for (let i = 0; i < defaultAudios.length; i++) {
       const userAudioUrl = fileUrls[`AudioURL${i + 1}`];
@@ -257,15 +243,17 @@ const runComparisonAndSaveResult = async (
       // Run the comparison using the main comparison function
       const result = await run(defaultAudioUrl, userAudioUrl);
 
+      // Calculate the score based on stentWeightedSimilarity being >= 80
+      if (result.weightedSimilarity >= 80) {
+        totalScore += 1; // Increment the score
+      }
+
       // Save the detailed result for each audio comparison
       comparisonResults.push({
         ItemCode: `Itemcode${i + 1}`,
         mfccDistance: result.audioComparison.mfccDistance,
         chromaDistance: result.audioComparison.chromaDistance,
-        spectralCentroidDistance:
-          result.audioComparison.spectralCentroidDistance,
         zcr: result.audioComparison.zcr,
-        perceptualSpread: result.audioComparison.perceptualSpread,
         stentWeightedSimilarity: result.weightedSimilarity,
       });
     }
@@ -279,8 +267,12 @@ const runComparisonAndSaveResult = async (
       Type,
       Results: comparisonResults,
     });
+
+    // Return the total score
+    return totalScore;
   } catch (error) {
     console.error("Error during audio comparison:", error);
+    throw error;
   }
 };
 

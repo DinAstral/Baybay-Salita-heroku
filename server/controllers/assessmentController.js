@@ -412,7 +412,6 @@ const importSentence = async (req, res) => {
 
 const { runComparisonAndSaveResult } = require("../api/STT-TC-AC"); // Import the helper function for comparison
 
-// Upload user input audio
 const userInputAudio = async (req, res) => {
   const InputID = generateRandomCodeUser(6);
 
@@ -509,6 +508,17 @@ const userInputAudio = async (req, res) => {
         };
       });
 
+      // Run audio comparison and save the results to the database, get the score
+      const score = await runComparisonAndSaveResult(
+        InputID,
+        ActivityCode,
+        LRN,
+        Section,
+        Type,
+        fileUrls,
+        assessmentItems.map((item) => item.Audio) // Extract default audios
+      );
+
       // Prepare the data for insertion into the Performance model
       const performanceData = {
         UserInputId: InputID,
@@ -516,7 +526,8 @@ const userInputAudio = async (req, res) => {
         LRN,
         Section,
         Type,
-        Result: "Sumbitted",
+        Score: score, // Store the total score
+        Result: "Submitted",
         PerformanceItems: assessmentItems.map((item, index) => ({
           ItemCode: item.ItemCode,
           Word: item.Word,
@@ -530,17 +541,6 @@ const userInputAudio = async (req, res) => {
       const insert = await Performance.create(performanceData);
 
       if (insert) {
-        // Run audio comparison and save the results to the database
-        await runComparisonAndSaveResult(
-          InputID,
-          ActivityCode,
-          LRN,
-          Section,
-          Type,
-          fileUrls,
-          assessmentItems.map((item) => item.Audio) // Extract default audios
-        );
-
         return res.json({
           message:
             "Audio files uploaded, data stored, and comparison results saved successfully.",
