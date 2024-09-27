@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Tooltip } from "@nextui-org/react";
+import { Tooltip, Button, Input, Select, SelectItem } from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
-import "../ContentDasboard/Content.css";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -25,209 +24,189 @@ const BodyAdminEditAdmin = () => {
 
   useEffect(() => {
     axios
-      .get(`getAdmin/${UserID}`) // route to include student ID
+      .get(`getAdmin/${id}`) // route to include admin ID
       .then((response) => {
-        console.log("Response:", response.data); // Log response data
-        setData(response.data); // Assuming response.data contains student data
+        setData(response.data);
       })
       .catch((err) => {
-        console.error("Error fetching student data:", err);
-        toast.error("Failed to fetch student data. Please try again later.");
+        console.error("Error fetching admin data:", err);
+        toast.error("Failed to fetch admin data. Please try again later.");
       });
-  }, [UserID]); // Added 'id' to dependency array
+  }, [id]);
 
   const editAdmin = async (e) => {
     e.preventDefault();
-    const {
-      FirstName,
-      LastName,
-      Age,
-      Birthday,
-      Address,
-      Status,
-      Gender,
-      ContactNumber,
-      email,
-    } = data;
     try {
-      const { data } = await axios.patch(`updateParent/${id}`, {
-        FirstName,
-        LastName,
-        Age,
-        Birthday,
-        Address,
-        Status,
-        Gender,
-        ContactNumber,
-        email,
-      });
-      if (data.error) {
-        toast.error(data.error);
+      const { data: responseData } = await axios.patch(
+        `/updateAdmin/${id}`,
+        data
+      );
+      if (responseData.error) {
+        toast.error(responseData.error);
       } else {
-        setData({});
-        toast.success("Updated Parent information.");
+        toast.success("Updated admin information successfully.");
         navigate("/adminUsers");
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error updating admin data:", error);
+      toast.error("Failed to update admin. Please try again.");
     }
   };
 
   return (
-    <div className="content-body">
-      <div className="content-title-header">
-        <div>
-          Edit Your Information
+    <div className="container mx-auto px-6">
+      <div className="max-w-9xl mx-auto bg-white shadow-lg rounded-lg p-8">
+        <div className="flex items-center gap-2 mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">
+            Update Admin's Information
+          </h2>
           <Tooltip
             showArrow={true}
             content={
-              <div className="px-1 py-2">
-                <div className="text-small font-bold">Update Function</div>
-                <div className="text-tiny">
-                  This function will edit the information of the admin in each
-                  section.
+              <div className="px-2 py-1">
+                <div className="text-sm font-bold">Update Information</div>
+                <div className="text-xs">
+                  This function will update the information of the admin in the
+                  system.
                 </div>
               </div>
             }
           >
             <FontAwesomeIcon
               icon={faCircleInfo}
-              size="1x"
-              className="help-icon"
+              size="md"
+              className="text-gray-600"
             />
           </Tooltip>
         </div>
-      </div>
-      <form onSubmit={editAdmin}>
-        <div className="content-container">
-          <div className="back-button-profile">
-            <div className="btn-back" onClick={() => navigate(-1)}>
-              Back
-            </div>
-          </div>
-          <div className="add-inputs">
-            <div className="add-input">
-              <div className="label-add">First Name</div>
-              <input
-                type="text"
-                name="addFirstName"
-                id="addFirstName"
-                placeholder="Enter the First Name"
+        <form onSubmit={editAdmin}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">First Name</label>
+              <Input
+                underlined
+                clearable
                 value={data.FirstName}
                 onChange={(e) =>
                   setData({ ...data, FirstName: e.target.value })
                 }
+                placeholder="Enter the First Name"
               />
             </div>
-            <div className="add-input">
-              <div className="label-add">Last Name</div>
-              <input
-                type="text"
-                name="addLastName"
-                id="addLastName"
-                placeholder="Enter the Last Name"
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">Last Name</label>
+              <Input
+                underlined
+                clearable
                 value={data.LastName}
                 onChange={(e) => setData({ ...data, LastName: e.target.value })}
+                placeholder="Enter the Last Name"
               />
             </div>
-            <div className="add-input">
-              <div className="label-add">Age</div>
-              <input
-                type="text"
-                name="addAge"
-                id="addAge"
-                placeholder="Enter Teacher's age"
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">Age</label>
+              <Input
+                underlined
+                clearable
                 value={data.Age}
                 onChange={(e) => setData({ ...data, Age: e.target.value })}
+                placeholder="Enter Admin's age"
+                type="number"
               />
             </div>
-            <div className="add-input">
-              <div className="label-add">Birthday</div>
-              <input
-                type="date"
-                name="addBirthday"
-                id="addBirthday"
-                placeholder="Enter Parent's Birthday"
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">Birthday</label>
+              <Input
+                underlined
+                clearable
                 value={data.Birthday}
                 onChange={(e) => setData({ ...data, Birthday: e.target.value })}
+                type="date"
               />
             </div>
-            <div className="add-input">
-              <div className="label-add">Gender</div>
-              <select
-                className="select-gender"
-                name="addGender"
-                id="addGender"
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">Gender</label>
+              <Select
+                placeholder="Select Gender"
                 value={data.Gender}
-                onChange={(e) => setData({ ...data, Gender: e.target.value })}
+                onChange={(value) => setData({ ...data, Gender: value })}
               >
-                <option value="" disabled>
+                <SelectItem key="" disabled>
                   Select Gender
-                </option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </select>
+                </SelectItem>
+                <SelectItem key="Male">Male</SelectItem>
+                <SelectItem key="Female">Female</SelectItem>
+                <SelectItem key="Other">Other</SelectItem>
+              </Select>
             </div>
-            <div className="add-input">
-              <div className="label-add">Address</div>
-              <input
-                type="text"
-                name="addAddress"
-                id="addAddress"
-                placeholder="Enter the Address"
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">Address</label>
+              <Input
+                underlined
+                clearable
                 value={data.Address}
                 onChange={(e) => setData({ ...data, Address: e.target.value })}
+                placeholder="Enter the Address"
               />
             </div>
-            <div className="add-input">
-              <div className="label-add">Status</div>
-              <select
-                className="select-gender"
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">Status</label>
+              <Select
+                placeholder="Select Status"
                 value={data.Status}
-                onChange={(e) => setData({ ...data, Status: e.target.value })}
+                onChange={(value) => setData({ ...data, Status: value })}
               >
-                <option value="" disabled>
+                <SelectItem key="" disabled>
                   Select Status
-                </option>
-                <option value="Single">Single</option>
-                <option value="Married">Married</option>
-                <option value="Widowed">Widowed</option>
-                <option value="Separated">Separated</option>
-              </select>
+                </SelectItem>
+                <SelectItem key="Single">Single</SelectItem>
+                <SelectItem key="Married">Married</SelectItem>
+                <SelectItem key="Widowed">Widowed</SelectItem>
+                <SelectItem key="Separated">Separated</SelectItem>
+              </Select>
             </div>
-            <div className="add-input">
-              <div className="label-add">Contact Number</div>
-              <input
-                type="text"
-                name="addContactNumber"
-                id="addContactNumber"
-                placeholder="Enter the Contact Number"
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">
+                Contact Number
+              </label>
+              <Input
+                underlined
+                clearable
                 value={data.ContactNumber}
                 onChange={(e) =>
                   setData({ ...data, ContactNumber: e.target.value })
                 }
+                placeholder="Enter the Contact Number"
               />
             </div>
-            <div className="add-input">
-              <div className="label-add">Email</div>
-              <input
-                type="email"
-                name="addEmail"
-                id="addEmail"
-                placeholder="Enter the Teacher's Email"
+            <div className="flex flex-col">
+              <label className="font-medium text-gray-700">Email</label>
+              <Input
+                underlined
+                clearable
                 value={data.email}
                 onChange={(e) => setData({ ...data, email: e.target.value })}
+                placeholder="Enter the Admin's Email"
+                type="email"
               />
             </div>
           </div>
-          <div className="add-student">
-            <button className="btn-add" type="submit">
+          <div className="flex justify-end mt-6">
+            <Button type="submit" color="primary" auto>
               Save Changes
-            </button>
+            </Button>
+            <Button
+              auto
+              flat
+              color="danger"
+              onClick={() => navigate(-1)}
+              className="ml-4"
+            >
+              Cancel
+            </Button>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

@@ -245,6 +245,30 @@ const getOnePerformance = async (req, res) => {
   }
 };
 
+// get performance based on input ID
+const getPerformanceMobile = async (req, res) => {
+  const { ActivityCode } = req.params;
+
+  try {
+    const activity = await Performance.findOne({ ActivityCode });
+
+    // If no parent is found, return a 404 status
+    if (!activity) {
+      return res.json({
+        message: "No ActivityCode found",
+      });
+    }
+
+    // Return the found parent
+    res.json(activity);
+  } catch (error) {
+    // Handle any other errors
+    res.json({
+      message: error.message,
+    });
+  }
+};
+
 // Get performance data
 const getPerformance = (req, res) => {
   Performance.find()
@@ -572,6 +596,7 @@ module.exports = {
   importSentence,
   submitAssessment,
   getAssessmentCode,
+  getPerformanceMobile,
   getAssessmentID,
   getImportWords,
   getOnePerformance,

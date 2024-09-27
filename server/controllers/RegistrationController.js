@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const User = require("../models/users");
 const Admin = require("../models/admin");
 const Teacher = require("../models/teachers");
@@ -877,6 +878,78 @@ const profileUpdate = async (req, res) => {
   });
 };
 
+const updateAdmin = async (req, res) => {
+  const { UserID } = req.params;
+
+  try {
+    // Destructure only the necessary fields from the request body
+    const {
+      email,
+      FirstName,
+      LastName,
+      Age,
+      Birthday,
+      Gender,
+      Address,
+      Status,
+      ContactNumber,
+    } = req.body;
+
+    // Validate that the email field is present
+    if (!email) {
+      return res.status(400).json({
+        error: "Email is required",
+      });
+    }
+
+    // Create an object to hold only the updatable fields
+    const updateFields = {
+      email,
+      FirstName,
+      LastName,
+      Age,
+      Birthday,
+      Gender,
+      Address,
+      Status,
+      ContactNumber,
+    };
+
+    // Remove any fields that are undefined (optional)
+    Object.keys(updateFields).forEach(
+      (key) => updateFields[key] === undefined && delete updateFields[key]
+    );
+
+    // Update the admin information
+    const adminUpdate = await Admin.findOneAndUpdate({ UserID }, updateFields, {
+      new: true, // Return the updated document
+      runValidators: true, // Validate the update against the schema
+    });
+
+    // Update the user information
+    const userUpdate = await User.findOneAndUpdate({ UserID }, updateFields, {
+      new: true,
+      runValidators: true,
+    });
+
+    // Check if either update was successful
+    if (!adminUpdate && !userUpdate) {
+      return res.status(404).json({
+        message: "No account found with this ID",
+      });
+    }
+
+    // Return the updated admin and user documents
+    return res.status(200).json({
+      admin: adminUpdate,
+      user: userUpdate,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
 module.exports = {
   registerAdmin,
   registerParent,
@@ -888,4 +961,5 @@ module.exports = {
   resetPassword,
   logout,
   profileUpdate,
+  updateAdmin,
 };

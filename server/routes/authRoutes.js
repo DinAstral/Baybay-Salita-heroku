@@ -48,6 +48,7 @@ const {
   resetPassword,
   logout,
   profileUpdate,
+  updateAdmin,
 } = require("../controllers/RegistrationController");
 
 const {
@@ -55,6 +56,7 @@ const {
   importSentence,
   submitAssessment,
   getAssessmentCode,
+  getPerformanceMobile,
   getImportWords,
   getPerformance,
   getOnePerformance,
@@ -107,7 +109,8 @@ router.post("/submitAssessment", submitAssessment); //okay
 router.get("/getActivity/:ActivityCode", getAssessmentCode); //okay imporSentence deletePerformance
 router.get("/getActivity/:UserID", getAssessmentID);
 router.get("/getPerformance", getPerformance); //okay
-router.get("/getPerformance/:UserInputId", getOnePerformance);
+router.get("/getPerformance/:UserInputId", getOnePerformance); //okay
+router.get("/getPerformance/:ActivityCode", getPerformanceMobile); //okay
 router.get("/getSentence", getSentence); //okay
 router.get("/getAssessments", getActivities); //okay
 router.get("/getAssessment/:id", getActivity); //okay
@@ -121,7 +124,11 @@ router.get("/getUser/:id", getUser); //okay
 router.get("/getAdmin/:UserID", getAdmin); //okay
 router.patch("/updateUser/:id", updateUser);
 router.delete("/deleteUser/:email", deleteUser); //okay
-router.get("/profile", getProfile); //okay
+router.get("/profile", getProfile); //okay updateAdmin
+
+router.patch("/updateAdmin/:UserID", updateAdmin); //okay
+router.patch("/updateTeacher/:UserID", updateTeacher); //okay
+router.patch("/updateParent/:UserID", updateParent); //okay
 
 // Student Routes
 router.post("/addStudent", addStudent); // okay
@@ -134,11 +141,9 @@ router.patch("/updateStudent/:id", updateStudent); //okay
 router.get("/getParent", getParentUsers); //okay
 router.get("/getParent/:UserID", getParentUser); //okay
 router.get("/getStudentParent/:LRN", getStudentUser); //okay getFeedbacks
-router.patch("/updateParent/:id", updateParent);
 router.get("/getFeedbacks", getFeedbacks);
 
 // Teacher Routes
-router.patch("/updateTeacher/:id", updateTeacher);
 router.post("/createAssessment", createAssessment); //okay
 router.patch("/updateAssessment/:id", updateActivity);
 router.get("/getTeacher", getTeacherUsers); //okay

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import profileImage from "./../../assets/profile.png";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Tooltip, Button, Modal } from "@nextui-org/react";
+import { Tooltip, Button, Input, Select, SelectItem } from "@nextui-org/react";
 import {
   faAddressCard,
   faCircleInfo,
@@ -12,32 +12,6 @@ import { UserContext } from "../../../context/userContext";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const EditUser = ({ show, onClose, profile }) => {
-  return (
-    <Modal open={show} onClose={onClose} aria-labelledby="modal-title" centered>
-      <Modal.Header>
-        <h3 id="modal-title">Update User Information</h3>
-      </Modal.Header>
-      <Modal.Body>
-        <p>
-          You are now going to update your profile. Do you wish to continue?
-        </p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button color="error" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button
-          color="primary"
-          onClick={() => navigate(`/parentUpdateProfile/${profile}`)}
-        >
-          Update
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-
 const BodyParentProfile = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -45,7 +19,9 @@ const BodyParentProfile = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [modalShow, setModalShow] = useState(false);
   const [profileImg, setProfileImg] = useState(profileImage);
-  const [parent, setParent] = useState([""]);
+  const [parent, setParent] = useState({});
+  const [age, setAge] = useState(null);
+  const [data, setData] = useState({});
 
   useEffect(() => {
     axios
@@ -53,6 +29,7 @@ const BodyParentProfile = () => {
       .then((response) => {
         setProfileImg(response.data.Picture || profileImage);
         setParent(response.data);
+        setData(response.data); // Initialize the data state with the parent's information
       })
       .catch(() => {
         toast.error("Failed to fetch parent data. Please try again later.");
@@ -65,12 +42,68 @@ const BodyParentProfile = () => {
     setActiveIndex(index);
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (parent.Birthday) {
+      const calculateAge = (birthday) => {
+        const birthDate = new Date(birthday);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (
+          monthDiff < 0 ||
+          (monthDiff === 0 && today.getDate() < birthDate.getDate())
+        ) {
+          age--;
+        }
+        return age;
+      };
+      setAge(calculateAge(parent.Birthday));
+    }
+  }, [parent.Birthday]);
+
   const handleEditClick = () => {
     setModalShow(true);
   };
 
   const toggleActive = (index) => {
     setActiveIndex(index);
+  };
+
+  const editParent = async (event) => {
+    event.preventDefault(); // Prevent the default form submission
+
+    try {
+      const response = await axios.patch(`/updateParent/${data.UserID}`, data);
+
+      // Check if the response indicates success
+      if (response.status === 200 && response.data) {
+        toast.success("Your profile updated successfully!");
+
+        // Optionally, you can refetch the data after the update
+        const updatedResponse = await axios.get(`/getParent/${data.UserID}`);
+        setData(updatedResponse.data);
+      } else {
+        toast.error(`Error: ${response.data.error || "Update failed."}`);
+      }
+    } catch (error) {
+      console.error("Error updating parent profile:", error); // Log the error for debugging
+
+      // Check if error response from server
+      if (error.response) {
+        // Server responded with a status other than 2xx
+        toast.error(
+          `Failed to update parent profile: ${
+            error.response.data.error || "Please try again later."
+          }`
+        );
+      } else if (error.request) {
+        // Request was made but no response received
+        toast.error("No response from server. Please check your connection.");
+      } else {
+        // Something else caused the error
+        toast.error("Failed to update parent profile. Please try again later.");
+      }
+    }
   };
 
   return (
@@ -93,12 +126,6 @@ const BodyParentProfile = () => {
       </div>
 
       <div className="w-full max-w-8xl mx-auto bg-white shadow-lg rounded-lg p-[3rem]">
-        <EditUser
-          show={modalShow}
-          onClose={() => setModalShow(false)}
-          profile={user.UserID}
-        />
-
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6 relative">
           <Tooltip
             content={
@@ -167,7 +194,7 @@ const BodyParentProfile = () => {
               className={`text-md font-medium ${
                 activeIndex === 1 ? "border-b-4 border-blue-500" : ""
               }`}
-              onClick={handleEditClick}
+              onClick={() => toggleActive(1)}
             >
               Update
             </Button>
@@ -189,7 +216,7 @@ const BodyParentProfile = () => {
                     Contact Number:
                   </span>
                   <p className="text-gray-800">
-                    {parent ? parent.ContactNumber : "N/A"}
+                    {parent.ContactNumber || "N/A"}
                   </p>
                 </div>
                 <div>
@@ -202,24 +229,102 @@ const BodyParentProfile = () => {
                 </div>
                 <div>
                   <span className="block text-sm text-gray-600">Gender:</span>
-                  <p className="text-gray-800">
-                    {parent ? parent.Gender : "N/A"}
-                  </p>
+                  <p className="text-gray-800">{parent.Gender || "N/A"}</p>
                 </div>
                 <div>
                   <span className="block text-sm text-gray-600">Birthday:</span>
-                  <p className="text-gray-800">
-                    {parent ? parent.Birthday : "N/A"}
-                  </p>
+                  <p className="text-gray-800">{parent.Birthday || "N/A"}</p>
+                </div>
+                <div>
+                  <span className="block text-sm text-gray-600">Age:</span>
+                  <p className="text-gray-800">{age !== null ? age : "N/A"}</p>
                 </div>
                 <div>
                   <span className="block text-sm text-gray-600">Address:</span>
-                  <p className="text-gray-800">
-                    {parent ? parent.Address : "N/A"}
-                  </p>
+                  <p className="text-gray-800">{parent.Address || "N/A"}</p>
+                </div>
+                <div>
+                  <span className="block text-sm text-gray-600">
+                    Nationality:
+                  </span>
+                  <p className="text-gray-800">{parent.Nationality || "N/A"}</p>
                 </div>
               </div>
             </div>
+          )}
+
+          {activeIndex === 1 && (
+            <form
+              onSubmit={editParent}
+              className="mt-6 bg-[#faf9f4] p-6 rounded-lg shadow"
+            >
+              <h2 className="text-lg font-semibold mb-4">
+                Update Your Profile
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  required
+                  label="First Name"
+                  value={data.FirstName || ""}
+                  onChange={(e) =>
+                    setData({ ...data, FirstName: e.target.value })
+                  }
+                />
+                <Input
+                  required
+                  label="Last Name"
+                  value={data.LastName || ""}
+                  onChange={(e) =>
+                    setData({ ...data, LastName: e.target.value })
+                  }
+                />
+                <Select
+                  label="Gender"
+                  value={data.Gender || ""}
+                  onChange={(e) => setData({ ...data, Gender: e })}
+                >
+                  <SelectItem value="Male">Male</SelectItem>
+                  <SelectItem value="Female">Female</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </Select>
+                <Input
+                  required
+                  type="date"
+                  label="Birthday"
+                  value={data.Birthday || ""}
+                  onChange={(e) =>
+                    setData({ ...data, Birthday: e.target.value })
+                  }
+                />
+                <Input
+                  required
+                  label="Contact Number"
+                  value={data.ContactNumber || ""}
+                  onChange={(e) =>
+                    setData({ ...data, ContactNumber: e.target.value })
+                  }
+                />
+                <Input
+                  label="Address"
+                  value={data.Address || ""}
+                  onChange={(e) =>
+                    setData({ ...data, Address: e.target.value })
+                  }
+                />
+                <Input
+                  label="Nationality"
+                  value={data.Nationality || ""}
+                  onChange={(e) =>
+                    setData({ ...data, Nationality: e.target.value })
+                  }
+                />
+              </div>
+              <div className="mt-4">
+                <Button type="submit" color="primary">
+                  Update Profile
+                </Button>
+              </div>
+            </form>
           )}
         </div>
       </div>

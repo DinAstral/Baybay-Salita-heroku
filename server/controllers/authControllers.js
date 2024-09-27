@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcryptjs");
+const ParentModel = require("../models/parents");
 
 let transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -56,78 +57,78 @@ const test = (req, res) => {
 
 // Update the data of the Parent base on the _id
 const updateParent = async (req, res) => {
-  const { id } = req.params;
-
-  const isNumber = (value) => {
-    return !isNaN(value);
-  };
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({
-      message: "Invalid ID format",
-    });
-  }
+  const { UserID } = req.params;
 
   try {
+    // Destructure only the necessary fields from the request body
     const {
+      email,
       FirstName,
       LastName,
       Age,
       Birthday,
+      Gender,
       Address,
       Status,
-      Gender,
       ContactNumber,
-      email,
-      password,
     } = req.body;
 
-    if (!FirstName) {
-      return res.json({ error: "First Name is required" });
-    }
-    if (!LastName) {
-      return res.json({ error: "Last Name is required" });
-    }
-    if (!Age) {
-      return res.json({ error: "Age is required" });
-    }
-    if (!isNumber(Age)) {
-      return res.json({ error: "Invalid age inputted" });
-    }
-    if (!Birthday) {
-      return res.json({ error: "Birthday is required" });
-    }
-    if (!Gender) {
-      return res.json({ error: "Gender is required" });
-    }
-    if (!Address) {
-      return res.json({ error: "Address is required" });
-    }
-    if (!Status) {
-      return res.json({ error: "Status is required" });
-    }
-    if (!ContactNumber) {
-      return res.json({ error: "Contact Number is required" });
-    }
-    if (!isNumber(ContactNumber)) {
-      return res.json({ error: "Invalid Contact Number inputted" });
-    }
+    // Validate that the email field is present
     if (!email) {
-      return res.json({ error: "Email is required" });
-    }
-
-    const user = await User.findByIdAndUpdate({ _id: id }, { ...req.body }); // Update credentials in database
-
-    if (!user) {
-      return res.status(404).json({
-        message: "No account found",
+      return res.status(400).json({
+        error: "Email is required",
       });
     }
 
-    return res.json(user);
+    // Create an object to hold only the updatable fields
+    const updateFields = {
+      email,
+      FirstName,
+      LastName,
+      Age,
+      Birthday,
+      Gender,
+      Address,
+      Status,
+      ContactNumber,
+    };
+
+    // Remove any fields that are undefined (optional)
+    Object.keys(updateFields).forEach(
+      (key) => updateFields[key] === undefined && delete updateFields[key]
+    );
+
+    // Update the admin information
+    const adminUpdate = await ParentModel.findOneAndUpdate(
+      { UserID },
+      updateFields,
+      {
+        new: true, // Return the updated document
+        runValidators: true, // Validate the update against the schema
+      }
+    );
+
+    // Update the user information
+    const userUpdate = await User.findOneAndUpdate({ UserID }, updateFields, {
+      new: true,
+      runValidators: true,
+    });
+
+    // Check if either update was successful
+    if (!adminUpdate && !userUpdate) {
+      return res.status(404).json({
+        message: "No account found with this ID",
+      });
+    }
+
+    // Return the updated admin and user documents
+    return res.status(200).json({
+      admin: adminUpdate,
+      user: userUpdate,
+    });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: "Server error" }); // Add proper error response
+    console.error(error);
+    return res.status(500).json({ error: "Server error" });
   }
 };
 

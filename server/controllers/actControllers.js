@@ -2,6 +2,8 @@ const Activity = require("../models/assessment");
 const Teacher = require("../models/teachers");
 const AssessmentModel = require("../models/assessment");
 const mongoose = require("mongoose");
+const TeacherModel = require("../models/teachers");
+const UserModel = require("../models/users");
 
 function generateRandomCode(length) {
   const characters =
@@ -143,94 +145,89 @@ const addTeacherDetails = async (req, res) => {
 };
 
 const updateTeacher = async (req, res) => {
-  const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.status(400).json({
-      message: "Invalid ID format",
-    });
-  }
-
-  const isNumber = (value) => {
-    return !isNaN(value);
-  };
+  const { UserID } = req.params;
 
   try {
+    // Destructure only the necessary fields from the request body
     const {
+      email,
       FirstName,
       LastName,
-      Department,
       Age,
-      Section,
+      Birthday,
       Gender,
+      Address,
+      Status,
       ContactNumber,
-      email,
     } = req.body;
 
-    // Check the inputted data
-    if (!FirstName) {
-      return res.status(400).json({
-        error: "First Name is required",
-      });
-    }
-    if (!LastName) {
-      return res.status(400).json({
-        error: "Last Name is required",
-      });
-    }
-    if (!Department) {
-      return res.status(400).json({
-        error: "Department is required",
-      });
-    }
-    if (!Section) {
-      return res.status(400).json({
-        error: "Section is required",
-      });
-    }
-    if (!Age) {
-      return res.status(400).json({
-        error: "Age is required",
-      });
-    }
-    if (!isNumber(Age)) {
-      return res.status(400).json({
-        error: "Invalid Age inputted",
-      });
-    }
-    if (!Gender) {
-      return res.status(400).json({
-        error: "Gender is required",
-      });
-    }
-    if (!ContactNumber) {
-      return res.status(400).json({
-        error: "Contact Number is required",
-      });
-    }
-    if (!isNumber(ContactNumber) || ContactNumber.length < 11) {
-      return res.status(400).json({
-        error: "Invalid Contact Number inputted",
-      });
-    }
+    // Validate that the email field is present
     if (!email) {
       return res.status(400).json({
+        success: false,
         error: "Email is required",
       });
     }
 
-    const user = await Teacher.findOneAndUpdate({ _id: id }, { ...req.body });
+    // Create an object to hold only the updatable fields
+    const updateFields = {
+      email,
+      FirstName,
+      LastName,
+      Age,
+      Birthday,
+      Gender,
+      Address,
+      Status,
+      ContactNumber,
+    };
 
-    if (!user) {
+    // Remove any fields that are undefined (optional)
+    Object.keys(updateFields).forEach(
+      (key) => updateFields[key] === undefined && delete updateFields[key]
+    );
+
+    // Update the teacher information
+    const adminUpdate = await TeacherModel.findOneAndUpdate(
+      { UserID },
+      updateFields,
+      {
+        new: true, // Return the updated document
+        runValidators: true, // Validate the update against the schema
+      }
+    );
+
+    // Update the user information
+    const userUpdate = await UserModel.findOneAndUpdate(
+      { UserID },
+      updateFields,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    // Check if either update was successful
+    if (!adminUpdate && !userUpdate) {
       return res.status(404).json({
-        message: "No account found",
+        success: false,
+        message: "No account found with this ID",
       });
     }
 
-    return res.json(user);
+    // Return the updated admin and user documents
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully!",
+      admin: adminUpdate,
+      user: userUpdate,
+    });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: "Server error" });
+    return res.status(500).json({
+      success: false,
+      error: "Server error",
+    });
   }
 };
 

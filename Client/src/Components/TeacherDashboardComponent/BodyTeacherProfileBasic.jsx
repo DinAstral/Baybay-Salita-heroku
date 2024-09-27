@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import profileImage from "./../../assets/profile.png";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Tooltip, Button } from "@nextui-org/react";
+import { Tooltip, Button, Input, Select, SelectItem } from "@nextui-org/react";
 import {
   faAddressCard,
   faCircleInfo,
@@ -43,7 +43,7 @@ const BodyTeacherProfileBasic = () => {
         setProfileImg(response.data.Picture || profileImage);
       })
       .catch(() => {
-        toast.error("Failed to fetch admin data. Please try again later.");
+        toast.error("Failed to fetch teacher data. Please try again later.");
       });
   }, [user.UserID]);
 
@@ -53,12 +53,34 @@ const BodyTeacherProfileBasic = () => {
     setActiveIndex(index);
   }, [location.pathname]);
 
+  // Calculate age based on birthday
+  const calculateAge = (birthday) => {
+    const birthDate = new Date(birthday);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+    return age;
+  };
+
+  useEffect(() => {
+    if (data.Birthday) {
+      const age = calculateAge(data.Birthday);
+      setData((prevData) => ({ ...prevData, Age: age }));
+    }
+  }, [data.Birthday]);
+
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
       const formData = new FormData();
       formData.append("Profile", file);
-      formData.append("role", user.role); // Adjust role according to your user context
+      formData.append("role", user.role);
       formData.append("UserID", user.UserID);
 
       try {
@@ -66,7 +88,7 @@ const BodyTeacherProfileBasic = () => {
           headers: { "Content-Type": "multipart/form-data" },
         });
         if (response.data.message) {
-          setProfileImg(response.data.updatedProfileUrl); // Update profile image URL
+          setProfileImg(response.data.updatedProfileUrl);
           toast.success("Profile picture updated successfully!");
         } else if (response.data.error) {
           toast.error(`Error: ${response.data.error}`);
@@ -85,6 +107,27 @@ const BodyTeacherProfileBasic = () => {
 
   const toggleActive = (index) => {
     setActiveIndex(index);
+  };
+
+  const handleUpdate = async (event) => {
+    event.preventDefault(); // Prevent default form submission
+    try {
+      const response = await axios.patch(`/updateTeacher/${data.UserID}`, data);
+
+      if (response.data.success) {
+        toast.success(response.data.message); // Show success message
+        // Optionally refetch the updated data
+        const updatedResponse = await axios.get(`/getTeacher/${data.UserID}`);
+        setData(updatedResponse.data); // Update state with the new data
+      } else {
+        // Handle known errors returned from the server
+        toast.error(response.data.message || "Update failed.");
+      }
+    } catch (error) {
+      // Handle unexpected errors
+      console.error(error);
+      toast.error("An unexpected error occurred. Please try again later.");
+    }
   };
 
   return (
@@ -113,7 +156,7 @@ const BodyTeacherProfileBasic = () => {
               <div className="p-2">
                 <div className="text-sm font-bold">Profile Picture Update</div>
                 <div className="text-xs">
-                  You can update you profile picture once clicked.
+                  You can update your profile picture once clicked.
                 </div>
               </div>
             }
@@ -134,7 +177,7 @@ const BodyTeacherProfileBasic = () => {
           </Tooltip>
           <div className="flex-1">
             <h2 className="text-2xl font-bold">
-              {data ? `${data.FirstName} ${data.LastName}` : "Admin Name"}
+              {data ? `${data.FirstName} ${data.LastName}` : "Teacher Name"}
             </h2>
             <h4>
               {user ? `Adviser of ${data.Section}` : "Adviser of Section"}
@@ -146,7 +189,7 @@ const BodyTeacherProfileBasic = () => {
                   className="text-gray-600"
                 />
                 <span>
-                  Teacher ID Number: {data ? data.UserID : "Admin ID"}
+                  Teacher ID Number: {data ? data.UserID : "Teacher ID"}
                 </span>
               </div>
               <div className="flex items-center gap-2 mt-2">
@@ -185,7 +228,7 @@ const BodyTeacherProfileBasic = () => {
               className={`text-md font-medium ${
                 activeIndex === 1 ? "border-b-4 border-blue-500" : ""
               }`}
-              onClick={handleEditClick}
+              onClick={() => toggleActive(1)}
             >
               Update
             </Button>
@@ -218,8 +261,18 @@ const BodyTeacherProfileBasic = () => {
                   <p className="text-gray-800">{data.Gender || "N/A"}</p>
                 </div>
                 <div>
+                  <span className="block text-sm text-gray-600">Age:</span>
+                  <p className="text-gray-800">{data.Age || "N/A"}</p>
+                </div>
+                <div>
                   <span className="block text-sm text-gray-600">Birthday:</span>
                   <p className="text-gray-800">{data.Birthday || "N/A"}</p>
+                </div>
+                <div>
+                  <span className="block text-sm text-gray-600">
+                    Nationality:
+                  </span>
+                  <p className="text-gray-800">{data.Nationality || "N/A"}</p>
                 </div>
                 <div>
                   <span className="block text-sm text-gray-600">Address:</span>
@@ -231,13 +284,82 @@ const BodyTeacherProfileBasic = () => {
                   </span>
                   <p className="text-gray-800">{data.ContactNumber || "N/A"}</p>
                 </div>
+                <div>
+                  <span className="block text-sm text-gray-600">Section:</span>
+                  <p className="text-gray-800">{data.Section || "N/A"}</p>
+                </div>
               </div>
             </div>
           )}
-
           {activeIndex === 1 && (
-            <div className="mt-6 bg-[#f9f9f9] p-6 rounded-lg shadow">
-              <p>Update Profile form goes here...</p>
+            <div className="mt-6 bg-[#faf9f4] p-6 rounded-lg shadow">
+              {/* Form for updating profile */}
+              <form onSubmit={handleUpdate}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input
+                    label="First Name"
+                    value={data.FirstName}
+                    onChange={(e) =>
+                      setData({ ...data, FirstName: e.target.value })
+                    }
+                  />
+                  <Input
+                    label="Last Name"
+                    value={data.LastName}
+                    onChange={(e) =>
+                      setData({ ...data, LastName: e.target.value })
+                    }
+                  />
+                  <Input
+                    label="Gender"
+                    value={data.Gender}
+                    onChange={(e) =>
+                      setData({ ...data, Gender: e.target.value })
+                    }
+                  />
+                  <Input
+                    label="Birthday"
+                    type="date"
+                    value={data.Birthday}
+                    onChange={(e) =>
+                      setData({ ...data, Birthday: e.target.value })
+                    }
+                  />
+                  <Input
+                    label="Nationality"
+                    value={data.Nationality}
+                    onChange={(e) =>
+                      setData({ ...data, Nationality: e.target.value })
+                    }
+                  />
+                  <Input
+                    label="Address"
+                    value={data.Address}
+                    onChange={(e) =>
+                      setData({ ...data, Address: e.target.value })
+                    }
+                  />
+                  <Input
+                    label="Contact Number"
+                    value={data.ContactNumber}
+                    onChange={(e) =>
+                      setData({ ...data, ContactNumber: e.target.value })
+                    }
+                  />
+                  <Input
+                    label="Section"
+                    value={data.Section}
+                    onChange={(e) =>
+                      setData({ ...data, Section: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="mt-4 flex justify-end">
+                  <Button type="submit" color="primary">
+                    Update
+                  </Button>
+                </div>
+              </form>
             </div>
           )}
         </div>
