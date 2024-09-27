@@ -50,8 +50,7 @@ import ManagePerformance from "./Pages/TeacherDashboard/ManagePerformance";
 import ViewStudentAssessment from "./Pages/TeacherDashboard/ViewStudentAssessment";
 import ViewStudentPerformance from "./Pages/TeacherDashboard/ViewStudentPerformance";
 
-axios.defaults.baseURL =
-  "https://baybay-salita-heroku-8c328f3ddd0f.herokuapp.com"; // SERVER_URL https://baybay-salita-heroku-8c328f3ddd0f.herokuapp.com/
+axios.defaults.baseURL = "http://192.168.1.14:8000"; // SERVER_URL https://baybay-salita-heroku-8c328f3ddd0f.herokuapp.com/
 axios.defaults.withCredentials = true;
 
 const App = () => {
