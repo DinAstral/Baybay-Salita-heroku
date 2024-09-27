@@ -69,64 +69,68 @@ const BodyAdminDashboard = () => {
   });
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get("/users");
-        const data = response.data;
-        setUsers(data);
-        setTeachersCount(countByRole(data, "Teacher"));
-        setParentsCount(countByRole(data, "Parent"));
+        await Promise.all([fetchUsers(), fetchStudents(), fetchAssessment()]);
+        await fetchPerformance();
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching data:", err);
       }
     };
 
-    const fetchStudents = async () => {
-      try {
-        const response = await axios.get("/getStudents");
-        const data = response.data;
-        setStudents(data);
-        setFilteredRoles(data);
-        setSectionCounts(countStudentsBySection(data));
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    const fetchAssessment = async () => {
-      try {
-        const response = await axios.get("/getAssessments");
-        const data = response.data;
-        setAssessment(data);
-        setActivityCounts(countAssessmentsByType(data));
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    const fetchPerformance = async () => {
-      try {
-        const response = await axios.get(
-          `/getPerformance?assessment=${selectedAssessment}`
-        );
-        const data = response.data;
-
-        const distribution = countScores(data);
-        setScoreDistribution(distribution);
-      } catch (err) {
-        console.error("Error fetching performance data:", err);
-      }
-    };
-
-    fetchUsers();
-    fetchStudents();
-    fetchAssessment();
-    fetchPerformance();
+    fetchData();
   }, [selectedAssessment]);
 
-  const countByRole = (data, role) => {
-    return data.filter((user) => user.role === role).length;
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get("/users");
+      const data = response.data;
+      setUsers(data);
+      setTeachersCount(countByRole(data, "Teacher"));
+      setParentsCount(countByRole(data, "Parent"));
+    } catch (err) {
+      console.error("Error fetching users:", err);
+    }
   };
+
+  const fetchStudents = async () => {
+    try {
+      const response = await axios.get("/getStudents");
+      const data = response.data;
+      setStudents(data);
+      setFilteredRoles(data);
+      setSectionCounts(countStudentsBySection(data));
+    } catch (err) {
+      console.error("Error fetching students:", err);
+    }
+  };
+
+  const fetchAssessment = async () => {
+    try {
+      const response = await axios.get("/getAssessments");
+      const data = response.data;
+      setAssessment(data);
+      setActivityCounts(countAssessmentsByType(data));
+    } catch (err) {
+      console.error("Error fetching assessments:", err);
+    }
+  };
+
+  const fetchPerformance = async () => {
+    try {
+      const response = await axios.get(
+        `/getPerformance?assessment=${selectedAssessment}`
+      );
+      const data = response.data;
+      const distribution = countScores(data);
+      setScoreDistribution(distribution);
+    } catch (err) {
+      console.error("Error fetching performance data:", err);
+    }
+  };
+
+  const countByRole = (data, role) =>
+    data.filter((user) => user.role === role).length;
 
   const countStudentsBySection = (students) => {
     const sections = [
@@ -162,7 +166,7 @@ const BodyAdminDashboard = () => {
     const scoreMap = Array(11).fill(0); // Initialize array for scores from 0 to 10
 
     performanceData.forEach((student) => {
-      let score = undefined;
+      let score;
 
       // Check if Score exists and handle possible structures
       if (student.Score && typeof student.Score === "object") {
@@ -174,11 +178,10 @@ const BodyAdminDashboard = () => {
       }
     });
 
-    // Return the scores (0 to 10) and their counts
-    const scores = Array.from({ length: 11 }, (_, i) => i);
-    const counts = scoreMap;
-
-    return { scores, counts };
+    return {
+      scores: Array.from({ length: 11 }, (_, i) => i),
+      counts: scoreMap,
+    };
   };
 
   // Pagination controls
