@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "postinstall": "npm install --prefix ../Client && npm run build --prefix ../Client"
+    "postinstall": "npm install --prefix ../Client && npm install && npm run build --prefix ../Client"
   },
   "engines": {
     "node": "21.x"
