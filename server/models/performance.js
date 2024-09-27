@@ -11,8 +11,8 @@ const performanceSchema = new Schema(
     Section: String,
     ActivityCode: String,
     Type: String,
+    Score: Object,
     PerformanceItems: Object,
-    Score: String,
     Result: String,
   },
   { timestamps: true }

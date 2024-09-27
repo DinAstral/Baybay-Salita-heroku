@@ -56,7 +56,6 @@ const {
   importSentence,
   submitAssessment,
   getAssessmentCode,
-  getPerformanceMobile,
   getImportWords,
   getPerformance,
   getOnePerformance,
@@ -110,7 +109,6 @@ router.get("/getActivity/:ActivityCode", getAssessmentCode); //okay imporSentenc
 router.get("/getActivity/:UserID", getAssessmentID);
 router.get("/getPerformance", getPerformance); //okay
 router.get("/getPerformance/:UserInputId", getOnePerformance); //okay
-router.get("/getPerformance/:ActivityCode", getPerformanceMobile); //okay
 router.get("/getSentence", getSentence); //okay
 router.get("/getAssessments", getActivities); //okay
 router.get("/getAssessment/:id", getActivity); //okay
