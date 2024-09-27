@@ -7,9 +7,6 @@
     "start": "node index.js",
     "postinstall": "npm install --prefix ../Client && npm install && npm run build --prefix ../Client"
   },
-  "engines": {
-    "node": "21.x"
-  },
   "author": "",
   "license": "ISC",
   "description": "",
