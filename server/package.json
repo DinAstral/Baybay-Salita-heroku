@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "postinstall": "cd .. && cd Client && npm install --prefix Client && npm run build --prefix Client && cd .. && cd server && npm install"
+    "postinstall": "cd .. && npm install --prefix Client && npm run build --prefix Client && cd server && npm install"
   },
   "author": "",
   "license": "ISC",
