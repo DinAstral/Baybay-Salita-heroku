@@ -231,7 +231,7 @@ const runComparisonAndSaveResult = async (
       const result = await run(defaultAudioUrl, userAudioUrl);
 
       // Calculate the score based on stentWeightedSimilarity being >= 80
-      if (result.weightedSimilarity >= 30) {
+      if (result.weightedSimilarity >= 25) {
         totalScore += 1; // Increment the score
       }
 
