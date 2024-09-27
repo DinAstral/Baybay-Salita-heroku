@@ -148,30 +148,20 @@ const compareAudioFeatures = (features1, features2) => {
 
   const mfccDistance = euclideanDistance(features1.mfcc, features2.mfcc);
   const chromaDistance = euclideanDistance(features1.chroma, features2.chroma);
-  const spectralCentroidDistance = euclideanDistance(
-    features1.spectralCentroid,
-    features2.spectralCentroid
-  );
   const zcr = euclideanDistance(features1.zcr, features2.zcr);
-  const perceptualSpread = euclideanDistance(
-    features1.perceptualSpread,
-    features2.perceptualSpread
-  );
 
   return {
     mfccDistance,
     chromaDistance,
-    spectralCentroidDistance,
     zcr,
-    perceptualSpread,
   };
 };
 
 // Function to compute Stent Weighted Audio Similarity with NaN handling and scaling to 0-100
 const stentWeightedAudioSimilarity = (mfccDistance, chromaDistance, zcr) => {
-  const weightMfcc = 0.4; // Adjust weights as needed
-  const weightChroma = 0.4;
-  const weightZcr = 0.2;
+  const weightMfcc = 0.8; // Adjust weights as needed
+  const weightChroma = 0.1;
+  const weightZcr = 0.1;
 
   // Calculate the weighted sum
   let similarityScore =
