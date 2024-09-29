@@ -562,6 +562,47 @@ const userInputAudio = async (req, res) => {
   });
 };
 
+const userInputSentence = async (req, res) => {
+  const InputID = generateRandomCodeUser(6);
+
+  try {
+    const { Type, LRN, Section, ActivityCode, TimeRead, Score, ItemCode } =
+      req.body;
+
+    // Prepare the data for insertion into the Performance model
+    const performanceData = {
+      UserInputId: InputID,
+      ActivityCode,
+      LRN,
+      Section,
+      Type,
+      TimeRead,
+      Score,
+      Result: "Submitted",
+    };
+
+    // Insert data into the Performance model
+    const insert = await Performance.create(performanceData);
+
+    if (insert) {
+      return res.json({
+        message: "Data stored save successfully.",
+      });
+    } else {
+      return res.status(500).json({
+        error: "Upload unsuccessful. Please try again later!",
+      });
+    }
+  } catch (error) {
+    console.error("Error during upload process:", error);
+    if (!res.headersSent) {
+      return res
+        .status(500)
+        .json({ error: "An error occurred during the upload process." });
+    }
+  }
+};
+
 const getImportWords = (req, res) => {
   Material.find()
     .then((users) => res.json(users))
@@ -581,4 +622,5 @@ module.exports = {
   deleteAssessment,
   deletePerformance,
   userInputAudio,
+  userInputSentence,
 };

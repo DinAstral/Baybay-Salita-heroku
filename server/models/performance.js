@@ -7,13 +7,14 @@ const performanceSchema = new Schema(
       type: String,
       unique: true,
     },
+    ActivityCode: String,
     LRN: String,
     Section: String,
-    ActivityCode: String,
     Type: String,
+    TimeRead: String,
     Score: Object,
-    PerformanceItems: Object,
     Result: String,
+    PerformanceItems: Object,
   },
   { timestamps: true }
 );
