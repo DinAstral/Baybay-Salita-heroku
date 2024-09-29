@@ -245,6 +245,30 @@ const getOnePerformance = async (req, res) => {
   }
 };
 
+// get performance based on input LRN getPerformanceStudent
+const getPerformanceStudent = async (req, res) => {
+  const { LRN } = req.params;
+
+  try {
+    const activity = await Performance.find({ LRN });
+
+    // If no parent is found, return a 404 status
+    if (!activity) {
+      return res.json({
+        message: "No LRN input found",
+      });
+    }
+
+    // Return the found parent
+    res.json(activity);
+  } catch (error) {
+    // Handle any other errors
+    res.json({
+      message: error.message,
+    });
+  }
+};
+
 // Get performance data
 const getPerformance = (req, res) => {
   Performance.find()
@@ -623,4 +647,5 @@ module.exports = {
   deletePerformance,
   userInputAudio,
   userInputSentence,
+  getPerformanceStudent,
 };

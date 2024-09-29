@@ -65,6 +65,7 @@ const {
   userInputAudio,
   getSentence,
   userInputSentence,
+  getPerformanceStudent,
 } = require("../controllers/assessmentController");
 
 const {
@@ -72,12 +73,14 @@ const {
   getStudentbyLRN,
 } = require("../controllers/mobileController");
 
+const { studentStatus } = require("../controllers/analyticsController");
+
 const { compareAudio } = require("../controllers/CompareController");
 
 // Configure CORS middleware
 router.use(
   cors({
-    origin: "http://192.168.1.10:3000", // Update this with your client's URL https://baybay-salita-edu.netlify.app
+    origin: "https://baybay-salita-edu.netlify.app", // Update this with your client's URL https://baybay-salita-edu.netlify.app
     methods: ["GET", "POST", "DELETE", "PATCH"], // Add the allowed HTTP methods
     credentials: true, // Allow credentials (cookies, authorization headers)
   })
@@ -109,6 +112,7 @@ router.post("/submitAssessment", submitAssessment); //okay
 router.get("/getActivity/:ActivityCode", getAssessmentCode); //okay
 router.get("/getActivity/:UserID", getAssessmentID);
 router.get("/getPerformance", getPerformance); //okay
+router.get("/getPerformanceStudent/:LRN", getPerformanceStudent);
 router.get("/getPerformance/:UserInputId", getOnePerformance); //okay
 router.get("/getSentence", getSentence); //okay
 router.get("/getAssessments", getActivities); //okay
@@ -136,6 +140,8 @@ router.get("/getStudents", getStudents); //okay
 router.get("/getStudentID/:id", getStudent); //okay
 router.delete("/deleteStudent/:id", deleteStudent); //okay
 router.patch("/updateStudent/:id", updateStudent); //okay
+
+router.patch("/studentStatus/:LRN", studentStatus); //okay
 
 // Parent Routes
 router.get("/getParent", getParentUsers); //okay

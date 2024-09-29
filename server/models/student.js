@@ -19,7 +19,7 @@ const studentSchema = new Schema(
     Nationality: String,
     Gender: String,
     picture: String,
-    Status: String,
+    status: String,
     role: String,
   },
   { timestamps: true }

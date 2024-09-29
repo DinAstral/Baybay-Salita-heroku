@@ -130,6 +130,24 @@ const BodyManageStudent = () => {
   const offset = currentPage * usersPerPage;
   const currentUsers = filteredStudents.slice(offset, offset + usersPerPage);
 
+  // Function to get color based on the status
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Grade Ready Reader":
+        return "text-green-600"; // Green
+      case "Transitioning Reader":
+        return "text-blue-600"; // Blue
+      case "Developing Reader":
+        return "text-orange-600"; // Orange
+      case "Low and High Emerging Reader":
+        return "text-red-600"; // Red
+      case "Incomplete":
+        return "text-gray-600"; // Gray
+      default:
+        return "text-black"; // Default color
+    }
+  };
+
   return (
     <div className="px-9">
       <PrintRecord
@@ -236,12 +254,13 @@ const BodyManageStudent = () => {
                     <TableColumn>Birthday</TableColumn>
                     <TableColumn>Mother Tongue</TableColumn>
                     <TableColumn>Gender</TableColumn>
+                    <TableColumn>Status</TableColumn>{" "}
+                    {/* Added Status Column */}
                     <TableColumn className="text-center">Actions</TableColumn>
                   </TableHeader>
-
                   <TableBody emptyContent={"No rows to display."}>
                     {currentUsers.map((student) => (
-                      <TableRow key={student.LRN}>
+                      <TableRow key={student._id}>
                         <TableCell>{student.LRN}</TableCell>
                         <TableCell>{student.FirstName}</TableCell>
                         <TableCell>{student.LastName}</TableCell>
@@ -250,22 +269,31 @@ const BodyManageStudent = () => {
                         <TableCell>{student.Birthday}</TableCell>
                         <TableCell>{student.MotherTongue}</TableCell>
                         <TableCell>{student.Gender}</TableCell>
-                        <TableCell className="text-center">
-                          <div className="table-buttons">
+                        {/* Apply color to the status based on student performance */}
+                        <TableCell>
+                          <span className={getStatusColor(student.status)}>
+                            {student.status}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex justify-center gap-2">
                             <Button
-                              color="default"
+                              color="primary"
+                              size="sm"
                               onClick={() => handleViewClick(student)}
                             >
                               View
                             </Button>
                             <Button
-                              color="primary"
+                              color="secondary"
+                              size="sm"
                               onClick={() => handleEditClick(student)}
                             >
-                              Update
+                              Edit
                             </Button>
                             <Button
                               color="danger"
+                              size="sm"
                               onClick={() => handleDeleteClick(student)}
                             >
                               Delete

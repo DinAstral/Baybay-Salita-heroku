@@ -26,6 +26,28 @@ const BodyAdminEditStudent = () => {
     ContactNumber: "",
   });
 
+  // Function to calculate age from birthday
+  const calculateAge = (birthday) => {
+    if (!birthday) return "";
+    const birthDate = new Date(birthday);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+    return age;
+  };
+
+  // Update age whenever birthday changes
+  useEffect(() => {
+    const age = calculateAge(data.Birthday);
+    setData((prevData) => ({ ...prevData, Age: age }));
+  }, [data.Birthday]);
+
   useEffect(() => {
     axios
       .get(`/getStudentID/${id}`)
@@ -40,6 +62,14 @@ const BodyAdminEditStudent = () => {
 
   const editStudent = async (e) => {
     e.preventDefault();
+
+    // Validate if the age matches the calculated age from the birthday
+    const calculatedAge = calculateAge(data.Birthday);
+    if (data.Age !== calculatedAge) {
+      toast.error("Age does not match the birthday. Please correct it.");
+      return;
+    }
+
     try {
       const { data: responseData } = await axios.patch(
         `/updateStudent/${id}`,
@@ -110,18 +140,6 @@ const BodyAdminEditStudent = () => {
               />
             </div>
             <div className="flex flex-col">
-              <label className="font-medium text-gray-700">Middle Name</label>
-              <Input
-                underlined
-                clearable
-                value={data.MiddleName}
-                onChange={(e) =>
-                  setData({ ...data, MiddleName: e.target.value })
-                }
-                placeholder="Enter the Middle Name"
-              />
-            </div>
-            <div className="flex flex-col">
               <label className="font-medium text-gray-700">Last Name</label>
               <Input
                 underlined
@@ -130,31 +148,6 @@ const BodyAdminEditStudent = () => {
                 onChange={(e) => setData({ ...data, LastName: e.target.value })}
                 placeholder="Enter the Last Name"
               />
-            </div>
-            <div className="flex flex-col">
-              <label className="font-medium text-gray-700">Age</label>
-              <Input
-                underlined
-                clearable
-                value={data.Age}
-                onChange={(e) => setData({ ...data, Age: e.target.value })}
-                placeholder="Enter student's age"
-                type="number"
-              />
-            </div>
-            <div className="flex flex-col">
-              <label className="font-medium text-gray-700">Grade Level</label>
-              <Select
-                placeholder="Select Grade Level"
-                value={data.Level}
-                onChange={(value) => setData({ ...data, Level: value })}
-              >
-                <SelectItem key="" disabled>
-                  Select Grade Level
-                </SelectItem>
-                <SelectItem key="Grade 1">Grade 1</SelectItem>
-                {/* Add more options as needed */}
-              </Select>
             </div>
             <div className="flex flex-col">
               <label className="font-medium text-gray-700">Section</label>

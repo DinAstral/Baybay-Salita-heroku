@@ -45,17 +45,17 @@ const Main = () => {
     <div className="body-main">
       <Navbar />
       <Hero />
-      <div className="container">
+      <div className="px-8">
         <Title subTitle="Aming Serbisyo" title="Ang handog namin sa inyo" />
         <Program />
-        <About />
-        <Title
-          subTitle="Kami ay kontakin"
-          title="Tayu'y maging malapit sa isa't-isa"
-        />
-        <Contact />
-        <Footer />
       </div>
+      <About />
+      <Title
+        subTitle="Kami ay kontakin"
+        title="Tayu'y maging malapit sa isa't-isa"
+      />
+      <Contact />
+      <Footer />
     </div>
   );
 };

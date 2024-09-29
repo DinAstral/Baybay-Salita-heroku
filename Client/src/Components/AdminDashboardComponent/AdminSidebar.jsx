@@ -75,7 +75,7 @@ const AdminSidebar = () => {
         <div className="flex flex-col px-5">
           <Button
             color="error"
-            className="w-full text-md font-semibold py-3 rounded-lg shadow-md transition-all duration-150 hover:bg-red-600"
+            className="w-full text-md font-semibold py-3 rounded-lg shadow-md transition-all duration-150 text-white bg-[#ff505b] hover:bg-red-600"
             onClick={handleLogout}
           >
             Logout

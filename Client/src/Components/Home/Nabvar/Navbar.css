@@ -29,7 +29,7 @@ nav ul li {
 }
 
 .dark-nav {
-    background: #d4983d;
+    background: #facc87;
     transition: 0.5s;
 }
 
@@ -38,6 +38,10 @@ nav ul li {
 }
 
 nav ul li:hover {
+    color: #facc87;
+}
+
+.dark-nav ul li:hover {
     color: aliceblue;
 }
 
@@ -81,6 +85,7 @@ nav ul li:hover {
     .menu-icon {
         display: block;
         cursor: pointer;
+        margin-right: 10px;
     }
 
     .hide-mobile-menu {

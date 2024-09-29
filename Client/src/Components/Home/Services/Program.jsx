@@ -24,6 +24,7 @@ const Program = () => {
           <p>Madaling Pag-gamit ng Aplikasyon</p>
         </div>
       </div>
+
       <div className="service">
         <img src={service_2} alt="" />
         <div className="caption">
@@ -31,6 +32,7 @@ const Program = () => {
           <p>Tulong Sa Pagbaybay ng Salita ng mga bata</p>
         </div>
       </div>
+
       <div className="service">
         <img src={service_3} alt="" />
         <div className="caption">

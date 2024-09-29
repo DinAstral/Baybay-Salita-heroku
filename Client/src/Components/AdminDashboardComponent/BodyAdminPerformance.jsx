@@ -236,7 +236,8 @@ const BodyAdminPerformance = () => {
                     <TableColumn>Section</TableColumn>
                     <TableColumn>Activity Code</TableColumn>
                     <TableColumn>Type</TableColumn>
-                    <TableColumn>Submitted</TableColumn>
+                    <TableColumn>Score</TableColumn>
+                    <TableColumn>Result</TableColumn>
                     <TableColumn className="text-center">Actions</TableColumn>
                   </TableHeader>
                   <TableBody emptyContent={"No rows to display."}>
@@ -247,6 +248,7 @@ const BodyAdminPerformance = () => {
                         <TableCell>{performance.Section}</TableCell>
                         <TableCell>{performance.ActivityCode}</TableCell>
                         <TableCell>{performance.Type}</TableCell>
+                        <TableCell>{performance.Score}</TableCell>
                         <TableCell>{performance.Result}</TableCell>
                         <TableCell className="text-center">
                           <div className="table-buttons">

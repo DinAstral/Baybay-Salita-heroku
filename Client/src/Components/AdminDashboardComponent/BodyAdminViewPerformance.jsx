@@ -81,6 +81,16 @@ const BodyAdminViewPerformance = () => {
                   <p className="text-gray-800">
                     <strong>Word:</strong> {item.Word || "N/A"}
                   </p>
+                  {data.Type === "Pagbabasa" && (
+                    <div className="mt-2">
+                      <strong>Pagbabasa Specific Content:</strong>
+                      {/* Display specific content for Pagbabasa */}
+                      <p>
+                        {item.PagbabasaSpecificContent ||
+                          "No specific content."}
+                      </p>
+                    </div>
+                  )}
                   <p className="text-gray-800">
                     <strong>Image:</strong>
                     {item.Image && (
@@ -110,7 +120,7 @@ const BodyAdminViewPerformance = () => {
                           rel="noopener noreferrer"
                           color="primary"
                           size="sm"
-                          className="ml-2 my-2" // Added vertical spacing
+                          className="ml-2 my-2"
                         >
                           Play User Audio
                         </Button>
@@ -130,7 +140,7 @@ const BodyAdminViewPerformance = () => {
                           rel="noopener noreferrer"
                           color="primary"
                           size="sm"
-                          className="ml-2 my-2" // Added vertical spacing
+                          className="ml-2 my-2"
                         >
                           Play Default Audio
                         </Button>

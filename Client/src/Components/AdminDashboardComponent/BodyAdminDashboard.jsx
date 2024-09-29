@@ -7,16 +7,7 @@ import {
   faCircleInfo,
   faHouse,
 } from "@fortawesome/free-solid-svg-icons";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableColumn,
-  TableRow,
-  TableCell,
-  Button,
-  Tooltip,
-} from "@nextui-org/react";
+import { Table, Button, Tooltip } from "@nextui-org/react";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { LineChart } from "@mui/x-charts/LineChart";
@@ -28,14 +19,8 @@ const BodyAdminDashboard = () => {
   const [assessments, setAssessment] = useState([]);
   const [teachersCount, setTeachersCount] = useState(0);
   const [parentsCount, setParentsCount] = useState(0);
-
   const [performanceData, setPerformanceData] = useState([]);
   const [selectedAssessment, setSelectedAssessment] = useState("Assessment 1");
-
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(0);
-  const [usersPerPage] = useState(10); // Number of users per page
-  const [filteredRoles, setFilteredRoles] = useState([]);
 
   const [sectionCounts, setSectionCounts] = useState({
     Aster: 0,
@@ -69,11 +54,12 @@ const BodyAdminDashboard = () => {
     sheet: "Students",
   });
 
+  // Fetch data when the component loads or when the selectedAssessment changes
   useEffect(() => {
     const fetchData = async () => {
       try {
         await Promise.all([fetchUsers(), fetchStudents(), fetchAssessment()]);
-        await fetchPerformance();
+        await fetchPerformance(); // Fetch performance data separately
       } catch (err) {
         console.error("Error fetching data:", err);
       }
@@ -99,8 +85,7 @@ const BodyAdminDashboard = () => {
       const response = await axios.get("/getStudents");
       const data = response.data;
       setStudents(data);
-      setFilteredRoles(data);
-      setSectionCounts(countStudentsBySection(data));
+      setSectionCounts(countStudentsBySection(data)); // Set section counts
     } catch (err) {
       console.error("Error fetching students:", err);
     }
@@ -123,7 +108,8 @@ const BodyAdminDashboard = () => {
         `/getPerformance?assessment=${selectedAssessment}`
       );
       const data = response.data;
-      const distribution = countScores(data);
+      setPerformanceData(data); // Set performance data
+      const distribution = countScores(data); // Calculate score distribution
       setScoreDistribution(distribution);
     } catch (err) {
       console.error("Error fetching performance data:", err);
@@ -153,9 +139,28 @@ const BodyAdminDashboard = () => {
     }, {});
   };
 
-  useEffect(() => {
-    getFormattedData();
-  }, [selectedAssessment]);
+  const countAssessmentsByType = (assessments) => {
+    const assessmentTypes = ["Pagbabaybay", "Pantig", "Salita", "Pagbabasa"];
+    return assessmentTypes.reduce((acc, type) => {
+      acc[type] = assessments.filter(
+        (assessment) => assessment.type === type
+      ).length;
+      return acc;
+    }, {});
+  };
+
+  const countScores = (data) => {
+    const scores = {};
+    const counts = {};
+    data.forEach((entry) => {
+      const { Score, AssessmentType } = entry;
+      if (!scores[AssessmentType]) scores[AssessmentType] = 0;
+      scores[AssessmentType] += Score;
+      if (!counts[AssessmentType]) counts[AssessmentType] = 0;
+      counts[AssessmentType]++;
+    });
+    return { scores, counts };
+  };
 
   const getFormattedData = () => {
     const studentDataMap = {};
@@ -166,50 +171,32 @@ const BodyAdminDashboard = () => {
       "Assessment 4",
     ];
 
-    // Initialize data structure for each student (LRN) with scores for each assessment type
     performanceData.forEach((entry) => {
       const { LRN, Score, AssessmentType } = entry;
 
-      // Ensure the LRN exists in the map
       if (!studentDataMap[LRN]) {
-        studentDataMap[LRN] = { LRN, scores: assessments.map(() => 0) }; // Default scores to 0
+        studentDataMap[LRN] = { LRN, scores: assessments.map(() => 0) };
       }
 
-      // Scale the score for Assessment 4 and store it in the correct position
       const index = assessments.indexOf(AssessmentType);
-      let totalScore = 0;
+      let totalScore =
+        AssessmentType === "Assessment 4" ? (Score / 5) * 10 : Score || 0;
 
-      if (AssessmentType === "Assessment 4") {
-        totalScore = Score ? (Score / 5) * 10 : 0; // Handle invalid/missing score
-      } else {
-        totalScore = Score || 0; // Default to 0 if score is missing or invalid
-      }
-
-      // Update the student's score for the current assessment type
       if (index !== -1) {
         studentDataMap[LRN].scores[index] = totalScore;
       }
     });
 
-    // Convert the map into an array that LineChart can understand
     return Object.values(studentDataMap).map((student) => ({
       label: `LRN: ${student.LRN}`,
       data: student.scores.map((score, index) => ({
         x: assessments[index],
-        y: !isNaN(score) ? score : 0, // Ensure no NaN values in chart data
+        y: !isNaN(score) ? score : 0,
       })),
     }));
   };
+
   const formattedData = getFormattedData();
-
-  // Pagination controls
-  const offset = currentPage * usersPerPage;
-  const currentUsers = filteredRoles.slice(offset, offset + usersPerPage);
-  const totalPages = Math.ceil(filteredRoles.length / usersPerPage);
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
 
   return (
     <div className="px-9">
@@ -333,100 +320,6 @@ const BodyAdminDashboard = () => {
             ]}
             height={300}
           />
-        </div>
-      </div>
-
-      <div className="mt-6">
-        <h2 className="text-2xl font-semibold mb-4">
-          Score Rating of Students
-        </h2>
-
-        {/* Buttons to select assessments */}
-        <div className="flex space-x-4">
-          <button onClick={() => setSelectedAssessment("Assessment 1")}>
-            Assessment 1
-          </button>
-          <button onClick={() => setSelectedAssessment("Assessment 2")}>
-            Assessment 2
-          </button>
-          <button onClick={() => setSelectedAssessment("Assessment 3")}>
-            Assessment 3
-          </button>
-          <button onClick={() => setSelectedAssessment("Assessment 4")}>
-            Assessment 4
-          </button>
-        </div>
-
-        {/* Line chart for student performance */}
-        <div className="bg-white rounded-lg shadow p-4 mt-4">
-          <LineChart
-            xAxis={[
-              {
-                label: "Assessment Type",
-                data: [
-                  "Assessment 1",
-                  "Assessment 2",
-                  "Assessment 3",
-                  "Assessment 4",
-                ], // Fixed x-axis data
-              },
-            ]}
-            yAxis={[
-              {
-                label: "Total Score (0-10)", // Y-axis label
-              },
-            ]}
-            series={formattedData} // Data series for each student
-            height={300}
-            grid={{ vertical: true, horizontal: true }}
-            title={`Score Performance - ${selectedAssessment}`} // Dynamic chart title
-            titleProps={{ style: { fontSize: "1.5rem", fontWeight: "bold" } }}
-            tooltip={{ show: true }} // Enable tooltips
-          />
-        </div>
-      </div>
-
-      <div className="mt-6">
-        <h2 className="text-2xl font-semibold mb-4">Student List</h2>
-        <div className="bg-white rounded-lg shadow p-4">
-          <Table aria-label="Paginated table of students" ref={tableRef}>
-            <TableHeader>
-              <TableColumn>Name</TableColumn>
-              <TableColumn>Email</TableColumn>
-              <TableColumn>Section</TableColumn>
-              <TableColumn>Gender</TableColumn>
-            </TableHeader>
-            <TableBody>
-              {currentUsers.map((student) => (
-                <TableRow key={student._id}>
-                  <TableCell>
-                    {student.FirstName + " " + student.LastName}
-                  </TableCell>
-                  <TableCell>{student.Email}</TableCell>
-                  <TableCell>{student.Section}</TableCell>
-                  <TableCell>{student.Gender}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-
-          <div className="mt-4 flex justify-between">
-            <Button
-              disabled={currentPage === 0}
-              onClick={() => handlePageChange(currentPage - 1)}
-            >
-              Previous Page
-            </Button>
-            <Button
-              disabled={currentPage === totalPages - 1}
-              onClick={() => handlePageChange(currentPage + 1)}
-            >
-              Next Page
-            </Button>
-            <Button color="success" onClick={onDownload}>
-              Export to Excel
-            </Button>
-          </div>
         </div>
       </div>
     </div>
