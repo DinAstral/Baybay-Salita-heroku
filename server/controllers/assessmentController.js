@@ -544,6 +544,7 @@ const userInputAudio = async (req, res) => {
         return res.json({
           message:
             "Audio files uploaded, data stored, and comparison results saved successfully.",
+          UserInputId: InputID, // Include UserInputId in response
         });
       } else {
         return res.status(500).json({

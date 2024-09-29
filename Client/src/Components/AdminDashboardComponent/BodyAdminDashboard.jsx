@@ -29,6 +29,9 @@ const BodyAdminDashboard = () => {
   const [teachersCount, setTeachersCount] = useState(0);
   const [parentsCount, setParentsCount] = useState(0);
 
+  const [performanceData, setPerformanceData] = useState([]);
+  const [selectedAssessment, setSelectedAssessment] = useState("Assessment 1");
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
   const [usersPerPage] = useState(10); // Number of users per page
@@ -57,8 +60,6 @@ const BodyAdminDashboard = () => {
     scores: [],
     counts: [],
   });
-
-  const [selectedAssessment, setSelectedAssessment] = useState("Assessment 1");
 
   const tableRef = useRef(null);
 
@@ -152,37 +153,54 @@ const BodyAdminDashboard = () => {
     }, {});
   };
 
-  const countAssessmentsByType = (assessments) => {
-    const activities = ["Pagbabaybay", "Pantig", "Salita", "Pagbabasa"];
-    return activities.reduce((acc, activity) => {
-      acc[activity] = assessments.filter(
-        (assessment) => assessment.Type === activity
-      ).length;
-      return acc;
-    }, {});
-  };
+  useEffect(() => {
+    getFormattedData();
+  }, [selectedAssessment]);
 
-  const countScores = (performanceData) => {
-    const scoreMap = Array(11).fill(0); // Initialize array for scores from 0 to 10
+  const getFormattedData = () => {
+    const studentDataMap = {};
+    const assessments = [
+      "Assessment 1",
+      "Assessment 2",
+      "Assessment 3",
+      "Assessment 4",
+    ];
 
-    performanceData.forEach((student) => {
-      let score;
+    // Initialize data structure for each student (LRN) with scores for each assessment type
+    performanceData.forEach((entry) => {
+      const { LRN, Score, AssessmentType } = entry;
 
-      // Check if Score exists and handle possible structures
-      if (student.Score && typeof student.Score === "object") {
-        score = student.Score.obtained ?? student.Score.value ?? student.Score;
+      // Ensure the LRN exists in the map
+      if (!studentDataMap[LRN]) {
+        studentDataMap[LRN] = { LRN, scores: assessments.map(() => 0) }; // Default scores to 0
       }
 
-      if (score !== undefined && !isNaN(score) && score >= 0 && score <= 10) {
-        scoreMap[score] += 1; // Increment the count for the corresponding score
+      // Scale the score for Assessment 4 and store it in the correct position
+      const index = assessments.indexOf(AssessmentType);
+      let totalScore = 0;
+
+      if (AssessmentType === "Assessment 4") {
+        totalScore = Score ? (Score / 5) * 10 : 0; // Handle invalid/missing score
+      } else {
+        totalScore = Score || 0; // Default to 0 if score is missing or invalid
+      }
+
+      // Update the student's score for the current assessment type
+      if (index !== -1) {
+        studentDataMap[LRN].scores[index] = totalScore;
       }
     });
 
-    return {
-      scores: Array.from({ length: 11 }, (_, i) => i),
-      counts: scoreMap,
-    };
+    // Convert the map into an array that LineChart can understand
+    return Object.values(studentDataMap).map((student) => ({
+      label: `LRN: ${student.LRN}`,
+      data: student.scores.map((score, index) => ({
+        x: assessments[index],
+        y: !isNaN(score) ? score : 0, // Ensure no NaN values in chart data
+      })),
+    }));
   };
+  const formattedData = getFormattedData();
 
   // Pagination controls
   const offset = currentPage * usersPerPage;
@@ -322,27 +340,48 @@ const BodyAdminDashboard = () => {
         <h2 className="text-2xl font-semibold mb-4">
           Score Rating of Students
         </h2>
+
+        {/* Buttons to select assessments */}
         <div className="flex space-x-4">
-          <Button onClick={() => setSelectedAssessment("Assessment 1")}>
+          <button onClick={() => setSelectedAssessment("Assessment 1")}>
             Assessment 1
-          </Button>
-          <Button onClick={() => setSelectedAssessment("Assessment 2")}>
+          </button>
+          <button onClick={() => setSelectedAssessment("Assessment 2")}>
             Assessment 2
-          </Button>
-          <Button onClick={() => setSelectedAssessment("Assessment 3")}>
+          </button>
+          <button onClick={() => setSelectedAssessment("Assessment 3")}>
             Assessment 3
-          </Button>
+          </button>
+          <button onClick={() => setSelectedAssessment("Assessment 4")}>
+            Assessment 4
+          </button>
         </div>
+
+        {/* Line chart for student performance */}
         <div className="bg-white rounded-lg shadow p-4 mt-4">
           <LineChart
-            xAxis={[{ data: scoreDistribution.scores }]} // X-axis with scores (0 to 10)
-            yAxis={[{ label: "Number of Students" }]} // Y-axis label
-            series={[{ data: scoreDistribution.counts }]} // Y-axis with student count
+            xAxis={[
+              {
+                label: "Assessment Type",
+                data: [
+                  "Assessment 1",
+                  "Assessment 2",
+                  "Assessment 3",
+                  "Assessment 4",
+                ], // Fixed x-axis data
+              },
+            ]}
+            yAxis={[
+              {
+                label: "Total Score (0-10)", // Y-axis label
+              },
+            ]}
+            series={formattedData} // Data series for each student
             height={300}
             grid={{ vertical: true, horizontal: true }}
-            title={`Score Distribution of Students - ${selectedAssessment}`}
+            title={`Score Performance - ${selectedAssessment}`} // Dynamic chart title
             titleProps={{ style: { fontSize: "1.5rem", fontWeight: "bold" } }}
-            tooltip={{ show: true }} // Enable tooltips for better interactivity
+            tooltip={{ show: true }} // Enable tooltips
           />
         </div>
       </div>
