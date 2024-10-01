@@ -37,7 +37,7 @@ const BodyTeacherProfileBasic = () => {
 
   useEffect(() => {
     axios
-      .get(`getTeacher/${user.UserID}`)
+      .get(`/api/getTeacher/${user.UserID}`)
       .then((response) => {
         setData(response.data);
         setProfileImg(response.data.Picture || profileImage);
@@ -84,7 +84,7 @@ const BodyTeacherProfileBasic = () => {
       formData.append("UserID", user.UserID);
 
       try {
-        const response = await axios.post("/profileUpdate", formData, {
+        const response = await axios.post("/api/profileUpdate", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         if (response.data.message) {
@@ -112,12 +112,17 @@ const BodyTeacherProfileBasic = () => {
   const handleUpdate = async (event) => {
     event.preventDefault(); // Prevent default form submission
     try {
-      const response = await axios.patch(`/updateTeacher/${data.UserID}`, data);
+      const response = await axios.patch(
+        `/api/updateTeacher/${data.UserID}`,
+        data
+      );
 
       if (response.data.success) {
         toast.success(response.data.message); // Show success message
         // Optionally refetch the updated data
-        const updatedResponse = await axios.get(`/getTeacher/${data.UserID}`);
+        const updatedResponse = await axios.get(
+          `/api/getTeacher/${data.UserID}`
+        );
         setData(updatedResponse.data); // Update state with the new data
       } else {
         // Handle known errors returned from the server

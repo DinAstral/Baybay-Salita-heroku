@@ -49,7 +49,7 @@ const BodyAdminStudentAssessment = () => {
 
   const refreshActivities = () => {
     axios
-      .get("/getAssessments")
+      .get("/api/getAssessments")
       .then((response) => {
         setActivities(response.data);
         setFilteredActivities(response.data);

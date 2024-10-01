@@ -47,7 +47,7 @@ const BodyAdminPerformance = () => {
 
   const refreshActivities = () => {
     axios
-      .get("/getPerformance")
+      .get("/api/getPerformance")
       .then((response) => {
         setPerformance(response.data);
         setFilteredRoles(response.data);

@@ -20,7 +20,7 @@ const VerifyEmail = () => {
     }
 
     try {
-      const response = await axios.post("/verify", { userId, otp });
+      const response = await axios.post("/api/verify", { userId, otp });
 
       if (response.data.error) {
         toast.error(response.data.error);

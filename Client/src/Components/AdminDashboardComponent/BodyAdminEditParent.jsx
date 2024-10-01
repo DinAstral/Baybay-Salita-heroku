@@ -26,7 +26,7 @@ const BodyAdminEditParent = () => {
 
   useEffect(() => {
     axios
-      .get(`getUser/${id}`) // route to include student ID
+      .get(`/api/getUser/${id}`) // route to include student ID
       .then((response) => {
         console.log("Response:", response.data); // Log response data
         setData(response.data); // Assuming response.data contains student data
@@ -51,7 +51,7 @@ const BodyAdminEditParent = () => {
       email,
     } = data;
     try {
-      const { data } = await axios.patch(`updateParent/${id}`, {
+      const { data } = await axios.patch(`/api/updateParent/${id}`, {
         FirstName,
         LastName,
         Age,

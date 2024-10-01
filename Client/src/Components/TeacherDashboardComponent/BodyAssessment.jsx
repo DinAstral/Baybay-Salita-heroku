@@ -56,7 +56,7 @@ const BodyAssessment = () => {
   useEffect(() => {
     if (user && user.UserID) {
       axios
-        .get(`/getTeacher/${user.UserID}`) // API endpoint to fetch teacher data
+        .get(`/api/getTeacher/${user.UserID}`) // API endpoint to fetch teacher data
         .then((response) => {
           setTeacherSection(response.data.Section); // Assuming the response contains the teacher's section as a string
         })
@@ -67,7 +67,7 @@ const BodyAssessment = () => {
   useEffect(() => {
     if (user && user.UserID) {
       axios
-        .get(`/getActivity/${user.UserID}`) // Fetch assessments based on teacherID
+        .get(`/api/getActivity/${user.UserID}`) // Fetch assessments based on teacherID
         .then((response) => {
           // Secondary filter on frontend, if needed
           const teacherAssessments = response.data.filter(

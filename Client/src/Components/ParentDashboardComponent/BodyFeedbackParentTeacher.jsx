@@ -21,7 +21,7 @@ const BodyFeedbackParentTeacher = () => {
 
   useEffect(() => {
     axios
-      .get(`getParent/${user.UserID}`)
+      .get(`/api/getParent/${user.UserID}`)
       .then((response) => {
         setParent(response.data);
         console.log("Parent Data:", response.data); // Debug log
@@ -37,7 +37,7 @@ const BodyFeedbackParentTeacher = () => {
   useEffect(() => {
     const fetchParentAndFeedbacks = async () => {
       try {
-        const feedbackResponse = await axios.get(`/getFeedbacks`);
+        const feedbackResponse = await axios.get(`/api/getFeedbacks`);
         console.log("Feedback Data:", feedbackResponse.data); // Debug log
 
         const studentFeedbacks = feedbackResponse.data.filter(

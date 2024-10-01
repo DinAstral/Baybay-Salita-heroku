@@ -25,7 +25,7 @@ const BodyParentProfile = () => {
 
   useEffect(() => {
     axios
-      .get(`getParent/${user.UserID}`)
+      .get(`/api/getParent/${user.UserID}`)
       .then((response) => {
         setProfileImg(response.data.Picture || profileImage);
         setParent(response.data);
@@ -73,14 +73,19 @@ const BodyParentProfile = () => {
     event.preventDefault(); // Prevent the default form submission
 
     try {
-      const response = await axios.patch(`/updateParent/${data.UserID}`, data);
+      const response = await axios.patch(
+        `/api/updateParent/${data.UserID}`,
+        data
+      );
 
       // Check if the response indicates success
       if (response.status === 200 && response.data) {
         toast.success("Your profile updated successfully!");
 
         // Optionally, you can refetch the data after the update
-        const updatedResponse = await axios.get(`/getParent/${data.UserID}`);
+        const updatedResponse = await axios.get(
+          `/api/getParent/${data.UserID}`
+        );
         setData(updatedResponse.data);
       } else {
         toast.error(`Error: ${response.data.error || "Update failed."}`);

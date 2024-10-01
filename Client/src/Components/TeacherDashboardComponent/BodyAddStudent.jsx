@@ -40,7 +40,7 @@ const BodyTeacherAddStudent = () => {
   const addStudent = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/addStudent", data);
+      const response = await axios.post("/api/addStudent", data);
       if (response.data.error) {
         toast.error(response.data.error);
       } else {

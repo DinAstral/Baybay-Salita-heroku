@@ -19,7 +19,7 @@ const BodyAdminEditUser = () => {
 
   useEffect(() => {
     axios
-      .get(`getUser/${id}`)
+      .get(`/api/getUser/${id}`)
       .then((response) => {
         setData(response.data);
       })
@@ -33,7 +33,7 @@ const BodyAdminEditUser = () => {
     e.preventDefault();
     const { email, password, role } = data;
     try {
-      const response = await axios.patch(`updateUser/${id}`, {
+      const response = await axios.patch(`/api/updateUser/${id}`, {
         email,
         password,
         role,

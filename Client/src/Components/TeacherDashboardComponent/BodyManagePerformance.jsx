@@ -50,7 +50,7 @@ const BodyManagePerformance = () => {
   useEffect(() => {
     if (user && user.UserID) {
       axios
-        .get(`/getTeacher/${user.UserID}`) // API endpoint to fetch teacher data
+        .get(`/api/getTeacher/${user.UserID}`) // API endpoint to fetch teacher data
         .then((response) => {
           setTeacherSection(response.data.Section); // Assuming the response contains the teacher's section as a string
         })
@@ -62,7 +62,7 @@ const BodyManagePerformance = () => {
   useEffect(() => {
     if (teacherSection) {
       axios
-        .get("/getPerformance")
+        .get("/api/getPerformance")
         .then((response) => {
           // Filter performances based on the logged-in teacher's section
           const filteredPerformances = response.data.filter(

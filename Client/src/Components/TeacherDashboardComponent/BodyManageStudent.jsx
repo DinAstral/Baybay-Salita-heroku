@@ -58,7 +58,7 @@ const BodyManageStudent = () => {
   useEffect(() => {
     if (user && user.UserID) {
       axios
-        .get(`/getTeacher/${user.UserID}`) // API endpoint to fetch teacher data
+        .get(`/api/getTeacher/${user.UserID}`) // API endpoint to fetch teacher data
         .then((response) => {
           setTeacherSection(response.data.Section); // Assuming the response contains the teacher's section
         })
@@ -69,7 +69,7 @@ const BodyManageStudent = () => {
   // Fetch all students
   useEffect(() => {
     axios
-      .get("/getStudents")
+      .get("/api/getStudents")
       .then((response) => {
         setStudents(response.data);
       })

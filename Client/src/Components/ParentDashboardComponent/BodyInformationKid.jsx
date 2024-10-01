@@ -32,7 +32,7 @@ const BodyInformationKid = () => {
 
   useEffect(() => {
     axios
-      .get(`getParent/${user.UserID}`)
+      .get(`/api/getParent/${user.UserID}`)
       .then((response) => {
         setParent(response.data);
       })
@@ -48,7 +48,7 @@ const BodyInformationKid = () => {
     if (parent && parent.LRN) {
       setLoading(true);
       axios
-        .get(`getStudentParent/${parent.LRN}`)
+        .get(`/api/getStudentParent/${parent.LRN}`)
         .then((response) => {
           setStudent(response.data);
         })

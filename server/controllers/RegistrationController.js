@@ -745,7 +745,7 @@ const forgotPassword = async (req, res) => {
       const token = jwt.sign({ email: userEmail, id: userEmail._id }, secret, {
         expiresIn: "30m",
       });
-      const link = `https://baybay-salita-edu.netlify.app/reset-password/${userEmail._id}/${token}`;
+      const link = `https://baybay-salita-heroku-8c328f3ddd0f.herokuapp.com/api/reset-password/${userEmail._id}/${token}`;
       console.log(link);
       sendForgotPasswordEmail({ email, link }, res);
     }

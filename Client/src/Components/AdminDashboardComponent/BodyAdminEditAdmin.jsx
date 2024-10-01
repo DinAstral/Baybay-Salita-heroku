@@ -24,7 +24,7 @@ const BodyAdminEditAdmin = () => {
 
   useEffect(() => {
     axios
-      .get(`getAdmin/${id}`) // route to include admin ID
+      .get(`/api/getAdmin/${id}`) // route to include admin ID
       .then((response) => {
         setData(response.data);
       })
@@ -38,7 +38,7 @@ const BodyAdminEditAdmin = () => {
     e.preventDefault();
     try {
       const { data: responseData } = await axios.patch(
-        `/updateAdmin/${id}`,
+        `/api/updateAdmin/${id}`,
         data
       );
       if (responseData.error) {

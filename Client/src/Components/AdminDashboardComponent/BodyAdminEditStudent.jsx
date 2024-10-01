@@ -50,7 +50,7 @@ const BodyAdminEditStudent = () => {
 
   useEffect(() => {
     axios
-      .get(`/getStudentID/${id}`)
+      .get(`/api/getStudentID/${id}`)
       .then((response) => {
         setData(response.data);
       })
@@ -72,7 +72,7 @@ const BodyAdminEditStudent = () => {
 
     try {
       const { data: responseData } = await axios.patch(
-        `/updateStudent/${id}`,
+        `/api/updateStudent/${id}`,
         data
       );
       if (responseData.error) {

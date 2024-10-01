@@ -21,7 +21,7 @@ export function UserContextProvider({ children }) {
           setUser(storedUser); // Set the user data from localStorage
         } else {
           try {
-            const { data } = await axios.get("/profile");
+            const { data } = await axios.get("/api/profile");
             setUser(data);
             localStorage.setItem("user", JSON.stringify(data)); // Save user data to localStorage
           } catch (error) {
@@ -37,7 +37,7 @@ export function UserContextProvider({ children }) {
 
   const clearCookie = async () => {
     try {
-      await axios.post("/logout");
+      await axios.post("/api/logout");
       localStorage.removeItem("token");
       localStorage.removeItem("user"); // Remove user data from localStorage
       toast.success("Logout Successfully");

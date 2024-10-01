@@ -53,7 +53,7 @@ const BodyAdminStudent = () => {
 
   useEffect(() => {
     axios
-      .get("/getStudents") // Corrected route
+      .get("/api/getStudents") // Corrected route
       .then((response) => {
         setStudents(response.data);
         setFilteredRoles(response.data);

@@ -70,7 +70,7 @@ const BodyAdminDashboard = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("/users");
+      const response = await axios.get("/api/users");
       const data = response.data;
       setUsers(data);
       setTeachersCount(countByRole(data, "Teacher"));
@@ -82,7 +82,7 @@ const BodyAdminDashboard = () => {
 
   const fetchStudents = async () => {
     try {
-      const response = await axios.get("/getStudents");
+      const response = await axios.get("/api/getStudents");
       const data = response.data;
       setStudents(data);
       setSectionCounts(countStudentsBySection(data)); // Set section counts
@@ -93,7 +93,7 @@ const BodyAdminDashboard = () => {
 
   const fetchAssessment = async () => {
     try {
-      const response = await axios.get("/getAssessments");
+      const response = await axios.get("/api/getAssessments");
       const data = response.data;
       setAssessment(data);
       setActivityCounts(countAssessmentsByType(data));
@@ -105,7 +105,7 @@ const BodyAdminDashboard = () => {
   const fetchPerformance = async () => {
     try {
       const response = await axios.get(
-        `/getPerformance?assessment=${selectedAssessment}`
+        `/api/getPerformance?assessment=${selectedAssessment}`
       );
       const data = response.data;
       setPerformanceData(data); // Set performance data

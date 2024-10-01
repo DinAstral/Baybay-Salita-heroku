@@ -29,7 +29,7 @@ const BodyViewPerformnace = () => {
   useEffect(() => {
     const fetchPerformanceData = async () => {
       try {
-        const response = await axios.get(`/getPerformance/${UserInputId}`);
+        const response = await axios.get(`/api/getPerformance/${UserInputId}`);
         setData(response.data);
       } catch (err) {
         toast.error(

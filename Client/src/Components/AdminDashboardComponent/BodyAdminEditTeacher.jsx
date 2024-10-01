@@ -29,7 +29,7 @@ const BodyAdminEditTeacher = () => {
 
   useEffect(() => {
     axios
-      .get(`getUser/${id}`)
+      .get(`/api/getUser/${id}`)
       .then((response) => {
         setData(response.data);
       })
@@ -42,7 +42,7 @@ const BodyAdminEditTeacher = () => {
   const editTeacher = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.patch(`updateTeacher/${id}`, data);
+      const response = await axios.patch(`/api/updateTeacher/${id}`, data);
       if (response.data.error) {
         toast.error(response.data.error);
       } else {

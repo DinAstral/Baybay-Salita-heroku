@@ -32,7 +32,7 @@ const BodyUpdateTeacherProfile = () => {
 
   useEffect(() => {
     axios
-      .get(`getTeacher/${id}`) // route to include student ID
+      .get(`/api/getTeacher/${id}`) // route to include student ID
       .then((response) => {
         console.log("Response:", response.data); // Log response data
         setData(response.data); // Assuming response.data contains student data
@@ -67,7 +67,7 @@ const BodyUpdateTeacherProfile = () => {
       email,
     } = data;
     try {
-      const { data } = await axios.patch(`updateTeacher/${id}`, {
+      const { data } = await axios.patch(`/api/updateTeacher/${id}`, {
         FirstName,
         MiddleName,
         LastName,

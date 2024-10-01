@@ -22,7 +22,7 @@ const BodyAdminViewAssessment = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`/getActivity/${ActivityCode}`);
+        const response = await axios.get(`/api/getActivity/${ActivityCode}`);
         setData(response.data);
       } catch (err) {
         toast.error("Failed to fetch assessment data. Please try again later.");

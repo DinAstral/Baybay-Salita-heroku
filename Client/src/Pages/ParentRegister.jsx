@@ -194,7 +194,7 @@ const ParentRegister = () => {
     } = data;
 
     try {
-      const response = await axios.post("/registerParent", {
+      const response = await axios.post("/api/registerParent", {
         FirstName,
         LastName,
         StudentName,

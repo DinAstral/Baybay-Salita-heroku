@@ -22,7 +22,7 @@ const BodyTeacherDashboard = () => {
   useEffect(() => {
     const fetchTeacher = async () => {
       try {
-        const response = await axios.get(`/getTeacher/${user.UserID}`);
+        const response = await axios.get(`/api/getTeacher/${user.UserID}`);
         setTeacher(response.data);
       } catch (err) {
         console.error("Error fetching teacher:", err);
@@ -31,7 +31,7 @@ const BodyTeacherDashboard = () => {
 
     const fetchStudents = async () => {
       try {
-        const response = await axios.get("/getStudents");
+        const response = await axios.get("/api/getStudents");
         const data = response.data;
 
         // Filter students by the section of the current teacher

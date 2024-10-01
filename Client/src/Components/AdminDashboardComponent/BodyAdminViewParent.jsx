@@ -33,7 +33,7 @@ const BodyAdminViewParent = () => {
 
   useEffect(() => {
     axios
-      .get(`getParent/${UserID}`)
+      .get(`/api/getParent/${UserID}`)
       .then((response) => {
         setData(response.data);
       })

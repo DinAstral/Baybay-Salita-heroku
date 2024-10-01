@@ -37,7 +37,7 @@ const BodyAdminProfile = () => {
 
   useEffect(() => {
     axios
-      .get(`getAdmin/${user.UserID}`)
+      .get(`/api/getAdmin/${user.UserID}`)
       .then((response) => {
         setData(response.data);
         setProfileImg(response.data.Picture || profileImage);
@@ -62,7 +62,7 @@ const BodyAdminProfile = () => {
       formData.append("UserID", user.UserID);
 
       try {
-        const response = await axios.post("/profileUpdate", formData, {
+        const response = await axios.post("/api/profileUpdate", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         if (response.data.message) {
@@ -113,14 +113,17 @@ const BodyAdminProfile = () => {
     event.preventDefault(); // Prevent the default form submission
 
     try {
-      const response = await axios.patch(`/updateAdmin/${data.UserID}`, data);
+      const response = await axios.patch(
+        `/api/updateAdmin/${data.UserID}`,
+        data
+      );
 
       // Check if the response indicates success
       if (response.status === 200 && response.data) {
         toast.success("Admin profile updated successfully!");
 
         // Optionally, you can refetch the data after the update
-        const updatedResponse = await axios.get(`/getAdmin/${data.UserID}`);
+        const updatedResponse = await axios.get(`/api/getAdmin/${data.UserID}`);
         setData(updatedResponse.data);
       } else {
         toast.error(`Error: ${response.data.error || "Update failed."}`);

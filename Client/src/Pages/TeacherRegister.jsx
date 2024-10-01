@@ -193,7 +193,7 @@ const TeacherRegister = () => {
     }
 
     try {
-      const response = await axios.post("/registerTeacher", {
+      const response = await axios.post("/api/registerTeacher", {
         FirstName,
         LastName,
         Section,

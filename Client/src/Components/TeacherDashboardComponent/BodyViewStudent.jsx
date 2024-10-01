@@ -31,7 +31,7 @@ const BodyViewStudent = () => {
 
   useEffect(() => {
     axios
-      .get(`getStudentID/${id}`)
+      .get(`/api/getStudentID/${id}`)
       .then((response) => {
         setData(response.data);
       })

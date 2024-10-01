@@ -30,7 +30,7 @@ const ResetPassword = () => {
       return;
     }
     try {
-      const { data } = await axios.post(`/reset-password/${id}/${token}`, {
+      const { data } = await axios.post(`/api/reset-password/${id}/${token}`, {
         password,
       });
       if (data.error) {

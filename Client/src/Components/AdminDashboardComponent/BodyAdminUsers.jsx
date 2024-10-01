@@ -78,7 +78,7 @@ const BodyAdminUsers = () => {
   // Fetch users data
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("/users");
+      const response = await axios.get("/api/users");
       setUsers(response.data);
     } catch (err) {
       console.error(err);

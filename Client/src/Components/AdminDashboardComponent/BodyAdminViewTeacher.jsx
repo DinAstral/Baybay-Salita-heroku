@@ -36,7 +36,7 @@ const BodyAdminViewTeacher = () => {
 
   useEffect(() => {
     axios
-      .get(`getTeacher/${UserID}`)
+      .get(`/api/getTeacher/${UserID}`)
       .then((response) => {
         setData(response.data);
       })

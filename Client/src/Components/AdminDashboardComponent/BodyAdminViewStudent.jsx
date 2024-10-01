@@ -30,11 +30,11 @@ const BodyAdminViewStudent = () => {
   useEffect(() => {
     const fetchStudentData = async () => {
       try {
-        const studentResponse = await axios.get(`getStudentID/${id}`);
+        const studentResponse = await axios.get(`/api/getStudentID/${id}`);
         setData(studentResponse.data);
         setStatus(studentResponse.data.status); // Set the student status
         const performanceResponse = await axios.get(
-          `getPerformanceStudent/${studentResponse.data.LRN}`
+          `/api/getPerformanceStudent/${studentResponse.data.LRN}`
         );
         setPerformance(performanceResponse.data);
       } catch (err) {

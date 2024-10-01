@@ -54,7 +54,7 @@ const BodyAdminAddUser = () => {
     const UserID = generateRandomCode(role, 6);
 
     try {
-      const response = await axios.post("/addUser", {
+      const response = await axios.post("/api/addUser", {
         UserID,
         email,
         password,
