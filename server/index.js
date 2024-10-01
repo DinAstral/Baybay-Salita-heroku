@@ -32,15 +32,6 @@ app.use(express.json({ limit: "100mb" })); // Limit for incoming JSON payload
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 
-// Routes
-app.use("/", require("./routes/authRoutes"));
-
-// Error handling middleware for any unhandled routes
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send("Something went wrong!");
-});
-
 // Serve static files from the dist directory
 app.use(express.static(path.join(__dirname, "../Client/dist")));
 
@@ -54,6 +45,15 @@ app.get("*", function (req, res) {
       }
     }
   );
+});
+
+// Routes
+app.use("/", require("./routes/authRoutes"));
+
+// Error handling middleware for any unhandled routes
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Something went wrong!");
 });
 
 const port = process.env.PORT || 5000; // Default port if not provided in .env
