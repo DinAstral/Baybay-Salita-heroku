@@ -11,7 +11,7 @@ const { wordUpload, UserUpload } = require("../middleware/multer");
 const {
   cloudinaryUploader,
   cloudinaryUploaderUser,
-} = require("../api/cloudinary");
+} = require("../hooks/cloudinary");
 
 cloudinary.config({
   cloud_name: "dvcqnbkwb",
@@ -434,7 +434,7 @@ const importSentence = async (req, res) => {
   }
 };
 
-const { runComparisonAndSaveResult } = require("../api/STT-TC-AC"); // Import the helper function for comparison
+const { runComparisonAndSaveResult } = require("../hooks/STT-TC-AC"); // Import the helper function for comparison
 
 const userInputAudio = async (req, res) => {
   const InputID = generateRandomCodeUser(6);

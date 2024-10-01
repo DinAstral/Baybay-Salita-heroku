@@ -6,7 +6,7 @@ const cookieParser = require("cookie-parser");
 const path = require("path");
 const cloudinary = require("cloudinary").v2;
 
-const { run } = require("./api/STT-TC-AC");
+const { run } = require("./hooks/STT-TC-AC");
 
 const app = express();
 
