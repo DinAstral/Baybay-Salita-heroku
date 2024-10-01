@@ -805,7 +805,7 @@ const logout = (req, res) => {
 };
 
 const { profileUpload } = require("../middleware/multer");
-const { cloudinaryUploaderProfile } = require("../api/cloudinary");
+const { cloudinaryUploaderProfile } = require("../hooks/cloudinary");
 const multer = require("multer");
 
 const profileUpdate = async (req, res) => {
