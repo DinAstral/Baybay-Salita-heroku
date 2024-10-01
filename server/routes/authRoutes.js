@@ -80,7 +80,7 @@ const { compareAudio } = require("../controllers/CompareController");
 // Configure CORS middleware
 router.use(
   cors({
-    origin: "https://baybay-salita-edu.netlify.app", // Update this with your client's URL https://baybay-salita-edu.netlify.app
+    origin: "https://baybay-salita-heroku-1.onrender.com", // Update this with your client's URL https://baybay-salita-heroku-1.onrender.com
     methods: ["GET", "POST", "DELETE", "PATCH"], // Add the allowed HTTP methods
     credentials: true, // Allow credentials (cookies, authorization headers)
   })

@@ -50,27 +50,41 @@ const ParentRegister = () => {
 
   function validatePassword(password) {
     const minLength = 8;
+    const errors = [];
+
     const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
     const hasDigit = /\d/.test(password);
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
+    // Check if password is provided
+    if (!password) {
+      return "Password is required.";
+    }
+
+    // Validate the different criteria and accumulate errors
     if (password.length < minLength) {
-      return "Password must be at least 8 characters long.";
+      errors.push("Password must be at least 8 characters long.");
     }
     if (!hasUpperCase) {
-      return "Password must contain at least one uppercase letter.";
+      errors.push("Password must contain at least one uppercase letter.");
     }
     if (!hasLowerCase) {
-      return "Password must contain at least one lowercase letter.";
+      errors.push("Password must contain at least one lowercase letter.");
     }
     if (!hasDigit) {
-      return "Password must contain at least one digit.";
+      errors.push("Password must contain at least one digit.");
     }
     if (!hasSpecialChar) {
-      return "Password must contain at least one special character.";
+      errors.push("Password must contain at least one special character.");
     }
-    return null; // No error
+
+    // If there are any errors, return them as a combined string
+    if (errors.length > 0) {
+      return errors.join(" ");
+    }
+
+    return null; // No errors
   }
 
   const validateInputs = () => {
@@ -90,10 +104,6 @@ const ParentRegister = () => {
       isValid = false;
     }
     // Validate LRN
-    if (data.LRN.length !== 12) {
-      newErrors.LRN = "LRN must be 12 characters long.";
-      isValid = false;
-    }
     if (!isNumber(data.LRN)) {
       newErrors.LRN = "Invalid LRN";
       isValid = false;
@@ -137,6 +147,12 @@ const ParentRegister = () => {
     if (!data.email) {
       newErrors.email = "Email is required";
       isValid = false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Validate email format
+    if (!emailRegex.test(data.email)) {
+      newErrors.email = "Invalid email format.";
     }
 
     const passwordError = validatePassword(data.password);

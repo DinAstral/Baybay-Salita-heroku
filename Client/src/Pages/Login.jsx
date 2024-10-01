@@ -103,7 +103,7 @@ const Login = () => {
 
             <form onSubmit={loginUser} className="flex flex-col">
               <Input
-                type="email"
+                type="text"
                 label="Email"
                 variant="bordered"
                 placeholder="Enter your email"

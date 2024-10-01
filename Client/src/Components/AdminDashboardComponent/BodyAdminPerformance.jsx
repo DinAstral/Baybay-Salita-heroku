@@ -136,11 +136,12 @@ const BodyAdminPerformance = () => {
         show={modalShowDelete}
         onHide={() => setModalShowDelete(false)}
         performance={selectedPerformance}
+        refreshActivities={refreshActivities}
       />
 
       <div className="content-title-header">
         <div>
-          Admin View Student Performance
+          Student Performance
           <Tooltip
             showArrow
             content={

@@ -202,16 +202,16 @@ const getAssessmentID = async (req, res) => {
   const { UserID } = req.params;
 
   try {
-    const activity = await AssessmentModel.findOne({ UserID });
+    const activity = await AssessmentModel.find({ UserID });
 
-    // If no parent is found, return a 404 status
+    // If no assessment is found, return a 404 status
     if (!activity) {
       return res.json({
         message: "No activity found",
       });
     }
 
-    // Return the found parent
+    // Return the found assessment
     res.json(activity);
   } catch (error) {
     // Handle any other errors

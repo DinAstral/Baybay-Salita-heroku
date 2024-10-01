@@ -150,7 +150,7 @@ const BodyAdminUsers = () => {
 
       <div className="content-title-header">
         <div>
-          Admin Manage User
+          Manage User
           <Tooltip
             showArrow={true}
             content={

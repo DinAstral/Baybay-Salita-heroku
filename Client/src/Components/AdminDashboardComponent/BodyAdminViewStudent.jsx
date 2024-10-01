@@ -126,7 +126,9 @@ const BodyAdminViewStudent = () => {
                       ? "bg-blue-200 text-blue-800"
                       : status === "Developing Reader"
                       ? "bg-yellow-200 text-yellow-800"
-                      : "bg-red-200 text-red-800"
+                      : status === "Incomplete"
+                      ? "bg-gray-200 text-gray-800" // New color for "Incomplete" status
+                      : "bg-red-200 text-red-800" // Default fallback for other statuses
                   }`}
                 >
                   {status || "N/A"}

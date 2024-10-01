@@ -125,15 +125,17 @@ const BodyAdminStudent = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case "Grade Ready Reader":
-        return "text-green-600"; // Green
+        return "text-green-600 font-semibold"; // Green with bold text
       case "Transitioning Reader":
-        return "text-blue-600"; // Blue
+        return "text-blue-600 font-semibold"; // Blue with bold text
       case "Developing Reader":
-        return "text-orange-600"; // Orange
-      case "Low and High Emerging Reader":
-        return "text-red-600"; // Red
+        return "text-orange-600 font-semibold"; // Orange with bold text
+      case "Low Emerging Reader":
+        return "text-red-600 font-semibold"; // Red with bold text
+      case "High Emerging Reader":
+        return "text-red-600 font-semibold"; // Red with bold text
       case "Incomplete":
-        return "text-gray-600"; // Gray
+        return "text-gray-600 italic"; // Gray with italic style
       default:
         return "text-black"; // Default color
     }
@@ -165,7 +167,7 @@ const BodyAdminStudent = () => {
       />
       <div className="content-title-header">
         <div>
-          Admin Manage Student
+          Manage Student
           <Tooltip
             showArrow={true}
             content={
@@ -289,6 +291,7 @@ const BodyAdminStudent = () => {
                         <TableCell>{student.Gender}</TableCell>
                         {/* Apply color to the status based on student performance */}
                         <TableCell>
+                          {/* Apply color to the status based on student performance */}
                           <span className={getStatusColor(student.status)}>
                             {student.status}
                           </span>

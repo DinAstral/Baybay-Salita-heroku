@@ -37,6 +37,8 @@ const BodyAssessment = () => {
   const [modalShowSubmit, setModalShowSubmit] = useState(false);
   const [selectedType, setSelectedType] = useState("");
 
+  const [teacherSection, setTeacherSection] = useState(""); // Store teacher's section
+
   const { user } = useContext(UserContext); // Get UserID from context
 
   const handleClose = () => setShow(false);
@@ -50,10 +52,22 @@ const BodyAssessment = () => {
     sheet: "Assessment",
   });
 
+  // Fetch the teacher's section data
   useEffect(() => {
     if (user && user.UserID) {
       axios
-        .get(`/getAssessments?UserID=${user.UserID}`) // Fetch assessments based on teacherID
+        .get(`/getTeacher/${user.UserID}`) // API endpoint to fetch teacher data
+        .then((response) => {
+          setTeacherSection(response.data.Section); // Assuming the response contains the teacher's section as a string
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user && user.UserID) {
+      axios
+        .get(`/getActivity/${user.UserID}`) // Fetch assessments based on teacherID
         .then((response) => {
           // Secondary filter on frontend, if needed
           const teacherAssessments = response.data.filter(
@@ -126,7 +140,7 @@ const BodyAssessment = () => {
         show={show}
         handleClose={handleClose}
         userId={user.UserID}
-        section={user.section}
+        section={teacherSection}
       />
       <ImportWord
         show={modalShowImport}

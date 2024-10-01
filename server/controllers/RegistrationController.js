@@ -668,6 +668,8 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     const user = await User.findOne({ email });
     if (!email && !password) {
       return res.json({
@@ -679,15 +681,22 @@ const loginUser = async (req, res) => {
         error: "Email is Required.",
       });
     }
+    // Validate email format
+    if (!emailRegex.test(email)) {
+      return res.json({
+        error: "Invalid email format.",
+      });
+    }
     if (!password) {
       return res.json({
         error: "Password is Required",
       });
     }
 
+    // If the user is not found, return an error
     if (!user) {
       return res.json({
-        error: "User not found.",
+        error: "Email does not exist. Please try again",
       });
     }
 
@@ -711,8 +720,7 @@ const loginUser = async (req, res) => {
             .json({ success: true, token, role: user.role, user });
         }
       );
-    }
-    if (!match) {
+    } else if (!match) {
       res.json({
         error: "Email and Passowrd doesn't match",
       });
