@@ -1,57 +1,159 @@
 const express = require("express");
-require("dotenv").config();
+const router = express.Router();
 const cors = require("cors");
-const mongoose = require("mongoose");
-const cookieParser = require("cookie-parser");
-const path = require("path");
-const cloudinary = require("cloudinary").v2;
 
-const app = express();
+const {
+  test,
+  getUsers,
+  getUser,
+  getAdmin,
+  addUser,
+  updateUser,
+  addStudent,
+  getStudents,
+  getStudent,
+  deleteStudent,
+  updateStudent,
+  getProfile,
+  updateParent,
+  deleteUser,
+} = require("../controllers/authControllers");
 
-// Database connection
-const uri = process.env.MONGODB_URI;
-mongoose
-  .connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+const {
+  createAssessment,
+  getActivities,
+  addTeacherDetails,
+  updateTeacher,
+  getActivity,
+  updateActivity,
+  getTeacherUsers,
+  getTeacherUser,
+} = require("../controllers/actControllers");
+
+const {
+  getParentUsers,
+  getParentUser,
+  getStudentUser,
+  submitFeedback,
+  getFeedbacks,
+} = require("../controllers/parentController");
+
+const {
+  registerAdmin,
+  registerParent,
+  registerTeacher,
+  verifyOTP,
+  loginUser,
+  forgotPassword,
+  resetPassword,
+  logout,
+  profileUpdate,
+  updateAdmin,
+} = require("../controllers/RegistrationController");
+
+const {
+  importWord,
+  importSentence,
+  submitAssessment,
+  getAssessmentCode,
+  getImportWords,
+  getPerformance,
+  getOnePerformance,
+  getAssessmentID,
+  deleteAssessment,
+  deletePerformance,
+  userInputAudio,
+  getSentence,
+  userInputSentence,
+  getPerformanceStudent,
+} = require("../controllers/assessmentController");
+
+const {
+  mobileLogin,
+  getStudentbyLRN,
+} = require("../controllers/mobileController");
+
+const { studentStatus } = require("../controllers/analyticsController");
+
+const { compareAudio } = require("../controllers/CompareController");
+
+// Configure CORS middleware
+router.use(
+  cors({
+    origin: "https://baybay-salita-heroku-8c328f3ddd0f.herokuapp.com", // Update this with your client's URL
+    methods: ["GET", "POST", "DELETE", "PATCH"], // Add the allowed HTTP methods
+    credentials: true, // Allow credentials (cookies, authorization headers)
   })
-  .then(() => console.log("Database is Connected"))
-  .catch((err) => console.error("Database not connected", err));
+);
 
-// Cloudinary Setup
-cloudinary.config({
-  cloud_name: "dvcqnbkwb",
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+// Mobile route
+router.post("/mobileLogin", mobileLogin); //okay
+router.get("/getStudent/:LRN", getStudentbyLRN); //okay
 
-// Middleware
-app.use(express.json({ limit: "100mb" })); // Limit for incoming JSON payload
-app.use(cookieParser());
-app.use(express.urlencoded({ extended: false }));
-app.use(cors()); // Enable CORS globally
+// Login Routes
+router.get("/", test); //okay
+router.post("/registerParent", registerParent); //okay
+router.post("/registerTeacher", registerTeacher); //okay
+router.post("/verify", verifyOTP); //okay
+router.post("/login", loginUser); //okay
+router.post("/forgotPass", forgotPassword); //okay
+router.post("/reset-password/:id/:token", resetPassword); //okay
+router.post("/logout", logout); //okay
 
-// Routes
-app.use("/api", require("./routes/authRoutes")); // Ensure API routes are registered first
+// Upload Routes
+router.post("/importWord", importWord); //okay
+router.post("/userInput", userInputAudio); //okay
+router.get("/getImportWord", getImportWords); //okay profileUpdate
+router.post("/profileUpdate", profileUpdate); //okay
+router.post("/importSentence", importSentence); //okay
 
-// Serve static files (for the frontend)
-app.use(express.static(path.join(__dirname, "../Client/dist")));
+// Assessment Routes
+router.post("/submitAssessment", submitAssessment); //okay
+router.get("/getActivity/:ActivityCode", getAssessmentCode); //okay
+router.get("/getActivity/:UserID", getAssessmentID);
+router.get("/getPerformance", getPerformance); //okay
+router.get("/getPerformanceStudent/:LRN", getPerformanceStudent);
+router.get("/getPerformance/:UserInputId", getOnePerformance); //okay
+router.get("/getSentence", getSentence); //okay
+router.get("/getAssessments", getActivities); //okay
+router.get("/getAssessment/:id", getActivity); //okay
+router.delete("/deleteAssessment/:id", deleteAssessment); //Okay
+router.delete("/deletePerformance/:id", deletePerformance); //okay
+router.post("/userInputSentence", userInputSentence); //okay
 
-// Catch-all for serving the frontend app (fallback)
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../Client/dist/index.html"), (err) => {
-    if (err) {
-      res.status(500).send(err);
-    }
-  });
-});
+// Admin Routes
+router.post("/addUser", addUser); //okay
+router.get("/users", getUsers); //okay
+router.get("/getUser/:id", getUser); //okay
+router.get("/getAdmin/:UserID", getAdmin); //okay
+router.patch("/updateUser/:id", updateUser);
+router.delete("/deleteUser/:email", deleteUser); //okay
+router.get("/profile", getProfile); //okay updateAdmin
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send("Something went wrong!");
-});
+router.patch("/updateAdmin/:UserID", updateAdmin); //okay
+router.patch("/updateTeacher/:UserID", updateTeacher); //okay
+router.patch("/updateParent/:UserID", updateParent); //okay
 
-// Start the server
-const port = process.env.PORT || 5000;
-app.listen(port, () => console.log(`Server is running on port ${port}`));
+// Student Routes
+router.post("/addStudent", addStudent); // okay
+router.get("/getStudents", getStudents); //okay
+router.get("/getStudentID/:id", getStudent); //okay
+router.delete("/deleteStudent/:id", deleteStudent); //okay
+router.patch("/updateStudent/:id", updateStudent); //okay
+
+router.patch("/studentStatus/:LRN", studentStatus); //okay
+
+// Parent Routes
+router.get("/getParent", getParentUsers); //okay
+router.get("/getParent/:UserID", getParentUser); //okay
+router.get("/getStudentParent/:LRN", getStudentUser); //okay getFeedbacks
+router.get("/getFeedbacks", getFeedbacks);
+
+// Teacher Routes
+router.post("/createAssessment", createAssessment); //okay
+router.patch("/updateAssessment/:id", updateActivity);
+router.get("/getTeacher", getTeacherUsers); //okay
+router.get("/getTeacher/:UserID", getTeacherUser); //okay
+router.post("/submitFeedback", submitFeedback); //okay
+
+module.exports = router;
