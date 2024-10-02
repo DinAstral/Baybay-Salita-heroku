@@ -1,0 +1,1 @@
+import{r as a}from"./react-BCcS7c0c.js";function w(t,n,s){var c=a.useRef(t!==void 0),i=a.useState(n),u=i[0],f=i[1],e=t!==void 0,m=c.current;return c.current=e,!e&&m&&u!==n&&f(n),[e?t:u,a.useCallback(function(p){for(var o=arguments.length,v=new Array(o>1?o-1:0),r=1;r<o;r++)v[r-1]=arguments[r];s&&s.apply(void 0,[p].concat(v)),f(p)},[s])]}export{w as u};

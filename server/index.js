@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 const cloudinary = require("cloudinary").v2;
+const compression = require("compression");
 
 const app = express();
 
@@ -24,6 +25,9 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+
+// Enable compression
+app.use(compression());
 
 // Middleware
 app.use(express.json({ limit: "100mb" })); // Limit for incoming JSON payload
