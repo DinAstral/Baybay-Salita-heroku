@@ -44,6 +44,10 @@ const TeacherRegister = () => {
   const [isVisibleConfirm, setIsVisibleConfirm] = useState(false);
   const toggleVisibilityConfirm = () => setIsVisibleConfirm(!isVisibleConfirm);
 
+  const registerButton = () => {
+    navigate("/register");
+  };
+
   function isNumber(input) {
     return !isNaN(input);
   }
@@ -492,7 +496,7 @@ const TeacherRegister = () => {
                 <Button
                   className="w-full md:w-1/2 text-md"
                   color="danger"
-                  onClick={() => navigate(-1)}
+                  onClick={registerButton}
                 >
                   Cancel
                 </Button>

@@ -36,6 +36,10 @@ const ParentRegister = () => {
     confirmPassword: "",
   });
 
+  const registerButton = () => {
+    navigate("/register");
+  };
+
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
@@ -467,7 +471,7 @@ const ParentRegister = () => {
                 <Button
                   className="w-full md:w-1/3 text-md"
                   color="danger"
-                  onClick={() => navigate(-1)}
+                  onClick={registerButton}
                 >
                   Cancel
                 </Button>

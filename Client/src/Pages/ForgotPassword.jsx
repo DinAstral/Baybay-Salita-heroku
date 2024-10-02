@@ -10,6 +10,10 @@ import axios from "axios";
 const ForgotPassword = () => {
   const navigate = useNavigate();
 
+  const loginButton = () => {
+    navigate("/login");
+  };
+
   const [data, setData] = useState({
     email: "",
   });
@@ -66,9 +70,13 @@ const ForgotPassword = () => {
                 />
               </div>
               <div className="w-full flex items-center justify-center gap-6 my-4">
-                <Button className="my-2" size="lg" radius="md" color="danger">
-                  <Link to="/login">Cancel</Link>
-                </Button>
+                <Button
+                  className="my-2"
+                  size="lg"
+                  radius="md"
+                  color="danger"
+                  onClick={loginButton}
+                ></Button>
                 <Button
                   type="submit"
                   className="my-2"

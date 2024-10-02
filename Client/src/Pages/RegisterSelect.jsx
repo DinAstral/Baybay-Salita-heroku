@@ -13,6 +13,10 @@ const RegisterSelect = () => {
   const [isInvalid, setIsInvalid] = useState(true);
   const navigate = useNavigate();
 
+  const loginButton = () => {
+    navigate("/login");
+  };
+
   const handleNext = () => {
     if (selectedRoles.length === 1) {
       const selectedRole = selectedRoles[0];
@@ -30,7 +34,7 @@ const RegisterSelect = () => {
     <div className="flex bg-[#f6fbff] w-full h-screen items-center justify-center p-4">
       <div className="w-full max-w-lg flex flex-col items-center justify-center">
         <Card className="w-full p-6 sm:p-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-center mb-4 text-gray-700">
             Registration
           </h1>
           <p className="text-sm text-center mb-6">
@@ -59,10 +63,14 @@ const RegisterSelect = () => {
                 )}
               </div>
               <div className="flex items-center justify-center gap-4">
-                <Button className="my-2" size="lg" radius="md" color="danger">
-                  <Link to="/login" className="text-white">
-                    Cancel
-                  </Link>
+                <Button
+                  className="my-2"
+                  size="lg"
+                  radius="md"
+                  color="danger"
+                  onClick={loginButton}
+                >
+                  Cancel
                 </Button>
                 <Button
                   type="button"

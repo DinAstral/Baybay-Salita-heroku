@@ -10,6 +10,10 @@ const VerifyEmail = () => {
   const navigate = useNavigate();
   const [otp, setOtp] = useState("");
 
+  const loginButton = () => {
+    navigate("/login");
+  };
+
   const verifyUser = async (e) => {
     e.preventDefault();
     const userId = localStorage.getItem("userId"); // Retrieve userId from localStorage
@@ -65,11 +69,6 @@ const VerifyEmail = () => {
                 />
               </div>
               <div className="w-full flex items-center justify-center gap-6 my-4">
-                <Button className="my-2" size="lg" radius="md" color="danger">
-                  <Link to="/login" className="text-white no-underline">
-                    Cancel
-                  </Link>
-                </Button>
                 <Button
                   type="submit"
                   className="my-2"

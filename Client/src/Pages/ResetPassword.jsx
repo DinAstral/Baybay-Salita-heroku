@@ -21,6 +21,10 @@ const ResetPassword = () => {
     confirmPassword: "",
   });
 
+  const loginButton = () => {
+    navigate("/login");
+  };
+
   const resetPassword = async (e) => {
     e.preventDefault();
     const { password, confirmPassword } = data;
@@ -122,9 +126,13 @@ const ResetPassword = () => {
                 />
               </div>
               <div className="w-full flex items-center justify-center gap-6 my-4">
-                <Button className="my-2" size="lg" radius="md" color="danger">
-                  <Link to="/login">Cancel</Link>
-                </Button>
+                <Button
+                  className="my-2"
+                  size="lg"
+                  radius="md"
+                  color="danger"
+                  onClick={loginButton}
+                ></Button>
                 <Button
                   type="submit"
                   className="my-2"
