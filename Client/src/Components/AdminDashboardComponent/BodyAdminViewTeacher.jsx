@@ -14,8 +14,9 @@ import toast from "react-hot-toast";
 const BodyAdminViewTeacher = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [activeIndex, setActiveIndex] = useState(0);
   const { UserID } = useParams();
+
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const [data, setData] = useState({
     _id: "",
@@ -41,7 +42,7 @@ const BodyAdminViewTeacher = () => {
         setData(response.data);
       })
       .catch((err) => {
-        toast.error("Failed to fetch parent data. Please try again later.");
+        toast.error("Failed to fetch teacher data. Please try again later.");
       });
   }, [UserID]);
 
@@ -79,20 +80,24 @@ const BodyAdminViewTeacher = () => {
           <img src={profile} className="w-32 h-32 rounded-full" alt="Profile" />
           <div className="flex-1">
             <h2 className="text-2xl font-bold">
-              {data ? `${data.FirstName} ${data.LastName}` : "Parent Name: "}
+              {data.FirstName && data.LastName
+                ? `${data.FirstName} ${data.LastName}`
+                : "Teacher Name"}
             </h2>
-            <h4>{data ? `Section: ${data.Section}` : "Teacher of section"}</h4>
+            <h4>
+              {data.Section ? `Section: ${data.Section}` : "Teacher of section"}
+            </h4>
             <div className="flex flex-col mt-4 text-gray-700">
               <div className="flex items-center gap-2">
                 <FontAwesomeIcon
                   icon={faAddressCard}
                   className="text-gray-600"
                 />
-                <span>Teacher ID Number: {`${data.UserID}`}</span>
+                <span>Teacher ID Number: {data.UserID || "N/A"}</span>
               </div>
               <div className="flex items-center gap-2 mt-2">
                 <FontAwesomeIcon icon={faEnvelope} className="text-gray-600" />
-                <span> Email Address: {`${data.email}`}</span>
+                <span>Email Address: {data.email || "N/A"}</span>
               </div>
             </div>
           </div>

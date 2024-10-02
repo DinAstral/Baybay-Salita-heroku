@@ -17,11 +17,11 @@ import { faCircleInfo, faPrint } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import "../ContentDasboard/Content.css";
 import PrintRecord from "../Modals/PrintRecord";
-import CreateAssessment from "../Modals/CreateAssessment";
 import ImportWord from "../Modals/importWord";
 import DeleteAssessment from "../Modals/DeleteAssessment";
 import ImportSentence from "../Modals/importSentence";
 import ViewAssessment from "../Modals/ViewAssessment";
+import AdminCreateAssessment from "../Modals/AdminModal/AdminCreateAssessment";
 
 const BodyAdminStudentAssessment = () => {
   const [show, setShow] = useState(false);
@@ -117,7 +117,7 @@ const BodyAdminStudentAssessment = () => {
         onHide={() => setModalShowPrint(false)}
         print={onDownload}
       />
-      <CreateAssessment
+      <AdminCreateAssessment
         show={show}
         handleClose={handleClose}
         onSuccess={refreshActivities} // Pass callback to refresh activities on success
@@ -244,6 +244,7 @@ const BodyAdminStudentAssessment = () => {
                   <TableHeader>
                     <TableColumn>Activity Code</TableColumn>
                     <TableColumn>Grading Period</TableColumn>
+                    <TableColumn>Section</TableColumn>
                     <TableColumn>Type</TableColumn>
                     <TableColumn>Status</TableColumn>
                     <TableColumn className="text-center">Actions</TableColumn>
@@ -253,6 +254,7 @@ const BodyAdminStudentAssessment = () => {
                       <TableRow key={activity._id}>
                         <TableCell>{activity.ActivityCode}</TableCell>
                         <TableCell>{activity.Period}</TableCell>
+                        <TableCell>{activity.Section}</TableCell>
                         <TableCell>{activity.Type}</TableCell>
                         <TableCell>{activity.Assessment}</TableCell>
                         <TableCell className="text-center">

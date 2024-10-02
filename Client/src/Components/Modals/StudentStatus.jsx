@@ -43,7 +43,7 @@ const StudentStatus = ({ show, onHide, LRN, onStatusUpdate }) => {
   // Handle status update on button click
   const handleAssessClick = async () => {
     try {
-      const response = await axios.patch(`/studentStatus/${LRN}`);
+      const response = await axios.patch(`/api/studentStatus/${LRN}`);
       console.log("Response data:", response.data); // Log the API response
 
       const { status, comment } = response.data;

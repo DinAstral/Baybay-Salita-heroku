@@ -76,7 +76,9 @@ const ForgotPassword = () => {
                   radius="md"
                   color="danger"
                   onClick={loginButton}
-                ></Button>
+                >
+                  Back
+                </Button>
                 <Button
                   type="submit"
                   className="my-2"

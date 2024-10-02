@@ -154,7 +154,7 @@ const BodyAdminEditStudent = () => {
               <Select
                 placeholder="Select Section"
                 value={data.Section}
-                onChange={(value) => setData({ ...data, Section: value })}
+                onChange={(e) => setData({ ...data, Section: e.target.value })}
               >
                 <SelectItem key="" disabled>
                   Select Section
@@ -219,7 +219,7 @@ const BodyAdminEditStudent = () => {
               <Select
                 placeholder="Select Gender"
                 value={data.Gender}
-                onChange={(value) => setData({ ...data, Gender: value })}
+                onChange={(e) => setData({ ...data, Gender: e.target.value })}
               >
                 <SelectItem key="" disabled>
                   Select Gender

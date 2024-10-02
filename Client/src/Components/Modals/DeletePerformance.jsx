@@ -44,7 +44,7 @@ const DeletePerformance = ({
 
   const deleteActivity = async () => {
     try {
-      await axios.delete(`/deletePerformance/${performance._id}`);
+      await axios.delete(`/api/deletePerformance/${performance._id}`);
       setModalSubmitSuccess(true);
       refreshActivities(); // Automatically refresh activities
     } catch (err) {

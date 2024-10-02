@@ -24,8 +24,8 @@ import axios from "axios";
 import "../ContentDasboard/Content.css";
 import PrintRecord from "../Modals/PrintRecord";
 import ViewStudent from "../Modals/TeacherModal/ViewStudent";
-import AddStudent from "../Modals/AdminModal/AddStudent";
-import UpdateStudent from "../Modals/AdminModal/UpdateStudent";
+import AddStudent from "../Modals/TeacherModal/AddStudent";
+import UpdateStudent from "../Modals/TeacherModal/UpdateStudent";
 import DeleteStudent from "../Modals/AdminModal/DeleteStudent";
 import { UserContext } from "../../../context/userContext"; // Import the context
 
@@ -278,25 +278,18 @@ const BodyManageStudent = () => {
                         <TableCell>
                           <div className="flex justify-center gap-2">
                             <Button
-                              color="primary"
+                              color="default"
                               size="sm"
                               onClick={() => handleViewClick(student)}
                             >
                               View
                             </Button>
                             <Button
-                              color="secondary"
+                              color="primary"
                               size="sm"
                               onClick={() => handleEditClick(student)}
                             >
-                              Edit
-                            </Button>
-                            <Button
-                              color="danger"
-                              size="sm"
-                              onClick={() => handleDeleteClick(student)}
-                            >
-                              Delete
+                              Update
                             </Button>
                           </div>
                         </TableCell>

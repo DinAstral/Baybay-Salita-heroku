@@ -269,12 +269,6 @@ const BodyManagePerformance = () => {
                             >
                               View
                             </Button>
-                            <Button
-                              color="danger"
-                              onClick={() => handleDeleteClick(performance)}
-                            >
-                              Delete
-                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>

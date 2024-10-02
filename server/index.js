@@ -9,7 +9,7 @@ const compression = require("compression");
 
 const app = express();
 
-// Middleware to force HTTPS
+/*/ Middleware to force HTTPS
 app.use((req, res, next) => {
   // Check if request is forwarded via HTTPS (for apps behind proxy/load balancer like Heroku)
   if (req.header("x-forwarded-proto") !== "https") {
@@ -17,7 +17,7 @@ app.use((req, res, next) => {
     return res.redirect(`https://${req.header("host")}${req.url}`);
   }
   next();
-});
+}); */
 
 // Enable compression for better performance
 app.use(compression());
@@ -47,7 +47,7 @@ app.use(express.urlencoded({ extended: false }));
 // Register API routes
 app.use("/api", require("./routes/authRoutes"));
 
-// Serve static files from the client build (React Vite build)
+/*/ Serve static files from the client build (React Vite build)
 app.use(express.static(path.join(__dirname, "../Client/dist")));
 
 // Catch-all route to serve the React app (if no API route matches)
@@ -57,7 +57,7 @@ app.get("*", (req, res) => {
       res.status(500).send(err);
     }
   });
-});
+});*/
 
 // Error handling middleware
 app.use((err, req, res, next) => {

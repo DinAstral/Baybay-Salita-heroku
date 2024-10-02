@@ -42,7 +42,7 @@ const DeleteStudent = ({ show, onHide, student, onDeleteSuccess }) => {
 
   const deleteStudent = async () => {
     try {
-      await axios.delete(`/deleteStudent/${student._id}`); // Ensure this route matches your backend
+      await axios.delete(`/api/deleteStudent/${student._id}`); // Ensure this route matches your backend
       setModalDeleteSuccess(true); // Show success modal
       onDeleteSuccess(); // Call to refresh data in parent component
     } catch (err) {

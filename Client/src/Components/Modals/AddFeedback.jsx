@@ -61,7 +61,7 @@ const AddFeedback = ({ show, onHide, actCode, userid, lrn, section }) => {
     const { Feedback_Date, Type, Title, Context } = data;
 
     try {
-      const response = await axios.post(`/submitFeedback`, {
+      const response = await axios.post(`/api/submitFeedback`, {
         UserID: userid,
         LRN: lrn,
         Section: section,

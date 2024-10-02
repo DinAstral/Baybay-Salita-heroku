@@ -72,7 +72,7 @@ const ImportWord = ({ show, onHide }) => {
     formData.append("Audio", Audio);
 
     try {
-      const response = await axios.post("/importWord", formData, {
+      const response = await axios.post("/api/importWord", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -99,7 +99,8 @@ const ImportWord = ({ show, onHide }) => {
         aria-labelledby="contained-modal-title-vcenter"
         isDismissable={false}
         isKeyboardDismissDisabled={true}
-        scrollBehavior={"inside"}
+        scrollBehavior="inside"
+        placement="center"
       >
         <ModalContent>
           <ModalHeader id="contained-modal-title-vcenter">

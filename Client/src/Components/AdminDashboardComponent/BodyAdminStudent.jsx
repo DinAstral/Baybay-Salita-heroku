@@ -218,6 +218,7 @@ const BodyAdminStudent = () => {
                   variant="bordered"
                   defaultSelectedKeys={[""]}
                   onChange={handleSectionChange}
+                  aria-label="Filter students by section"
                   value={selectedRole}
                 >
                   <SelectItem key="">Select Section</SelectItem>
@@ -299,18 +300,18 @@ const BodyAdminStudent = () => {
                         <TableCell>
                           <div className="flex justify-center gap-2">
                             <Button
-                              color="primary"
+                              color="default"
                               size="sm"
                               onClick={() => handleViewClick(student)}
                             >
                               View
                             </Button>
                             <Button
-                              color="secondary"
+                              color="primary"
                               size="sm"
                               onClick={() => handleEditClick(student)}
                             >
-                              Edit
+                              Update
                             </Button>
                             <Button
                               color="danger"

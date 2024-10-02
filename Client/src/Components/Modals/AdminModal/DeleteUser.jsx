@@ -42,7 +42,7 @@ const DeleteUser = ({ show, onHide, user, onDeleteSuccess }) => {
 
   const deleteUser = async () => {
     try {
-      await axios.delete(`/deleteUser/${user.email}`);
+      await axios.delete(`/api/deleteUser/${user.email}`);
       setModalDeleteSuccess(true);
       onDeleteSuccess();
     } catch (err) {

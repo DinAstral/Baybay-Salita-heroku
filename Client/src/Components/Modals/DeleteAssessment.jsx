@@ -39,7 +39,7 @@ const DeleteAssessment = ({ show, onHide, activity }) => {
 
   const deleteActivity = async () => {
     try {
-      await axios.delete(`/deleteAssessment/${activity._id}`);
+      await axios.delete(`/api/deleteAssessment/${activity._id}`);
       setModalSubmitSuccess(true);
     } catch (err) {
       console.error("Error deleting activity:", err);

@@ -44,12 +44,13 @@ const CreateSuccess = ({ show, onHide }) => {
   );
 };
 
-const AdminCreateAssessment = ({ show, handleClose, userId, section }) => {
+const AdminCreateAssessment = ({ show, handleClose, userId }) => {
   const [modalShow, setModalShow] = useState(false);
   const [words, setWords] = useState([]);
   const [sentences, setSentences] = useState([]); // Changed from sentence to sentences
   const [filteredWords, setFilteredWords] = useState([]);
   const [data, setData] = useState({
+    Section: "",
     Period: "",
     Type: "",
     Title: "",
@@ -67,7 +68,7 @@ const AdminCreateAssessment = ({ show, handleClose, userId, section }) => {
 
   const fetchImportWord = () => {
     axios
-      .get("/getImportWord")
+      .get("/api/getImportWord")
       .then((response) => {
         setWords(response.data);
       })
@@ -76,7 +77,7 @@ const AdminCreateAssessment = ({ show, handleClose, userId, section }) => {
 
   const fetchImportSentence = () => {
     axios
-      .get("/getSentence")
+      .get("/api/getSentence")
       .then((response) => {
         setSentences(response.data); // Set sentences data
       })
@@ -107,12 +108,12 @@ const AdminCreateAssessment = ({ show, handleClose, userId, section }) => {
 
   const createAct = async (e) => {
     e.preventDefault();
-    const { Period, Type, Title } = data; // Use Title in the submission
+    const { Period, Type, Title, Section } = data; // Use Title in the submission
 
     try {
-      const response = await axios.post(`/submitAssessment`, {
+      const response = await axios.post(`/api/submitAssessment`, {
         UserID: userId,
-        Section: section,
+        Section,
         Period,
         Type,
         Title,
@@ -131,6 +132,7 @@ const AdminCreateAssessment = ({ show, handleClose, userId, section }) => {
         toast.error(response.data.error);
       } else {
         setData({
+          Section: "",
           Period: "",
           Type: "",
           Title: "",
@@ -159,32 +161,31 @@ const AdminCreateAssessment = ({ show, handleClose, userId, section }) => {
       <Modal
         isOpen={show}
         onClose={handleClose}
-        size="lg"
+        size="lg" // size prop can remain for larger screens
         aria-labelledby="contained-modal-title-vcenter"
         isDismissable={false}
         isKeyboardDismissDisabled={true}
-        scrollBehavior={"inside"}
+        placement="center"
+        scrollBehavior="inside" // Ensure content inside can scroll
       >
-        <ModalContent>
-          <ModalHeader id="contained-modal-title-vcenter">
+        <ModalContent className="w-full md:w-[50vw] max-w-full max-h-[80vh] overflow-y-auto bg-white p-4 rounded-lg">
+          <ModalHeader
+            id="contained-modal-title-vcenter"
+            className="text-lg font-bold"
+          >
             Create New Activity
           </ModalHeader>
-          <form onSubmit={createAct}>
+          <form onSubmit={createAct} className="space-y-4">
             <ModalBody>
+              {/* Form Inputs and Selects */}
               <Select
                 labelPlacement="outside"
                 label="Grading Period"
-                defaultSelectedKeys={"0"}
-                disabledKeys={"0"}
-                aria-label="Select grading period"
-                variant="bordered"
-                className="bg-transparent py-1 my-1"
+                placeholder="Select Grading Period"
                 value={data.Period}
-                onChange={(e) => {
-                  setData({ ...data, Period: e.target.value });
-                }}
+                onChange={(e) => setData({ ...data, Period: e.target.value })}
+                className="w-full my-2"
               >
-                <SelectItem key="0">Select Grading Period:</SelectItem>
                 <SelectItem key="1">Grading Period 1</SelectItem>
                 <SelectItem key="2">Grading Period 2</SelectItem>
                 <SelectItem key="3">Grading Period 3</SelectItem>
@@ -193,18 +194,34 @@ const AdminCreateAssessment = ({ show, handleClose, userId, section }) => {
 
               <Select
                 labelPlacement="outside"
-                label="Type of Assessment"
-                aria-label="Select type of assessment"
-                defaultSelectedKeys={"0"}
-                disabledKeys={"0"}
-                variant="bordered"
-                className="bg-transparent py-1 my-1"
-                value={data.Type}
-                onChange={(e) => {
-                  setData({ ...data, Type: e.target.value, Title: "" }); // Reset Title when type changes
-                }}
+                label="Section"
+                placeholder="Select Section"
+                className="w-full my-2"
+                value={data.Section}
+                onChange={(e) => setData({ ...data, Section: e.target.value })}
               >
-                <SelectItem key="0">Select Type of Assessment:</SelectItem>
+                <SelectItem key="" disabled>
+                  Select Section
+                </SelectItem>
+                <SelectItem key="Camia">Camia</SelectItem>
+                <SelectItem key="Daffodil">Daffodil</SelectItem>
+                <SelectItem key="Daisy">Daisy</SelectItem>
+                <SelectItem key="Gumamela">Gumamela</SelectItem>
+                <SelectItem key="Lily">Lily</SelectItem>
+                <SelectItem key="Rosal">Rosal</SelectItem>
+                <SelectItem key="Rose">Rose</SelectItem>
+                <SelectItem key="Santan">Santan</SelectItem>
+                <SelectItem key="Special">Special</SelectItem>
+              </Select>
+
+              <Select
+                labelPlacement="outside"
+                label="Type of Assessment"
+                placeholder="Select Type of Assessment:"
+                value={data.Type}
+                onChange={(e) => setData({ ...data, Type: e.target.value })}
+                className="w-full my-2"
+              >
                 <SelectItem key="Pagbabaybay">
                   Assessment 1: Pagbabaybay Tunog at Letra
                 </SelectItem>
@@ -213,20 +230,16 @@ const AdminCreateAssessment = ({ show, handleClose, userId, section }) => {
                 <SelectItem key="Pagbabasa">Assessment 4: Pagbabasa</SelectItem>
               </Select>
 
+              {/* Conditional content based on Type */}
               {data.Type === "Pagbabasa" ? (
                 <Select
                   labelPlacement="outside"
-                  placeholder="Select a Title"
                   label="Title"
-                  aria-label="Select title"
-                  variant="bordered"
-                  className="bg-transparent py-1 my-1"
                   value={data.Title}
-                  onChange={(e) => {
-                    setData({ ...data, Title: e.target.value });
-                  }}
+                  placeholder="Select a Title:"
+                  onChange={(e) => setData({ ...data, Title: e.target.value })}
+                  className="w-full my-2"
                 >
-                  <SelectItem key="0">Select a Title:</SelectItem>
                   {sentences.map((sentence) => (
                     <SelectItem key={sentence.Title} value={sentence.Title}>
                       {sentence.Title}
@@ -234,48 +247,30 @@ const AdminCreateAssessment = ({ show, handleClose, userId, section }) => {
                   ))}
                 </Select>
               ) : (
-                <>
-                  <div className="text-sm mb-4">
-                    <p>Please add items to your assessment.</p>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {[
-                      "Item1",
-                      "Item2",
-                      "Item3",
-                      "Item4",
-                      "Item5",
-                      "Item6",
-                      "Item7",
-                      "Item8",
-                      "Item9",
-                      "Item10",
-                    ].map((item, index) => (
-                      <Select
-                        key={item}
-                        labelPlacement="outside"
-                        placeholder="Select a word:"
-                        label={`Item ${index + 1}`}
-                        variant="bordered"
-                        className="bg-transparent py-1 my-1"
-                        value={data[item]}
-                        onChange={(e) => {
-                          handleWordChange(item, e.target.value);
-                        }}
-                      >
-                        <SelectItem key="0">Select Word:</SelectItem>
-                        {filteredWords.map((word) => (
-                          <SelectItem key={word.ItemCode} value={word.Word}>
-                            {word.Word}
-                          </SelectItem>
-                        ))}
-                      </Select>
-                    ))}
-                  </div>
-                </>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[...Array(10)].map((_, i) => (
+                    <Select
+                      key={`Item${i + 1}`}
+                      labelPlacement="outside"
+                      label={`Item ${i + 1}`}
+                      value={data[`Item${i + 1}`]}
+                      placeholder="Select a word:"
+                      onChange={(e) =>
+                        handleWordChange(`Item${i + 1}`, e.target.value)
+                      }
+                      className="w-full my-2"
+                    >
+                      {filteredWords.map((word) => (
+                        <SelectItem key={word.ItemCode} value={word.Word}>
+                          {word.Word}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                  ))}
+                </div>
               )}
             </ModalBody>
-            <ModalFooter>
+            <ModalFooter className="flex justify-end space-x-2">
               <Button color="danger" variant="light" onClick={handleClose}>
                 Close
               </Button>

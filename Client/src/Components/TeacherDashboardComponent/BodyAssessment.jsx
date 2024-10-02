@@ -286,15 +286,6 @@ const BodyAssessment = () => {
                             >
                               View
                             </Button>
-                            <Button
-                              color="danger"
-                              onClick={() => {
-                                setSelectedActivity(activity);
-                                setModalShowSubmit(true);
-                              }}
-                            >
-                              Delete
-                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>

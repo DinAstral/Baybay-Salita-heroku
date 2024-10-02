@@ -94,7 +94,7 @@ const ImportSentence = ({ show, onHide }) => {
     }
 
     try {
-      const response = await axios.post("/importSentence", {
+      const response = await axios.post("/api/importSentence", {
         Type,
         Title,
         Sentence,
@@ -132,8 +132,9 @@ const ImportSentence = ({ show, onHide }) => {
         isDismissable={false}
         isKeyboardDismissDisabled={true}
         scrollBehavior="inside"
+        placement="center"
       >
-        <ModalContent>
+        <ModalContent className="w-full md:w-[50vw] max-w-full max-h-[80vh] overflow-y-auto bg-white p-4 rounded-lg">
           <ModalHeader id="import-modal-title">Import New Sentence</ModalHeader>
           <form onSubmit={importSentence}>
             <ModalBody>
@@ -187,7 +188,7 @@ const ImportSentence = ({ show, onHide }) => {
                 }
               />
 
-              <div className="flex flex-col gap-6 overflow-y-auto max-h-96">
+              <div className="flex flex-col gap-6">
                 <div className="flex flex-wrap gap-4">
                   <div className="flex flex-1">
                     <Input

@@ -157,19 +157,6 @@ const BodyTeacherDashboard = () => {
           />
         </div>
       </div>
-
-      <div className="mt-6">
-        <h2 className="text-2xl font-semibold mb-4">Compared Result</h2>
-        <div className="bg-white rounded-lg shadow p-4">
-          <LineChart
-            xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
-            series={[{ data: [1, 1, 4, 6, 3, 10] }]}
-            height={300}
-            margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
-            grid={{ vertical: true, horizontal: true }}
-          />
-        </div>
-      </div>
     </div>
   );
 };
