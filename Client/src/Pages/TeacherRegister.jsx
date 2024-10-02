@@ -496,6 +496,7 @@ const TeacherRegister = () => {
                 <Button
                   className="w-full md:w-1/2 text-md"
                   color="danger"
+                  variant="light"
                   onClick={registerButton}
                 >
                   Cancel

@@ -75,6 +75,7 @@ const ForgotPassword = () => {
                   size="lg"
                   radius="md"
                   color="danger"
+                  variant="light"
                   onClick={loginButton}
                 >
                   Back

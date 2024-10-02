@@ -68,6 +68,7 @@ const RegisterSelect = () => {
                   size="lg"
                   radius="md"
                   color="danger"
+                  variant="light"
                   onClick={loginButton}
                 >
                   Cancel

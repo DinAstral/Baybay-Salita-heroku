@@ -38,6 +38,7 @@ const BodyAssessment = () => {
   const [selectedType, setSelectedType] = useState("");
 
   const [teacherSection, setTeacherSection] = useState(""); // Store teacher's section
+  const [teacherID, setTeacherID] = useState(""); // Store teacher's User ID
 
   const { user } = useContext(UserContext); // Get UserID from context
 
@@ -59,26 +60,27 @@ const BodyAssessment = () => {
         .get(`/api/getTeacher/${user.UserID}`) // API endpoint to fetch teacher data
         .then((response) => {
           setTeacherSection(response.data.Section); // Assuming the response contains the teacher's section as a string
+          setTeacherID(response.data.UserID);
         })
         .catch((err) => console.log(err));
     }
   }, [user]);
 
   useEffect(() => {
-    if (user && user.UserID) {
+    if (teacherSection) {
       axios
-        .get(`/api/getActivity/${user.UserID}`) // Fetch assessments based on teacherID
+        .get(`/api/getAssessments`)
         .then((response) => {
-          // Secondary filter on frontend, if needed
-          const teacherAssessments = response.data.filter(
-            (activity) => activity.UserID === user.UserID
+          // Filter performances based on the logged-in teacher's section
+          const filteredActivities = response.data.filter(
+            (activity) => activity.UserID === teacherID
           );
-          setActivities(teacherAssessments); // Set filtered activities
-          setFilteredActivities(teacherAssessments); // Initialize filtered activities
+          setActivities(filteredActivities); // Store filtered performances
+          setFilteredActivities(filteredActivities); // Set initial filtered data
         })
         .catch((err) => console.log(err));
     }
-  }, [user]);
+  }, [teacherSection]); // Trigger this useEffect when teacherSection is set
 
   const handlePrintClick = () => {
     setModalShowPrint(true);
@@ -264,6 +266,7 @@ const BodyAssessment = () => {
                   <TableHeader>
                     <TableColumn>Activity Code</TableColumn>
                     <TableColumn>Grading Period</TableColumn>
+                    <TableColumn>Section</TableColumn>
                     <TableColumn>Type</TableColumn>
                     <TableColumn>Status</TableColumn>
                     <TableColumn className="text-center">Actions</TableColumn>
@@ -273,6 +276,7 @@ const BodyAssessment = () => {
                       <TableRow key={activity._id}>
                         <TableCell>{activity.ActivityCode}</TableCell>
                         <TableCell>{activity.Period}</TableCell>
+                        <TableCell>{activity.Section}</TableCell>
                         <TableCell>{activity.Type}</TableCell>
                         <TableCell>{activity.Assessment}</TableCell>
                         <TableCell className="text-center">

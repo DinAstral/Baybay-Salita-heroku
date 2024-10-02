@@ -131,8 +131,11 @@ const ResetPassword = () => {
                   size="lg"
                   radius="md"
                   color="danger"
+                  variant="light"
                   onClick={loginButton}
-                ></Button>
+                >
+                  Back
+                </Button>
                 <Button
                   type="submit"
                   className="my-2"

@@ -471,6 +471,7 @@ const ParentRegister = () => {
                 <Button
                   className="w-full md:w-1/3 text-md"
                   color="danger"
+                  variant="light"
                   onClick={registerButton}
                 >
                   Cancel

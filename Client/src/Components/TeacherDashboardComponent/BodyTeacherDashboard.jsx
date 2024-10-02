@@ -102,32 +102,6 @@ const BodyTeacherDashboard = () => {
             />
           </div>
         </div>
-
-        <div className="col-span-1 lg:col-span-2 bg-white rounded-lg shadow p-4">
-          <h2 className="text-xl font-semibold"></h2>
-          <BarChart
-            xAxis={[
-              {
-                label: "Number of Students",
-              },
-            ]}
-            yAxis={[
-              {
-                label: "Sections",
-                scaleType: "band",
-                data: Object.keys(sectionCounts),
-              },
-            ]}
-            series={[
-              {
-                data: Object.values(sectionCounts),
-              },
-            ]}
-            layout="horizontal"
-            width={1000}
-            height={300}
-          />
-        </div>
       </div>
 
       <div className="mt-6">
