@@ -25,15 +25,9 @@ export default defineConfig({
               .split("/")[0]
               .toString();
           }
-          if (id.includes("node_modules")) {
-            return "vendor"; // All node_modules go into a common "vendor" chunk
-          }
-          if (id.includes("src/components/common/")) {
-            return "common"; // Commonly used components in the "common" chunk
-          }
         },
       },
     },
-    chunkSizeWarningLimit: 500, // You can customize this limit as per your needs
+    chunkSizeWarningLimit: 1000, // You can customize this limit as per your needs
   },
 });
