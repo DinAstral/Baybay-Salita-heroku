@@ -14,6 +14,8 @@ export default defineConfig({
     esbuild: {
       drop: ["console", "debugger"], // Remove console logs and debugger statements
     },
+    outDir: "dist",
+    assetsDir: "assets",
     rollupOptions: {
       output: {
         manualChunks(id) {

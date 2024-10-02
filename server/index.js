@@ -33,7 +33,6 @@ app.use(compression());
 app.use(express.json({ limit: "100mb" })); // Limit for incoming JSON payload
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors()); // Enable CORS globally
 
 // Routes
 app.use("/api", require("./routes/authRoutes")); // Ensure API routes are registered first
