@@ -1,14 +1,11 @@
 import "./About.css";
 import about_img from "../../../assets/img4.png";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay } from "@fortawesome/free-solid-svg-icons";
 
 const About = () => {
   return (
     <div className="about">
       <div className="about-left">
         <img src={about_img} alt="" className="about-img" />
-        <FontAwesomeIcon icon={faPlay} size="3x" className="icon-play" />
       </div>
       <div className="about-right">
         <h3>TUNGKOL SA APLIKASYON</h3>

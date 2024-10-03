@@ -47,6 +47,12 @@ app.use(express.urlencoded({ extended: false }));
 // Register API routes
 app.use("/api", require("./routes/authRoutes"));
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Something went wrong!");
+});
+
 // Serve static files from the client build (React Vite build)
 app.use(express.static(path.join(__dirname, "../Client/dist")));
 
@@ -57,12 +63,6 @@ app.get("*", (req, res) => {
       res.status(500).send(err);
     }
   });
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send("Something went wrong!");
 });
 
 // Start the server on the specified port
