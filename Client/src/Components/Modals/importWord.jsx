@@ -78,15 +78,21 @@ const ImportWord = ({ show, onHide }) => {
         },
       });
 
-      if (response.data.error) {
+      // Handle errors from the backend response
+      if (response.status === 400 && response.data.error) {
         toast.error(response.data.error);
       } else {
         toast.success("Word imported successfully.");
         setModalShow(true); // Show success modal
       }
     } catch (error) {
+      // Catch any network or server errors
+      if (error.response && error.response.data && error.response.data.error) {
+        toast.error(`Error: ${error.response.data.error}`);
+      } else {
+        toast.error("Failed to import word. Please try again.");
+      }
       console.error("Failed to import word:", error);
-      toast.error("Failed to import word.");
     }
   };
 

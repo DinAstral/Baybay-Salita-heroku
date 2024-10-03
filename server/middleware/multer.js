@@ -10,41 +10,11 @@ const storage = multer.diskStorage({
     //Generate new filename
     if (file.fieldname === "Profile") {
       fileName = `image_${fileExt}`;
-    }
-    if (file.fieldname === "Image") {
+    } else if (file.fieldname === "Image") {
       fileName = `image_${fileExt}`;
-    }
-    if (file.fieldname === "Audio") {
+    } else if (file.fieldname === "Audio") {
       fileName = `audio_${fileExt}`;
-    }
-    if (file.fieldname === "User1") {
-      fileName = `user_${fileExt}`;
-    }
-    if (file.fieldname === "User2") {
-      fileName = `user_${fileExt}`;
-    }
-    if (file.fieldname === "User3") {
-      fileName = `user_${fileExt}`;
-    }
-    if (file.fieldname === "User4") {
-      fileName = `user_${fileExt}`;
-    }
-    if (file.fieldname === "User5") {
-      fileName = `user_${fileExt}`;
-    }
-    if (file.fieldname === "User6") {
-      fileName = `user_${fileExt}`;
-    }
-    if (file.fieldname === "User7") {
-      fileName = `user_${fileExt}`;
-    }
-    if (file.fieldname === "User8") {
-      fileName = `user_${fileExt}`;
-    }
-    if (file.fieldname === "User9") {
-      fileName = `user_${fileExt}`;
-    }
-    if (file.fieldname === "User10") {
+    } else {
       fileName = `user_${fileExt}`;
     }
 
@@ -52,73 +22,43 @@ const storage = multer.diskStorage({
   },
 });
 
-// Set up file filter
 const fileFilter = (req, file, cb) => {
-  if (file.fieldname === "Image" || file.fieldname === "Profile") {
-    // Accept only JPEG and PNG files
-    if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
-      cb(null, true);
+  try {
+    // Check for image or audio type
+    if (file.fieldname === "Image" || file.fieldname === "Profile") {
+      if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+        return cb(null, true);
+      } else {
+        return cb(
+          new Error("Invalid file type. Only JPEG and PNG are allowed.")
+        );
+      }
+    } else if (
+      file.fieldname.startsWith("Audio") ||
+      file.fieldname.startsWith("User")
+    ) {
+      if (file.mimetype.startsWith("audio/")) {
+        return cb(null, true);
+      } else {
+        return cb(
+          new Error("Invalid file type. Only audio files are allowed.")
+        );
+      }
     } else {
-      cb(
+      return cb(
         new Error(
-          "Invalid file type. Only JPEG and PNG are allowed for images."
+          "Invalid fieldname. Please check the fieldname used in the upload."
         )
       );
     }
-  } else if (
-    file.fieldname === "Audio" ||
-    file.fieldname === "User1" ||
-    file.fieldname === "User2" ||
-    file.fieldname === "User3" ||
-    file.fieldname === "User4" ||
-    file.fieldname === "User5" ||
-    file.fieldname === "User6" ||
-    file.fieldname === "User7" ||
-    file.fieldname === "User8" ||
-    file.fieldname === "User9" ||
-    file.fieldname === "User10"
-  ) {
-    // Accept only audio files
-    if (file.mimetype.startsWith("audio/")) {
-      cb(null, true);
-    } else {
-      cb(
-        new Error(
-          "Invalid file type. Only audio files are allowed for audio uploads."
-        )
-      );
-    }
-  } else {
-    cb(
-      new Error(
-        "Invalid fieldname. Please check the fieldname used in the upload."
-      )
-    );
+  } catch (error) {
+    cb(new Error("Error occurred during file upload validation."));
   }
 };
 
-// Set up limits
+// Set general file size limit to handle errors better
 const limits = {
-  fileSize: (req, file, cb) => {
-    if (file.fieldname === "Image" || file.fieldname === "Profile") {
-      return 10 * 1024 * 1024; // 10 MB for images
-    } else if (
-      file.fieldname === "Audio" ||
-      file.fieldname === "User1" ||
-      file.fieldname === "User2" ||
-      file.fieldname === "User3" ||
-      file.fieldname === "User4" ||
-      file.fieldname === "User5" ||
-      file.fieldname === "User6" ||
-      file.fieldname === "User7" ||
-      file.fieldname === "User8" ||
-      file.fieldname === "User9" ||
-      file.fieldname === "User10"
-    ) {
-      return 100 * 1024 * 1024; // 100 MB for audio files
-    }
-    return 0; // No limit set for other files, but you can add more logic here
-  },
+  fileSize: 100 * 1024 * 1024, // 100 MB for all files
 };
 
 // Configure the multer upload
