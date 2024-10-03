@@ -41,10 +41,16 @@ const AdminSidebar = () => {
   return (
     <>
       <div className="flex flex-col gap-10 px-4 h-11 justify-between">
-        <div className="logo-dash pr-1">
+        {/* Logo Section */}
+        <div className="logo-dash pr-1 pt-4">
           <img src={logo} alt="Baybay Salita Logo" />
         </div>
-        <div className="flex flex-col gap-3 p-3">
+
+        {/* Separation Line */}
+        <hr className="border-gray-600 border-t-1" />
+
+        {/* Menu Items */}
+        <div className="flex flex-col gap-3 p-3 mb-4">
           {[
             { icon: faHome, text: "Dashboard", link: "/AdminDashboard" },
             { icon: faUser, text: "Manage Users", link: "/AdminUsers" },
@@ -72,6 +78,8 @@ const AdminSidebar = () => {
             </Link>
           ))}
         </div>
+
+        {/* Logout Button */}
         <div className="flex flex-col px-5">
           <Button
             color="error"

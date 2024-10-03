@@ -37,6 +37,10 @@ const ParentSidebar = () => {
         <div className="logo-dash pr-1">
           <img src={logo} alt="Baybay Salita Logo" />
         </div>
+
+        {/* Separation Line */}
+        <hr className="border-gray-600 border-t-1" />
+
         <div className="flex flex-col gap-3 p-3">
           {[
             {
@@ -75,7 +79,7 @@ const ParentSidebar = () => {
         <div className="flex flex-col px-5">
           <Button
             color="error"
-            className="w-full text-md font-semibold py-3 rounded-lg shadow-md transition-all duration-150 hover:bg-red-600"
+            className="w-full text-md font-semibold py-3 rounded-lg shadow-md transition-all duration-150 text-white bg-[#ff505b] hover:bg-red-600"
             onClick={handleLogout}
           >
             Logout
