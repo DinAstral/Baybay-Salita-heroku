@@ -402,8 +402,102 @@ const importSentence = async (req, res) => {
       Answer5,
     } = req.body;
 
-    if (!Type || !Sentence || !Question1 || !Title) {
-      return res.json({ error: "Type, Sentence, and Questions are required" });
+    // Basic field validation
+    if (!Type || typeof Type !== "string" || Type.trim() === "") {
+      return res.json({
+        error: "Type is required and must be a non-empty string",
+      });
+    }
+
+    if (!Title || typeof Title !== "string" || Title.trim() === "") {
+      return res.json({
+        error: "Title is required and must be a non-empty string",
+      });
+    }
+
+    if (!Sentence || typeof Sentence !== "string" || Sentence.trim() === "") {
+      return res.json({
+        error: "Sentence is required and must be a non-empty string",
+      });
+    }
+
+    // Ensure all questions are present and non-empty
+    if (
+      !Question1 ||
+      typeof Question1 !== "string" ||
+      Question1.trim() === ""
+    ) {
+      return res.json({
+        error: "Question1 is required and must be a non-empty string",
+      });
+    }
+    if (
+      !Question2 ||
+      typeof Question2 !== "string" ||
+      Question2.trim() === ""
+    ) {
+      return res.json({
+        error: "Question2 is required and must be a non-empty string",
+      });
+    }
+    if (
+      !Question3 ||
+      typeof Question3 !== "string" ||
+      Question3.trim() === ""
+    ) {
+      return res.json({
+        error: "Question3 is required and must be a non-empty string",
+      });
+    }
+    if (
+      !Question4 ||
+      typeof Question4 !== "string" ||
+      Question4.trim() === ""
+    ) {
+      return res.json({
+        error: "Question4 is required and must be a non-empty string",
+      });
+    }
+    if (
+      !Question5 ||
+      typeof Question5 !== "string" ||
+      Question5.trim() === ""
+    ) {
+      return res.json({
+        error: "Question5 is required and must be a non-empty string",
+      });
+    }
+
+    // Ensure all answers are present and non-empty
+    if (!Answer1 || typeof Answer1 !== "string" || Answer1.trim() === "") {
+      return res.json({
+        error:
+          "Answer1 is required for Question1 and must be a non-empty string",
+      });
+    }
+    if (!Answer2 || typeof Answer2 !== "string" || Answer2.trim() === "") {
+      return res.json({
+        error:
+          "Answer2 is required for Question2 and must be a non-empty string",
+      });
+    }
+    if (!Answer3 || typeof Answer3 !== "string" || Answer3.trim() === "") {
+      return res.json({
+        error:
+          "Answer3 is required for Question3 and must be a non-empty string",
+      });
+    }
+    if (!Answer4 || typeof Answer4 !== "string" || Answer4.trim() === "") {
+      return res.json({
+        error:
+          "Answer4 is required for Question4 and must be a non-empty string",
+      });
+    }
+    if (!Answer5 || typeof Answer5 !== "string" || Answer5.trim() === "") {
+      return res.json({
+        error:
+          "Answer5 is required for Question5 and must be a non-empty string",
+      });
     }
 
     // Create a new SentenceModel object

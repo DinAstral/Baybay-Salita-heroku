@@ -197,7 +197,7 @@ const BodyAdminUsers = () => {
               <div className="list-header-drop-score">
                 <Select
                   labelPlacement="outside"
-                  label="Sort by Role"
+                  label="Role"
                   variant="bordered"
                   className="bg-transparent w-[20%]"
                   onChange={(e) => setSelectedRole(e.target.value)}

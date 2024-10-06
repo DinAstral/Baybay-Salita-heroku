@@ -110,9 +110,9 @@ router.post("/importSentence", importSentence); //okay
 // Assessment Routes
 router.post("/submitAssessment", submitAssessment); //okay
 router.get("/getActivity/:ActivityCode", getAssessmentCode); //okay
-router.get("/getActivity/:UserID", getAssessmentID);
+router.get("/getActivity/:UserID", getAssessmentID); //okay
 router.get("/getPerformance", getPerformance); //okay
-router.get("/getPerformanceStudent/:LRN", getPerformanceStudent);
+router.get("/getPerformanceStudent/:LRN", getPerformanceStudent); // okay
 router.get("/getPerformance/:UserInputId", getOnePerformance); //okay
 router.get("/getSentence", getSentence); //okay
 router.get("/getAssessments", getActivities); //okay

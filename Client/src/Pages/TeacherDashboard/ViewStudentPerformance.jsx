@@ -1,7 +1,6 @@
 import React from "react";
 import ContentHeader from "../../Components/ContentDasboard/ContentHeader";
 import Sidebar from "../../Components/TeacherDashboardComponent/Sidebar";
-import BodyViewAssessment from "../../Components/TeacherDashboardComponent/BodyViewAssessment";
 import BodyViewPerformnace from "../../Components/TeacherDashboardComponent/BodyViewPerformnace";
 
 const ViewStudentPerformance = () => {

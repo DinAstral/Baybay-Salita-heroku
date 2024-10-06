@@ -211,13 +211,14 @@ const BodyAssessment = () => {
                 <div className="flex flex-row gap-5 justify-start w-[100%]">
                   <Select
                     labelPlacement="outside"
-                    label="Sort by Grading Period"
+                    label="Grading Period"
                     variant="bordered"
+                    placeholder="Select Grading Period"
                     className="bg-transparent w-[20%]"
                     onChange={(e) => handleFilterChange(e, "period")}
                     value={selectedRole}
                   >
-                    <SelectItem key="">Select Grading Period</SelectItem>
+                    <SelectItem key="">All</SelectItem>
                     <SelectItem key="1">Grading Period 1</SelectItem>
                     <SelectItem key="2">Grading Period 2</SelectItem>
                     <SelectItem key="3">Grading Period 3</SelectItem>
@@ -227,12 +228,13 @@ const BodyAssessment = () => {
                   <Select
                     className="w-[20%]"
                     labelPlacement="outside"
-                    label="Sort by Type"
+                    label="Assessment"
+                    placeholder="Select Type of Assessment"
                     variant="bordered"
                     onChange={(e) => handleFilterChange(e, "type")}
                     value={selectedType}
                   >
-                    <SelectItem key="">Select Type of Assessment:</SelectItem>
+                    <SelectItem key="">All</SelectItem>
                     <SelectItem key="Pagbabaybay">Assessment 1</SelectItem>
                     <SelectItem key="Pantig">Assessment 2</SelectItem>
                     <SelectItem key="Salita">Assessment 3</SelectItem>

@@ -13,16 +13,16 @@ const parentsSchema = new Schema(
     },
     FirstName: String,
     LastName: String,
-    StudentName: String,
-    LRN: String,
     Age: String,
     Birthday: String,
     Address: String,
     Status: String,
     Gender: String,
     ContactNumber: String,
+    Student: Object,
     role: String,
     picture: String,
+    verified: Boolean,
   },
   { timestamps: true }
 );

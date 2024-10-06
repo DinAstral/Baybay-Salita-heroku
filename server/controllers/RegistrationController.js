@@ -140,7 +140,7 @@ const sendForgotPasswordEmail = async ({ email, link }, res) => {
   }
 };
 
-const sendVerificationEmail = async ({ _id, email }, res) => {
+const sendVerificationEmail = async ({ UserID, email }, res) => {
   try {
     const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
 
@@ -164,7 +164,7 @@ const sendVerificationEmail = async ({ _id, email }, res) => {
 
     const hashedOTP = await bcrypt.hash(otp, saltrounds);
     const newOTPVerification = await new UserOTPVerification({
-      userId: _id,
+      userId: UserID,
       otp: hashedOTP,
       createdAt: Date.now(),
       expiresAt: Date.now() + 3600000,
@@ -176,7 +176,7 @@ const sendVerificationEmail = async ({ _id, email }, res) => {
       status: "PENDING",
       message: "Verification otp email sent",
       data: {
-        userId: _id,
+        userId: UserID,
         email,
       },
     });
@@ -229,7 +229,9 @@ const verifyOTP = async (req, res) => {
     }
 
     // Mark the user as verified
-    await User.updateOne({ _id: userId }, { verified: true });
+    await User.updateOne({ UserID: userId }, { verified: true });
+    await Parent.updateOne({ UserID: userId }, { verified: true });
+    await Teacher.updateOne({ UserID: userId }, { verified: true });
     await UserOTPVerification.deleteMany({ userId });
 
     res.json({
@@ -244,35 +246,6 @@ const verifyOTP = async (req, res) => {
 
 const registerTeacher = async (req, res) => {
   const TeacherID = generateRandomCodeTeacher(6);
-
-  function isNumber(input) {
-    return !isNaN(input);
-  }
-
-  function validatePassword(password) {
-    const minLength = 8;
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasDigit = /\d/.test(password);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-    if (password.length < minLength) {
-      return "Password must be at least 8 characters long.";
-    }
-    if (!hasUpperCase) {
-      return "Password must contain at least one uppercase letter.";
-    }
-    if (!hasLowerCase) {
-      return "Password must contain at least one lowercase letter.";
-    }
-    if (!hasDigit) {
-      return "Password must contain at least one digit.";
-    }
-    if (!hasSpecialChar) {
-      return "Password must contain at least one special character.";
-    }
-    return null; // No error
-  }
 
   try {
     const {
@@ -289,48 +262,9 @@ const registerTeacher = async (req, res) => {
       password,
     } = req.body;
 
-    if (!FirstName) {
-      return res.json({ error: "First Name is required" });
-    }
-    if (!LastName) {
-      return res.json({ error: "Last Name is required" });
-    }
-    if (!Section) {
-      return res.json({ error: "Section is required" });
-    }
-    if (!Department) {
-      return res.json({ error: "Department is required" });
-    }
-    if (!Birthday) {
-      return res.json({ error: "Birthday is required" });
-    }
-    if (!Gender) {
-      return res.json({ error: "Gender is required" });
-    }
-    if (!Address) {
-      return res.json({ error: "Address is required" });
-    }
-    if (!Status) {
-      return res.json({ error: "Status is required" });
-    }
-    if (!ContactNumber) {
-      return res.json({ error: "Contact Number is required" });
-    }
-    if (!isNumber(ContactNumber)) {
-      return res.json({ error: "Invalid Contact Number inputted" });
-    }
-    if (!email) {
-      return res.json({ error: "Email is required" });
-    }
-
     const exist = await User.findOne({ email });
     if (exist) {
-      return res.json({ error: "Email is already taken" });
-    }
-
-    const passwordError = validatePassword(password);
-    if (passwordError) {
-      return res.json({ error: passwordError });
+      return res.json({ error: "Email has already been taken." });
     }
 
     const hashedPassword = await hashPassword(password); // Hash the password
@@ -420,85 +354,56 @@ const uploadFile = async (req, res) => {
 const registerParent = async (req, res) => {
   const ParentID = generateRandomCodeParent(6);
 
-  function isNumber(input) {
-    return !isNaN(input);
-  }
-
   try {
     const {
       FirstName,
       LastName,
       LRN,
-      StudentName,
+      StudentFirstName,
+      StudentLastName,
       Birthday,
+      StudentBirthday,
       Address,
       Status,
       Gender,
+      StudentGender,
+      MotherTongue,
       ContactNumber,
       email,
       password,
     } = req.body;
 
-    if (!FirstName) {
-      return res.json({ error: "First Name is required" });
-    }
-    if (!LastName) {
-      return res.json({ error: "Last Name is required" });
-    }
-    if (!LRN) {
-      return res.json({ error: "LRN is required" });
-    }
-    if (!StudentName) {
-      return res.json({ error: "StudentName is required" });
-    }
-    if (!Birthday) {
-      return res.json({ error: "Birthday is required" });
-    }
-    if (!Gender) {
-      return res.json({ error: "Gender is required" });
-    }
-    if (!Address) {
-      return res.json({ error: "Address is required" });
-    }
-    if (!Status) {
-      return res.json({ error: "Status is required" });
-    }
-    if (!ContactNumber) {
-      return res.json({ error: "Contact Number is required" });
-    }
-    if (!isNumber(ContactNumber)) {
-      return res.json({ error: "Invalid Contact Number inputted" });
-    }
-    if (!email) {
-      return res.json({ error: "Email is required" });
-    }
-
     const exist = await User.findOne({ email });
     if (exist) {
-      return res.json({ error: "Email is already taken" });
-    }
-
-    const passwordError = validatePassword(password);
-    if (passwordError) {
-      return res.json({ error: passwordError });
+      return res.json({ error: "Email has already been taken." });
     }
 
     const hashedPassword = await hashPassword(password); // Hash the password
+
+    let student = [
+      {
+        FirstName: StudentFirstName,
+        LastName: StudentLastName,
+        LRN: LRN,
+        Birthday: StudentBirthday,
+        Gender: StudentGender,
+        MotherTongue: MotherTongue,
+      },
+    ];
 
     // Create Parent and User records
     const parent = new Parent({
       UserID: ParentID,
       FirstName,
       LastName,
-      LRN,
-      StudentName,
       Birthday,
-      Gender,
       Address,
       Status,
+      Gender,
       ContactNumber,
       email,
       password: hashedPassword,
+      Student: student,
       role: "Parent",
       verified: false,
     });
@@ -608,7 +513,7 @@ const registerAdmin = async (req, res) => {
 
     const exist = await User.findOne({ email });
     if (exist) {
-      return res.json({ error: "Email is already taken" });
+      return res.json({ error: "Email has already been taken." });
     }
 
     const passwordError = validatePassword(password);
@@ -689,14 +594,14 @@ const loginUser = async (req, res) => {
     }
     if (!password) {
       return res.json({
-        error: "Password is Required",
+        error: "Password is Required.",
       });
     }
 
     // If the user is not found, return an error
     if (!user) {
       return res.json({
-        error: "Email does not exist. Please try again",
+        error: "Email does not exist. Please try again.",
       });
     }
 
@@ -722,7 +627,7 @@ const loginUser = async (req, res) => {
       );
     } else if (!match) {
       res.json({
-        error: "Email and Passowrd doesn't match",
+        error: "Email and Password doesn't match.",
       });
     }
   } catch (error) {
@@ -738,7 +643,7 @@ const forgotPassword = async (req, res) => {
     const userEmail = await User.findOne({ email });
     if (!userEmail) {
       return res.json({
-        error: "No User email has found",
+        error: "No account found for this email address.",
       });
     } else {
       const secret = process.env.JWT_SECRET + userEmail.password;
@@ -762,7 +667,7 @@ const resetPassword = async (req, res) => {
 
     const user = await User.findById(id);
     if (!user) {
-      return res.json({ error: "User not found" });
+      return res.json({ error: "No account found for this email address." });
     }
 
     const passwordError = validatePassword(password);
@@ -782,7 +687,7 @@ const resetPassword = async (req, res) => {
           await user.save();
           return res.json({
             status: "Success",
-            message: "Password updated successfully",
+            message: "Password updated successfully.",
           });
         } catch (err) {
           console.error(err);
@@ -801,7 +706,7 @@ const resetPassword = async (req, res) => {
 
 const logout = (req, res) => {
   res.clearCookie("token", { path: "/" }); // Adjust the path as necessary
-  res.status(200).json({ message: "Logged out successfully" });
+  res.status(200).json({ message: "Logged out successfully." });
 };
 
 const { profileUpload } = require("../middleware/multer");
@@ -820,7 +725,7 @@ const profileUpdate = async (req, res) => {
       // Extracting Type, Role, and ID from request body
       const { role, UserID } = req.body;
       if (!role || !UserID) {
-        return res.json({ error: "Role and User ID are required" });
+        return res.json({ error: "Role and User ID are required." });
       }
 
       // Uploading to Cloudinary
@@ -872,11 +777,11 @@ const profileUpdate = async (req, res) => {
       }
 
       if (!updatedRecord) {
-        return res.json({ error: "User not found or update failed" });
+        return res.json({ error: "User not found or update failed." });
       }
 
       return res.json({
-        message: "Profile picture successfully updated",
+        message: "Profile picture successfully updated.",
         updatedProfileUrl: profileFile,
       });
     } catch (error) {
@@ -906,7 +811,7 @@ const updateAdmin = async (req, res) => {
     // Validate that the email field is present
     if (!email) {
       return res.status(400).json({
-        error: "Email is required",
+        error: "Email is required.",
       });
     }
 
@@ -943,7 +848,7 @@ const updateAdmin = async (req, res) => {
     // Check if either update was successful
     if (!adminUpdate && !userUpdate) {
       return res.status(404).json({
-        message: "No account found with this ID",
+        message: "No account found with this ID.",
       });
     }
 

@@ -274,12 +274,6 @@ const BodyTeacherProfileBasic = () => {
                   <p className="text-gray-800">{data.Birthday || "N/A"}</p>
                 </div>
                 <div>
-                  <span className="block text-sm text-gray-600">
-                    Nationality:
-                  </span>
-                  <p className="text-gray-800">{data.Nationality || "N/A"}</p>
-                </div>
-                <div>
                   <span className="block text-sm text-gray-600">Address:</span>
                   <p className="text-gray-800">{data.Address || "N/A"}</p>
                 </div>
@@ -288,10 +282,6 @@ const BodyTeacherProfileBasic = () => {
                     Contact Number:
                   </span>
                   <p className="text-gray-800">{data.ContactNumber || "N/A"}</p>
-                </div>
-                <div>
-                  <span className="block text-sm text-gray-600">Section:</span>
-                  <p className="text-gray-800">{data.Section || "N/A"}</p>
                 </div>
               </div>
             </div>
@@ -322,19 +312,23 @@ const BodyTeacherProfileBasic = () => {
                       setData({ ...data, Gender: e.target.value })
                     }
                   />
+                  <Select
+                    label="Civil Status"
+                    value={data.Status}
+                    onChange={(e) =>
+                      setData({ ...data, Status: e.target.value })
+                    }
+                  >
+                    <SelectItem value="Single">Single</SelectItem>
+                    <SelectItem value="Married">Married</SelectItem>
+                    <SelectItem value="Divorced">Divorced</SelectItem>
+                  </Select>
                   <Input
                     label="Birthday"
                     type="date"
                     value={data.Birthday}
                     onChange={(e) =>
                       setData({ ...data, Birthday: e.target.value })
-                    }
-                  />
-                  <Input
-                    label="Nationality"
-                    value={data.Nationality}
-                    onChange={(e) =>
-                      setData({ ...data, Nationality: e.target.value })
                     }
                   />
                   <Input

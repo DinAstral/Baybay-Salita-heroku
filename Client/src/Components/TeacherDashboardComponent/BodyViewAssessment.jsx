@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { Button, Tooltip } from "@nextui-org/react";
+import {
+  Button,
+  Tooltip,
+  Modal,
+  ModalHeader,
+  ModalBody,
+} from "@nextui-org/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
@@ -18,6 +24,8 @@ const BodyViewAssessment = () => {
     Questions: [],
     Items: [],
   });
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState({ type: "", src: "" });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,6 +39,16 @@ const BodyViewAssessment = () => {
 
     fetchData();
   }, [ActivityCode]);
+
+  const openModal = (type, src) => {
+    setModalContent({ type, src });
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setModalContent({ type: "", src: "" });
+  };
 
   return (
     <div className="p-10">
@@ -123,13 +141,10 @@ const BodyViewAssessment = () => {
                       {item.Image && (
                         <Tooltip content="View Image">
                           <Button
-                            as="a"
-                            href={item.Image}
-                            target="_blank"
-                            rel="noopener noreferrer"
                             color="primary"
                             size="sm"
                             className="ml-2 my-2"
+                            onClick={() => openModal("image", item.Image)}
                           >
                             View Image
                           </Button>
@@ -141,13 +156,10 @@ const BodyViewAssessment = () => {
                       {item.Audio && (
                         <Tooltip content="Play Audio">
                           <Button
-                            as="a"
-                            href={item.Audio}
-                            target="_blank"
-                            rel="noopener noreferrer"
                             color="primary"
                             size="sm"
                             className="ml-2 my-2"
+                            onClick={() => openModal("audio", item.Audio)}
                           >
                             Play Audio
                           </Button>
@@ -171,6 +183,34 @@ const BodyViewAssessment = () => {
           </Button>
         </div>
       </div>
+
+      <Modal
+        closeButton
+        aria-labelledby="modal-title"
+        open={modalVisible}
+        onClose={closeModal}
+        width="600px"
+      >
+        <ModalHeader>
+          <h3 className="text-lg font-semibold">
+            {modalContent.type === "image" ? "View Image" : "Play Audio"}
+          </h3>
+        </ModalHeader>
+        <ModalBody>
+          {modalContent.type === "image" && (
+            <img
+              src={modalContent.src}
+              alt="Image Preview"
+              style={{ width: "100%", objectFit: "contain" }}
+            />
+          )}
+          {modalContent.type === "audio" && (
+            <audio controls src={modalContent.src} className="w-full">
+              Your browser does not support the audio element.
+            </audio>
+          )}
+        </ModalBody>
+      </Modal>
     </div>
   );
 };

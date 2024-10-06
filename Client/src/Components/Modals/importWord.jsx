@@ -116,14 +116,14 @@ const ImportWord = ({ show, onHide }) => {
             <ModalBody>
               <Select
                 labelPlacement="outside"
-                label="Select type of Word Assessment"
+                label="Assessment"
+                placeholder="Select type of Word Assessment"
                 aria-label="Select activity type"
                 value={data.Type}
                 variant="bordered"
                 className="bg-transparent py-1 my-1"
                 onChange={(e) => setData({ ...data, Type: e.target.value })}
               >
-                <SelectItem key="">Select Type of Assessment:</SelectItem>
                 <SelectItem key="Pagbabaybay">
                   Assessment 1: Pagbabaybay Tunog at Letra
                 </SelectItem>

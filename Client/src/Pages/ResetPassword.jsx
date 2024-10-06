@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Input, Button, Card, CardBody } from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -11,134 +11,140 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const { id, token } = useParams();
 
+  // States for form inputs and password visibility
   const [isVisible, setIsVisible] = useState(false);
-  const toggleVisibility = () => setIsVisible(!isVisible);
   const [isVisibleConfirm, setIsVisibleConfirm] = useState(false);
-  const toggleVisibilityConfirm = () => setIsVisibleConfirm(!isVisibleConfirm);
-
   const [data, setData] = useState({
     password: "",
     confirmPassword: "",
   });
 
-  const loginButton = () => {
-    navigate("/login");
-  };
+  // Toggle password visibility
+  const toggleVisibility = useCallback(() => setIsVisible((prev) => !prev), []);
+  const toggleVisibilityConfirm = useCallback(
+    () => setIsVisibleConfirm((prev) => !prev),
+    []
+  );
 
+  // Handle form data changes
+  const handleChange = useCallback((e) => {
+    setData((prevData) => ({
+      ...prevData,
+      [e.target.name]: e.target.value,
+    }));
+  }, []);
+
+  // Navigate to login
+  const loginButton = useCallback(() => {
+    navigate("/login");
+  }, [navigate]);
+
+  // Form submission logic
   const resetPassword = async (e) => {
     e.preventDefault();
     const { password, confirmPassword } = data;
 
+    // Check if passwords match
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error("Passwords do not match!");
       return;
     }
+
+    // Try resetting the password via API
     try {
-      const { data } = await axios.post(`/api/reset-password/${id}/${token}`, {
+      const response = await axios.post(`/api/reset-password/${id}/${token}`, {
         password,
       });
-      if (data.error) {
-        toast.error(data.error);
+      if (response.data.error) {
+        toast.error(response.data.error);
       } else {
-        setData({});
-        toast.success("Reset Password Successful.");
+        setData({ password: "", confirmPassword: "" });
+        toast.success("Password reset successfully.");
         navigate("/login");
       }
     } catch (error) {
-      console.log(error);
+      toast.error("Something went wrong. Please try again.");
+      console.error(error);
     }
   };
 
   return (
-    <div className="flex bg-[#f6fbff] w-full h-screen ">
-      <div className="w-full flex flex-col items-center justify-center m-3">
-        <Card className="w-[50%] flex flex-col p-4 ">
-          <h1 className="text-3xl font-bold items-center justify-center">
+    <div className="flex bg-[#f6fbff] w-full h-screen justify-center items-center">
+      <div className="w-full max-w-lg px-6 sm:px-8 lg:px-12">
+        <Card className="flex flex-col p-6">
+          <h1 className="text-2xl lg:text-3xl font-bold text-center">
             Reset Password
           </h1>
-          <p className="text-sm items-center justify-center mt-2">
-            Please input your new password to your account.
+          <p className="text-sm text-center mt-2">
+            Enter your new password below.
           </p>
           <CardBody>
             <form onSubmit={resetPassword}>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-4">
+                {/* Password input */}
                 <Input
                   name="password"
                   label="Password"
                   variant="bordered"
-                  className="py-1 my-0 mb-2"
                   value={data.password}
-                  onChange={(e) =>
-                    setData({ ...data, password: e.target.value })
-                  }
+                  onChange={handleChange}
+                  required
                   endContent={
                     <button
                       className="focus:outline-none"
                       type="button"
                       onClick={toggleVisibility}
-                      aria-label="toggle password visibility"
+                      aria-label="Toggle password visibility"
                     >
-                      {isVisible ? (
-                        <FontAwesomeIcon
-                          icon={faEyeSlash}
-                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                        />
-                      ) : (
-                        <FontAwesomeIcon
-                          icon={faEye}
-                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                        />
-                      )}
+                      <FontAwesomeIcon
+                        icon={isVisible ? faEyeSlash : faEye}
+                        className="text-xl"
+                      />
                     </button>
                   }
                   type={isVisible ? "text" : "password"}
                 />
+
+                {/* Confirm Password input */}
                 <Input
                   name="confirmPassword"
                   label="Confirm Password"
                   variant="bordered"
-                  className="py-1 my-0 mb-2"
+                  value={data.confirmPassword}
+                  onChange={handleChange}
+                  required
                   endContent={
                     <button
                       className="focus:outline-none"
                       type="button"
                       onClick={toggleVisibilityConfirm}
-                      aria-label="toggle password visibility"
+                      aria-label="Toggle confirm password visibility"
                     >
-                      {isVisibleConfirm ? (
-                        <FontAwesomeIcon
-                          icon={faEyeSlash}
-                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                        />
-                      ) : (
-                        <FontAwesomeIcon
-                          icon={faEye}
-                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                        />
-                      )}
+                      <FontAwesomeIcon
+                        icon={isVisibleConfirm ? faEyeSlash : faEye}
+                        className="text-xl"
+                      />
                     </button>
                   }
                   type={isVisibleConfirm ? "text" : "password"}
-                  value={data.confirmPassword}
-                  onChange={(e) =>
-                    setData({ ...data, confirmPassword: e.target.value })
-                  }
                 />
               </div>
-              <div className="w-full flex items-center justify-center gap-6 my-4">
+
+              {/* Action buttons */}
+              <div className="flex justify-between gap-4 mt-6">
                 <Button
-                  className="my-2"
+                  className="w-full sm:w-auto"
                   size="lg"
                   radius="md"
                   color="danger"
                   variant="light"
                   onClick={loginButton}
                 >
-                  Back
+                  Back to Login
                 </Button>
                 <Button
                   type="submit"
-                  className="my-2"
+                  className="w-full sm:w-auto"
                   size="lg"
                   radius="md"
                   color="primary"

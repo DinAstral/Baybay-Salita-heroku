@@ -189,7 +189,7 @@ const BodyAdminStudentAssessment = () => {
                 <div className="flex flex-row gap-5 justify-start w-[100%]">
                   <Select
                     labelPlacement="outside"
-                    label="Sort by Grading Period"
+                    label="Grading Period"
                     variant="bordered"
                     className="bg-transparent w-[20%]"
                     onChange={(e) => handleFilterChange(e, "period")}
@@ -205,7 +205,7 @@ const BodyAdminStudentAssessment = () => {
                   <Select
                     className="w-[20%]"
                     labelPlacement="outside"
-                    label="Sort by Type"
+                    label="Assessment"
                     variant="bordered"
                     onChange={(e) => handleFilterChange(e, "type")}
                     value={selectedType}

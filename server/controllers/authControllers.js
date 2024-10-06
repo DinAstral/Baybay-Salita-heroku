@@ -134,9 +134,16 @@ const updateParent = async (req, res) => {
 
 //ADD STUDENT MODULE
 const addStudent = async (req, res) => {
+  // Helper function to check if a value is a valid number
   function isNumber(input) {
-    return !isNaN(input);
+    return !isNaN(input) !== ""; // Ensure input isn't empty and is a valid number
   }
+
+  // Consolidated error response
+  const errorResponse = (message) => {
+    return res.json({ error: message });
+  };
+
   try {
     const {
       LRN,
@@ -149,64 +156,43 @@ const addStudent = async (req, res) => {
       Address,
       MotherTongue,
       Gender,
+      ContactNumber,
     } = req.body;
-    // Check if name is entered
+
+    // Validate LRN
     if (!LRN) {
-      return res.json({
-        error: "LRN is required",
-      });
+      return errorResponse("LRN is required.");
     }
     if (!isNumber(LRN)) {
-      return res.json({ error: "Invalid LRN" });
+      return errorResponse("Invalid LRN. It must be numeric.");
     }
-    if (LRN.length != 12) {
-      return res.json({ error: "LRN must 12 numbers long" });
+    if (LRN.length !== 12) {
+      return errorResponse("LRN must be exactly 12 digits long.");
     }
 
+    // Check if the LRN is already in use
     const exist = await Student.findOne({ LRN });
     if (exist) {
-      return res.json({
-        error: "LRN is already taken",
-      });
+      return errorResponse("LRN is already taken.");
     }
 
-    if (!FirstName) {
-      return res.json({
-        error: "First Name is required",
-      });
-    }
-    if (!LastName) {
-      return res.json({
-        error: "Last Name is required",
-      });
-    }
-    if (!Section) {
-      return res.json({
-        error: "Section is required",
-      });
-    }
-    if (!Birthday) {
-      return res.json({
-        error: "Birthday is required",
-      });
-    }
-    if (!Address) {
-      return res.json({
-        error: "Address is required",
-      });
-    }
-    if (!MotherTongue) {
-      return res.json({
-        error: "MotherTongue is required",
-      });
-    }
-    if (!Gender) {
-      return res.json({
-        error: "Gender is required",
-      });
+    // Validate required fields
+    if (!FirstName) return errorResponse("First Name is required.");
+    if (!LastName) return errorResponse("Last Name is required.");
+    if (!Section) return errorResponse("Section is required.");
+    if (!Birthday) return errorResponse("Birthday is required.");
+    if (!Address) return errorResponse("Address is required.");
+    if (!MotherTongue) return errorResponse("Mother Tongue is required.");
+    if (!Gender) return errorResponse("Gender is required.");
+
+    // Validate Age (optional, depending on your requirements)
+    if (!Age || !isNumber(Age) || Age < 4 || Age > 100) {
+      return errorResponse(
+        "Invalid Age. It must be a number between 7 and 100."
+      );
     }
 
-    // Create user in database (Table)
+    // Create student in the database
     const student = await Student.create({
       LRN,
       FirstName,
@@ -218,13 +204,14 @@ const addStudent = async (req, res) => {
       Address,
       MotherTongue,
       Gender,
+      ContactNumber,
       role: "student",
     });
 
-    return res.json(student);
+    return res.status(201).json(student); // 201: Created successfully
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: "Server error" }); // Add proper error response
+    console.error(error);
+    return res.status(500).json({ error: "Server error" }); // 500: Server error
   }
 };
 

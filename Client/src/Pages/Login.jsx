@@ -108,7 +108,7 @@ const Login = () => {
                 variant="bordered"
                 placeholder="Enter your email"
                 className="mb-4"
-                errorMessage="Please enter a valid email"
+                errorMessage="Please enter a valid email."
                 value={data.email}
                 onChange={(e) => setData({ ...data, email: e.target.value })}
                 endContent={

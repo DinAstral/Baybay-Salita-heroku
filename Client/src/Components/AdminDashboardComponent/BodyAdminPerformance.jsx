@@ -189,13 +189,14 @@ const BodyAdminPerformance = () => {
                 <Select
                   className="w-[20%]"
                   labelPlacement="outside"
-                  label="Sort by Section"
+                  label="Section"
+                  placeholder="Select Section"
                   variant="bordered"
                   defaultSelectedKeys={[""]}
                   onChange={(e) => handleFilterChange(e, "section")}
                   value={selectedRole}
                 >
-                  <SelectItem key="">Select Section</SelectItem>
+                  <SelectItem key="">All</SelectItem>
                   <SelectItem key="Aster">Aster</SelectItem>
                   <SelectItem key="Camia">Camia</SelectItem>
                   <SelectItem key="Dahlia">Dahlia</SelectItem>
@@ -210,13 +211,14 @@ const BodyAdminPerformance = () => {
                 <Select
                   className="w-[20%]"
                   labelPlacement="outside"
-                  label="Sort by Type"
+                  label="Assessment"
+                  placeholder="Select Type of Assessment"
                   variant="bordered"
                   defaultSelectedKeys={[""]}
                   onChange={(e) => handleFilterChange(e, "type")}
                   value={selectedType}
                 >
-                  <SelectItem key="">Select Type of Assessment:</SelectItem>
+                  <SelectItem key="">All</SelectItem>
                   <SelectItem key="Pagbabaybay">Assessment 1</SelectItem>
                   <SelectItem key="Pantig">Assessment 2</SelectItem>
                   <SelectItem key="Salita">Assessment 3</SelectItem>

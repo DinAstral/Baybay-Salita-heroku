@@ -248,12 +248,6 @@ const BodyParentProfile = () => {
                   <span className="block text-sm text-gray-600">Address:</span>
                   <p className="text-gray-800">{parent.Address || "N/A"}</p>
                 </div>
-                <div>
-                  <span className="block text-sm text-gray-600">
-                    Nationality:
-                  </span>
-                  <p className="text-gray-800">{parent.Nationality || "N/A"}</p>
-                </div>
               </div>
             </div>
           )}
@@ -314,13 +308,6 @@ const BodyParentProfile = () => {
                   value={data.Address || ""}
                   onChange={(e) =>
                     setData({ ...data, Address: e.target.value })
-                  }
-                />
-                <Input
-                  label="Nationality"
-                  value={data.Nationality || ""}
-                  onChange={(e) =>
-                    setData({ ...data, Nationality: e.target.value })
                   }
                 />
               </div>

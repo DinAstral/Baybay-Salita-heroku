@@ -96,53 +96,53 @@ const TeacherRegister = () => {
     let newErrors = {};
 
     if (!data.FirstName) {
-      newErrors.FirstName = "First Name is required";
+      newErrors.FirstName = "First Name is required.";
       isValid = false;
     }
     if (!data.LastName) {
-      newErrors.LastName = "Last Name is required";
+      newErrors.LastName = "Last Name is required.";
       isValid = false;
     }
     if (!data.Section) {
-      newErrors.Section = "Section is required";
+      newErrors.Section = "Section is required.";
       isValid = false;
     }
     if (!data.Department) {
-      newErrors.Department = "Department is required";
+      newErrors.Department = "Department is required.";
       isValid = false;
     }
     if (!data.Birthday) {
-      newErrors.Birthday = "Birthday is required";
+      newErrors.Birthday = "Birthday is required.";
       isValid = false;
     }
     if (!data.Gender) {
-      newErrors.Gender = "Gender is required";
+      newErrors.Gender = "Gender is required.";
       isValid = false;
     }
     if (!data.Address) {
-      newErrors.Address = "Address is required";
+      newErrors.Address = "Address is required.";
       isValid = false;
     }
     if (!data.Status) {
-      newErrors.Status = "Status is required";
+      newErrors.Status = "Status is required.";
       isValid = false;
     }
     if (!data.ContactNumber) {
-      newErrors.ContactNumber = "Contact Number is required";
+      newErrors.ContactNumber = "Contact Number is required.";
       isValid = false;
     }
     if (!isNumber(data.ContactNumber)) {
-      newErrors.ContactNumber = "Invalid Contact Number";
+      newErrors.ContactNumber = "Invalid Contact Number.";
       isValid = false;
     }
     // Validate Contact Number (starts with 09 and 11 digits long)
     const phoneRegex = /^09\d{9}$/;
     if (!phoneRegex.test(data.ContactNumber)) {
-      newErrors.ContactNumber = "Enter PH Contact number";
+      newErrors.ContactNumber = "Please enter a valid PH contact number.";
       isValid = false;
     }
     if (!data.email) {
-      newErrors.email = "Email is required";
+      newErrors.email = "Email is required.";
       isValid = false;
     }
 
@@ -172,7 +172,7 @@ const TeacherRegister = () => {
     e.preventDefault();
 
     if (!validateInputs()) {
-      toast.error("Please fix the errors in the form.");
+      toast.error("Please fill out this form.");
       return;
     }
 

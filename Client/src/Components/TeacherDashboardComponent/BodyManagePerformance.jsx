@@ -201,7 +201,7 @@ const BodyManagePerformance = () => {
                 <Select
                   className="w-[20%]"
                   labelPlacement="outside"
-                  label="Sort by Section"
+                  label="Section"
                   variant="bordered"
                   defaultSelectedKeys={[""]}
                   onChange={(e) => handleFilterChange(e, "section")}
@@ -222,7 +222,7 @@ const BodyManagePerformance = () => {
                 <Select
                   className="w-[20%]"
                   labelPlacement="outside"
-                  label="Sort by Type"
+                  label="Type"
                   variant="bordered"
                   defaultSelectedKeys={[""]}
                   onChange={(e) => handleFilterChange(e, "type")}

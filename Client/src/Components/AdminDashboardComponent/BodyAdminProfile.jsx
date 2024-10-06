@@ -272,12 +272,6 @@ const BodyAdminProfile = () => {
                   <p className="text-gray-800">{data.LastName || "N/A"}</p>
                 </div>
                 <div>
-                  <span className="block text-sm text-gray-600">
-                    Nationality:
-                  </span>
-                  <p className="text-gray-800">{data.Nationality || "N/A"}</p>
-                </div>
-                <div>
                   <span className="block text-sm text-gray-600">Gender:</span>
                   <p className="text-gray-800">{data.Gender || "N/A"}</p>
                 </div>
@@ -326,7 +320,7 @@ const BodyAdminProfile = () => {
                 <Select
                   label="Civil Status"
                   value={data.Status}
-                  onChange={(e) => setData({ ...data, Status: e })}
+                  onChange={(e) => setData({ ...data, Status: e.target.value })}
                 >
                   <SelectItem value="Single">Single</SelectItem>
                   <SelectItem value="Married">Married</SelectItem>
@@ -353,7 +347,7 @@ const BodyAdminProfile = () => {
                 <Select
                   label="Gender"
                   value={data.Gender}
-                  onChange={(e) => setData({ ...data, Gender: e })}
+                  onChange={(e) => setData({ ...data, Gender: e.target.value })}
                 >
                   <SelectItem value="Male">Male</SelectItem>
                   <SelectItem value="Female">Female</SelectItem>
@@ -366,15 +360,6 @@ const BodyAdminProfile = () => {
                   value={data.Birthday.split("T")[0]} // Format the date properly for the input
                   onChange={(e) =>
                     setData({ ...data, Birthday: e.target.value })
-                  }
-                />
-                <Input
-                  clearable
-                  bordered
-                  label="Nationality"
-                  value={data.Nationality}
-                  onChange={(e) =>
-                    setData({ ...data, Nationality: e.target.value })
                   }
                 />
               </div>

@@ -203,18 +203,6 @@ const BodyAdminEditStudent = () => {
               />
             </div>
             <div className="flex flex-col">
-              <label className="font-medium text-gray-700">Nationality</label>
-              <Input
-                underlined
-                clearable
-                value={data.Nationality}
-                onChange={(e) =>
-                  setData({ ...data, Nationality: e.target.value })
-                }
-                placeholder="Enter the Nationality"
-              />
-            </div>
-            <div className="flex flex-col">
               <label className="font-medium text-gray-700">Gender</label>
               <Select
                 placeholder="Select Gender"

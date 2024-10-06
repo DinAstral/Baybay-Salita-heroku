@@ -47,7 +47,7 @@ const CreateSuccess = ({ show, onHide }) => {
 const CreateAssessment = ({ show, handleClose, userId, section }) => {
   const [modalShow, setModalShow] = useState(false);
   const [words, setWords] = useState([]);
-  const [sentences, setSentences] = useState([]); // Changed from sentence to sentences
+  const [sentences, setSentences] = useState([]);
   const [filteredWords, setFilteredWords] = useState([]);
   const [data, setData] = useState({
     Period: "",
@@ -65,6 +65,8 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
     Item10: "",
   });
 
+  const [errors, setErrors] = useState({});
+
   const fetchImportWord = () => {
     axios
       .get("/api/getImportWord")
@@ -78,14 +80,14 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
     axios
       .get("/api/getSentence")
       .then((response) => {
-        setSentences(response.data); // Set sentences data
+        setSentences(response.data);
       })
       .catch((err) => console.log(err));
   };
 
   useEffect(() => {
     fetchImportWord();
-    fetchImportSentence(); // Fetch sentences on mount
+    fetchImportSentence();
   }, []);
 
   useEffect(() => {
@@ -105,17 +107,52 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
     setData({ ...data, [itemKey]: selectedItem ? selectedItem.ItemCode : "" });
   };
 
+  // Validation function
+  const validateInputs = () => {
+    let isValid = true;
+    let newErrors = {};
+
+    // Check required fields
+    if (!data.Period) {
+      newErrors.Period = "Grading Period is required.";
+      isValid = false;
+    }
+    if (!data.Type) {
+      newErrors.Type = "Type of Assessment is required.";
+      isValid = false;
+    }
+
+    if (data.Type === "Pagbabasa" && !data.Title) {
+      newErrors.Title = "Title is required for Pagbabasa.";
+      isValid = false;
+    }
+
+    for (let i = 1; i <= 10; i++) {
+      if (!data[`Item${i}`]) {
+        newErrors[`Item${i}`] = `Item ${i} is required.`;
+        isValid = false;
+      }
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const createAct = async (e) => {
     e.preventDefault();
-    const { Period, Type, Title } = data; // Use Title in the submission
+
+    if (!validateInputs()) {
+      toast.error("Please fill out all required fields.");
+      return;
+    }
 
     try {
       const response = await axios.post(`/api/submitAssessment`, {
         UserID: userId,
         Section: section,
-        Period,
-        Type,
-        Title,
+        Period: data.Period,
+        Type: data.Type,
+        Title: data.Title,
         Item1: data.Item1,
         Item2: data.Item2,
         Item3: data.Item3,
@@ -151,6 +188,7 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
       }
     } catch (error) {
       console.log(error);
+      toast.error("Failed to create the activity. Please try again.");
     }
   };
 
@@ -159,12 +197,12 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
       <Modal
         isOpen={show}
         onClose={handleClose}
-        size="lg" // size prop can remain for larger screens
+        size="lg"
         aria-labelledby="contained-modal-title-vcenter"
         isDismissable={false}
         isKeyboardDismissDisabled={true}
         placement="center"
-        scrollBehavior="inside" // Ensure content inside can scroll
+        scrollBehavior="inside"
       >
         <ModalContent className="w-full md:w-[50vw] max-w-full max-h-[80vh] overflow-y-auto bg-white p-4 rounded-lg">
           <ModalHeader
@@ -175,7 +213,6 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
           </ModalHeader>
           <form onSubmit={createAct} className="space-y-4">
             <ModalBody>
-              {/* Form Inputs and Selects */}
               <Select
                 labelPlacement="outside"
                 label="Grading Period"
@@ -183,6 +220,8 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                 value={data.Period}
                 onChange={(e) => setData({ ...data, Period: e.target.value })}
                 className="w-full my-2"
+                isInvalid={!!errors.Period}
+                errorMessage={errors.Period}
               >
                 <SelectItem key="1">Grading Period 1</SelectItem>
                 <SelectItem key="2">Grading Period 2</SelectItem>
@@ -197,6 +236,8 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                 value={data.Type}
                 onChange={(e) => setData({ ...data, Type: e.target.value })}
                 className="w-full my-2"
+                isInvalid={!!errors.Type}
+                errorMessage={errors.Type}
               >
                 <SelectItem key="Pagbabaybay">
                   Assessment 1: Pagbabaybay Tunog at Letra
@@ -206,8 +247,7 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                 <SelectItem key="Pagbabasa">Assessment 4: Pagbabasa</SelectItem>
               </Select>
 
-              {/* Conditional content based on Type */}
-              {data.Type === "Pagbabasa" ? (
+              {data.Type === "Pagbabasa" && (
                 <Select
                   labelPlacement="outside"
                   label="Title"
@@ -215,6 +255,8 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                   placeholder="Select a Title:"
                   onChange={(e) => setData({ ...data, Title: e.target.value })}
                   className="w-full my-2"
+                  isInvalid={!!errors.Title}
+                  errorMessage={errors.Title}
                 >
                   {sentences.map((sentence) => (
                     <SelectItem key={sentence.Title} value={sentence.Title}>
@@ -222,29 +264,31 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                     </SelectItem>
                   ))}
                 </Select>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {[...Array(10)].map((_, i) => (
-                    <Select
-                      key={`Item${i + 1}`}
-                      labelPlacement="outside"
-                      label={`Item ${i + 1}`}
-                      value={data[`Item${i + 1}`]}
-                      placeholder="Select a word:"
-                      onChange={(e) =>
-                        handleWordChange(`Item${i + 1}`, e.target.value)
-                      }
-                      className="w-full my-2"
-                    >
-                      {filteredWords.map((word) => (
-                        <SelectItem key={word.ItemCode} value={word.Word}>
-                          {word.Word}
-                        </SelectItem>
-                      ))}
-                    </Select>
-                  ))}
-                </div>
               )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[...Array(10)].map((_, i) => (
+                  <Select
+                    key={`Item${i + 1}`}
+                    labelPlacement="outside"
+                    label={`Item ${i + 1}`}
+                    value={data[`Item${i + 1}`]}
+                    placeholder="Select a word:"
+                    onChange={(e) =>
+                      handleWordChange(`Item${i + 1}`, e.target.value)
+                    }
+                    className="w-full my-2"
+                    isInvalid={!!errors[`Item${i + 1}`]}
+                    errorMessage={errors[`Item${i + 1}`]}
+                  >
+                    {filteredWords.map((word) => (
+                      <SelectItem key={word.ItemCode} value={word.Word}>
+                        {word.Word}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                ))}
+              </div>
             </ModalBody>
             <ModalFooter className="flex justify-end space-x-2">
               <Button color="danger" variant="light" onClick={handleClose}>

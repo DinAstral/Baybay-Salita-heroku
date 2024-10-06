@@ -4,7 +4,8 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Toaster } from "react-hot-toast";
 import { UserContextProvider } from "../context/userContext";
-import RoleBasedRoute from "./Components/RoleBasedRoute";
+import RoleBasedRoute from "../hooks/RoleBasedRoute";
+import Loader from "./Components/Loader/Loader";
 
 // Lazy load components
 const Login = React.lazy(() => import("./Pages/Login"));
@@ -63,9 +64,6 @@ const Dashboard = React.lazy(() =>
 );
 const TeacherProfile = React.lazy(() =>
   import("./Pages/TeacherDashboard/TeacherProfile")
-);
-const UpdateProfileTeacher = React.lazy(() =>
-  import("./Pages/TeacherDashboard/UpdateProfileTeacher")
 );
 const ManageStudent = React.lazy(() =>
   import("./Pages/TeacherDashboard/ManageStudent")
@@ -135,7 +133,7 @@ const App = () => {
           <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
 
           {/* Routes */}
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Loader />}>
             <Routes>
               <Route path="/" element={<Main />} />
               <Route path="/login" element={<Login />} />
@@ -165,14 +163,6 @@ const App = () => {
                 element={
                   <RoleBasedRoute allowedRoles={["Teacher"]}>
                     <TeacherProfile />
-                  </RoleBasedRoute>
-                }
-              />
-              <Route
-                path="/teacherUpdateProfile/:id"
-                element={
-                  <RoleBasedRoute allowedRoles={["Teacher"]}>
-                    <UpdateProfileTeacher />
                   </RoleBasedRoute>
                 }
               />
