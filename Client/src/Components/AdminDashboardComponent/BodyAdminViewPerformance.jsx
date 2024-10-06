@@ -1,10 +1,8 @@
 import { useState, useEffect, useContext } from "react";
 import { Button, Tooltip } from "@nextui-org/react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
-
-import { UserContext } from "../../../context/userContext";
 
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -23,11 +21,6 @@ const formatTimeRead = (secondsString) => {
 };
 
 const BodyAdminViewPerformance = () => {
-  const navigate = useNavigate();
-  const [modalShowView, setModalShowView] = useState(false);
-
-  const { user } = useContext(UserContext);
-
   const { UserInputId } = useParams();
   const [data, setData] = useState({
     UserInputId: "",
@@ -55,10 +48,6 @@ const BodyAdminViewPerformance = () => {
 
     fetchPerformanceData();
   }, [UserInputId]);
-
-  const handleViewClick = () => {
-    setModalShowView(true);
-  };
 
   return (
     <div className="p-10">
