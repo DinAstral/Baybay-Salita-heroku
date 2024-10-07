@@ -3,8 +3,11 @@ import {
   Button,
   Tooltip,
   Modal,
+  ModalContent,
   ModalHeader,
   ModalBody,
+  ModalFooter,
+  useDisclosure,
 } from "@nextui-org/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -15,6 +18,8 @@ import toast from "react-hot-toast";
 const BodyViewAssessment = () => {
   const navigate = useNavigate();
   const { ActivityCode } = useParams();
+
+  // State for fetching assessment data
   const [data, setData] = useState({
     ActivityCode: "",
     Period: "",
@@ -24,9 +29,12 @@ const BodyViewAssessment = () => {
     Questions: [],
     Items: [],
   });
+
+  // Modal visibility control and media content
   const [modalVisible, setModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState({ type: "", src: "" });
 
+  // Fetch data on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -40,11 +48,13 @@ const BodyViewAssessment = () => {
     fetchData();
   }, [ActivityCode]);
 
+  // Function to open modal with the relevant content
   const openModal = (type, src) => {
     setModalContent({ type, src });
     setModalVisible(true);
   };
 
+  // Function to close modal
   const closeModal = () => {
     setModalVisible(false);
     setModalContent({ type: "", src: "" });
@@ -83,6 +93,7 @@ const BodyViewAssessment = () => {
           </p>
         </div>
 
+        {/* If the assessment type is 'Pagbabasa' */}
         {data.Type === "Pagbabasa" && (
           <div className="mb-6 bg-gray-100 p-4 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-4">Reading Activity</h2>
@@ -95,13 +106,14 @@ const BodyViewAssessment = () => {
           </div>
         )}
 
+        {/* Display Questions in a 3-column grid if assessment type is 'Pagbabasa' */}
         {data.Type === "Pagbabasa" && (
           <div>
             <h2 className="text-xl font-semibold mb-4">Questions</h2>
             {data.Questions.length > 0 ? (
-              <ul className="list-none pl-0 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {data.Questions.map((questionObj, qIndex) => (
-                  <li
+                  <div
                     key={qIndex}
                     className="bg-gray-100 p-4 rounded-lg shadow"
                   >
@@ -112,9 +124,9 @@ const BodyViewAssessment = () => {
                     <p className="text-gray-800">
                       <strong>Answer:</strong> {questionObj.Answer || "N/A"}
                     </p>
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             ) : (
               <p className="text-gray-700">
                 No questions available for this assessment.
@@ -123,52 +135,54 @@ const BodyViewAssessment = () => {
           </div>
         )}
 
+        {/* Display Items in a 3-column grid for non-Pagbabasa assessments */}
         {data.Type !== "Pagbabasa" && (
           <div>
             <h2 className="text-xl font-semibold mb-4">Items</h2>
             {data.Items.length > 0 ? (
-              <ul className="list-none pl-0 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {data.Items.map((item, index) => (
-                  <li key={index} className="bg-gray-100 p-4 rounded-lg shadow">
+                  <div
+                    key={index}
+                    className="bg-gray-100 p-4 rounded-lg shadow"
+                  >
                     <p className="text-gray-800">
                       <strong>Item Code:</strong> {item.ItemCode}
                     </p>
                     <p className="text-gray-800">
                       <strong>Word:</strong> {item.Word || "N/A"}
                     </p>
-                    <p className="text-gray-800">
-                      <strong>Image:</strong>
+
+                    {/* Flex container for Image and Audio buttons */}
+                    <div className="flex items-center space-x-4">
                       {item.Image && (
                         <Tooltip content="View Image">
                           <Button
                             color="primary"
                             size="sm"
-                            className="ml-2 my-2"
-                            onClick={() => openModal("image", item.Image)}
+                            className="my-2"
+                            onPress={() => openModal("image", item.Image)}
                           >
                             View Image
                           </Button>
                         </Tooltip>
                       )}
-                    </p>
-                    <p className="text-gray-800">
-                      <strong>Audio:</strong>
                       {item.Audio && (
                         <Tooltip content="Play Audio">
                           <Button
                             color="primary"
                             size="sm"
-                            className="ml-2 my-2"
-                            onClick={() => openModal("audio", item.Audio)}
+                            className="my-2"
+                            onPress={() => openModal("audio", item.Audio)}
                           >
                             Play Audio
                           </Button>
                         </Tooltip>
                       )}
-                    </p>
-                  </li>
+                    </div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             ) : (
               <p className="text-gray-700">
                 No items available for this assessment.
@@ -184,12 +198,12 @@ const BodyViewAssessment = () => {
         </div>
       </div>
 
+      {/* Modal to display either Image or Audio */}
       <Modal
-        closeButton
-        aria-labelledby="modal-title"
-        open={modalVisible}
+        isOpen={modalVisible}
         onClose={closeModal}
         width="600px"
+        aria-labelledby="modal-title"
       >
         <ModalHeader>
           <h3 className="text-lg font-semibold">
@@ -197,19 +211,23 @@ const BodyViewAssessment = () => {
           </h3>
         </ModalHeader>
         <ModalBody>
-          {modalContent.type === "image" && (
+          {modalContent.type === "image" ? (
             <img
               src={modalContent.src}
-              alt="Image Preview"
+              alt="Cloudinary Image"
               style={{ width: "100%", objectFit: "contain" }}
             />
-          )}
-          {modalContent.type === "audio" && (
+          ) : (
             <audio controls src={modalContent.src} className="w-full">
               Your browser does not support the audio element.
             </audio>
           )}
         </ModalBody>
+        <ModalFooter>
+          <Button color="danger" variant="light" onPress={closeModal}>
+            Close
+          </Button>
+        </ModalFooter>
       </Modal>
     </div>
   );

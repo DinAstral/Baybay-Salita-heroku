@@ -208,6 +208,10 @@ const BodyViewStudent = () => {
                   <p className="text-gray-800">{data?.Birthday || "N/A"}</p>
                 </div>
                 <div>
+                  <span className="block text-sm text-gray-600">Age:</span>
+                  <p className="text-gray-800">{data?.Age || "N/A"}</p>
+                </div>
+                <div>
                   <span className="block text-sm text-gray-600">Address:</span>
                   <p className="text-gray-800">{data?.Address || "N/A"}</p>
                 </div>

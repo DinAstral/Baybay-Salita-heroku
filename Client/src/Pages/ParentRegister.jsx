@@ -29,6 +29,21 @@ const ParentRegister = () => {
   const [isVisibleConfirm, setIsVisibleConfirm] = useState(false);
   const [errors, setErrors] = useState({});
 
+  // Helper function to calculate age based on birthday
+  const calculateAge = (birthday) => {
+    const birthDate = new Date(birthday);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--; // If birthday hasn't occurred this year, reduce age by 1
+    }
+    return age;
+  };
+
   const [data, setData] = useState({
     FirstName: "",
     LastName: "",
@@ -36,7 +51,9 @@ const ParentRegister = () => {
     StudentLastName: "",
     LRN: "",
     Birthday: "",
+    Age: "",
     StudentBirthday: "",
+    StudentAge: "",
     Gender: "",
     StudentGender: "",
     Address: "",
@@ -130,6 +147,11 @@ const ParentRegister = () => {
       newErrors.StudentBirthday = "Student Birthday is required.";
       isValid = false;
     }
+    // Age validation: must be >= 5 years old
+    if (data.StudentAge < 5) {
+      newErrors.StudentBirthday = "Age must be at least 5 years old.";
+      isValid = false;
+    }
     if (!data.MotherTongue) {
       newErrors.MotherTongue = "MotherTongue is required.";
       isValid = false;
@@ -205,6 +227,7 @@ const ParentRegister = () => {
       FirstName,
       LastName,
       Birthday,
+      Age,
       Address,
       Status,
       Gender,
@@ -215,6 +238,7 @@ const ParentRegister = () => {
       StudentLastName,
       LRN,
       StudentBirthday,
+      StudentAge,
       StudentGender,
       MotherTongue,
     } = data;
@@ -224,6 +248,7 @@ const ParentRegister = () => {
         FirstName,
         LastName,
         Birthday,
+        Age,
         Address,
         Status,
         Gender,
@@ -234,6 +259,7 @@ const ParentRegister = () => {
         StudentLastName,
         LRN,
         StudentBirthday,
+        StudentAge,
         StudentGender,
         MotherTongue,
       });
@@ -329,9 +355,11 @@ const ParentRegister = () => {
                     label="Birthday"
                     variant="bordered"
                     value={data.Birthday}
-                    onChange={(e) =>
-                      setData({ ...data, Birthday: e.target.value })
-                    }
+                    onChange={(e) => {
+                      const birthday = e.target.value;
+                      const age = calculateAge(birthday); // Calculate age
+                      setData({ ...data, Birthday: birthday, Age: age }); // Set both birthday and age
+                    }}
                     errorMessage={errors.Birthday}
                     isInvalid={!!errors.Birthday}
                   />
@@ -563,17 +591,22 @@ const ParentRegister = () => {
                     }
                   />
                   <Input
+                    className="pt-2"
                     type="date"
-                    name="Birthday"
                     label="Birthday"
                     variant="bordered"
-                    className="bg-transparent py-1 my-1"
                     value={data.StudentBirthday}
-                    onChange={(e) =>
-                      setData({ ...data, StudentBirthday: e.target.value })
-                    }
-                    errorMessage={errors.StudentBirthday}
-                    isInvalid={!!errors.StudentBirthday}
+                    onChange={(e) => {
+                      const birthday = e.target.value;
+                      const age = calculateAge(birthday); // Calculate age
+                      setData({
+                        ...data,
+                        StudentBirthday: birthday,
+                        StudentAge: age,
+                      }); // Set both birthday and age
+                    }}
+                    errorMessage={errors.Birthday}
+                    isInvalid={!!errors.Birthday}
                   />
                   <Select
                     label="Gender"

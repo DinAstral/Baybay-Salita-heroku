@@ -252,7 +252,6 @@ const BodyManageStudent = () => {
                     <TableColumn>Last Name</TableColumn>
                     <TableColumn>Age</TableColumn>
                     <TableColumn>Section</TableColumn>
-                    <TableColumn>Birthday</TableColumn>
                     <TableColumn>Mother Tongue</TableColumn>
                     <TableColumn>Gender</TableColumn>
                     <TableColumn>Status</TableColumn>{" "}
@@ -267,7 +266,6 @@ const BodyManageStudent = () => {
                         <TableCell>{student.LastName}</TableCell>
                         <TableCell>{student.Age}</TableCell>
                         <TableCell>{student.Section}</TableCell>
-                        <TableCell>{student.Birthday}</TableCell>
                         <TableCell>{student.MotherTongue}</TableCell>
                         <TableCell>{student.Gender}</TableCell>
                         {/* Apply color to the status based on student performance */}

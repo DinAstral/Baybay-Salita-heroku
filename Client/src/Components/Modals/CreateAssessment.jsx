@@ -19,6 +19,7 @@ const CreateSuccess = ({ show, onHide }) => {
     onHide();
     window.location.reload(); // Consider updating state instead of reloading.
   };
+
   return (
     <Modal
       isOpen={show}
@@ -91,7 +92,7 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
   }, []);
 
   useEffect(() => {
-    if (data.Type) {
+    if (data.Type && data.Type !== "Pagbabasa") {
       const filtered = words.filter((word) => word.Type === data.Type);
       setFilteredWords(filtered);
     } else {
@@ -122,15 +123,19 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
       isValid = false;
     }
 
+    // Title is required for Pagbabasa
     if (data.Type === "Pagbabasa" && !data.Title) {
       newErrors.Title = "Title is required for Pagbabasa.";
       isValid = false;
     }
 
-    for (let i = 1; i <= 10; i++) {
-      if (!data[`Item${i}`]) {
-        newErrors[`Item${i}`] = `Item ${i} is required.`;
-        isValid = false;
+    // Only validate items if the type is NOT Pagbabasa
+    if (data.Type !== "Pagbabasa") {
+      for (let i = 1; i <= 10; i++) {
+        if (!data[`Item${i}`]) {
+          newErrors[`Item${i}`] = `Item ${i} is required.`;
+          isValid = false;
+        }
       }
     }
 
@@ -247,6 +252,7 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                 <SelectItem key="Pagbabasa">Assessment 4: Pagbabasa</SelectItem>
               </Select>
 
+              {/* Only show title if type is Pagbabasa */}
               {data.Type === "Pagbabasa" && (
                 <Select
                   labelPlacement="outside"
@@ -266,29 +272,32 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                 </Select>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[...Array(10)].map((_, i) => (
-                  <Select
-                    key={`Item${i + 1}`}
-                    labelPlacement="outside"
-                    label={`Item ${i + 1}`}
-                    value={data[`Item${i + 1}`]}
-                    placeholder="Select a word:"
-                    onChange={(e) =>
-                      handleWordChange(`Item${i + 1}`, e.target.value)
-                    }
-                    className="w-full my-2"
-                    isInvalid={!!errors[`Item${i + 1}`]}
-                    errorMessage={errors[`Item${i + 1}`]}
-                  >
-                    {filteredWords.map((word) => (
-                      <SelectItem key={word.ItemCode} value={word.Word}>
-                        {word.Word}
-                      </SelectItem>
-                    ))}
-                  </Select>
-                ))}
-              </div>
+              {/* Only show the item selection if type is NOT Pagbabasa */}
+              {data.Type !== "Pagbabasa" && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[...Array(10)].map((_, i) => (
+                    <Select
+                      key={`Item${i + 1}`}
+                      labelPlacement="outside"
+                      label={`Item ${i + 1}`}
+                      value={data[`Item${i + 1}`]}
+                      placeholder="Select a word:"
+                      onChange={(e) =>
+                        handleWordChange(`Item${i + 1}`, e.target.value)
+                      }
+                      className="w-full my-2"
+                      isInvalid={!!errors[`Item${i + 1}`]}
+                      errorMessage={errors[`Item${i + 1}`]}
+                    >
+                      {filteredWords.map((word) => (
+                        <SelectItem key={word.ItemCode} value={word.Word}>
+                          {word.Word}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                  ))}
+                </div>
+              )}
             </ModalBody>
             <ModalFooter className="flex justify-end space-x-2">
               <Button color="danger" variant="light" onClick={handleClose}>

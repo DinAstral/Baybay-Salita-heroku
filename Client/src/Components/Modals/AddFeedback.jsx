@@ -15,7 +15,6 @@ import {
   Select,
   SelectItem,
 } from "@nextui-org/react";
-import { faBook, faPen } from "@fortawesome/free-solid-svg-icons";
 
 const AddSuccess = ({ show, onHide }) => {
   const handleSuccessClick = () => {
@@ -56,8 +55,42 @@ const AddFeedback = ({ show, onHide, actCode, userid, lrn, section }) => {
     Context: "",
   });
 
+  const [errors, setErrors] = useState({});
+
+  // Validation function
+  const validateInputs = () => {
+    let isValid = true;
+    let newErrors = {};
+
+    if (!data.Title) {
+      newErrors.Title = "Title is required.";
+      isValid = false;
+    }
+    if (!data.Type) {
+      newErrors.Type = "Type of assessment is required.";
+      isValid = false;
+    }
+    if (!data.Feedback_Date) {
+      newErrors.Feedback_Date = "Feedback date is required.";
+      isValid = false;
+    }
+    if (!data.Context) {
+      newErrors.Context = "Context is required.";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const createFeedback = async (e) => {
     e.preventDefault();
+
+    if (!validateInputs()) {
+      toast.error("Please fill out all required fields.");
+      return;
+    }
+
     const { Feedback_Date, Type, Title, Context } = data;
 
     try {
@@ -115,6 +148,8 @@ const AddFeedback = ({ show, onHide, actCode, userid, lrn, section }) => {
                 className="bg-transparent py-1 my-1"
                 value={data.Title}
                 onChange={(e) => setData({ ...data, Title: e.target.value })}
+                isInvalid={!!errors.Title}
+                errorMessage={errors.Title}
               />
 
               <Select
@@ -126,6 +161,8 @@ const AddFeedback = ({ show, onHide, actCode, userid, lrn, section }) => {
                 className="bg-transparent py-1 my-1"
                 value={data.Type}
                 onChange={(e) => setData({ ...data, Type: e.target.value })}
+                isInvalid={!!errors.Type}
+                errorMessage={errors.Type}
               >
                 <SelectItem key="">Select Type of Assessment</SelectItem>
                 <SelectItem key="Pagbabaybay">
@@ -146,6 +183,8 @@ const AddFeedback = ({ show, onHide, actCode, userid, lrn, section }) => {
                 onChange={(e) =>
                   setData({ ...data, Feedback_Date: e.target.value })
                 }
+                isInvalid={!!errors.Feedback_Date}
+                errorMessage={errors.Feedback_Date}
               />
 
               <Textarea
@@ -156,6 +195,8 @@ const AddFeedback = ({ show, onHide, actCode, userid, lrn, section }) => {
                 className="bg-transparent py-1 my-1"
                 value={data.Context}
                 onChange={(e) => setData({ ...data, Context: e.target.value })}
+                isInvalid={!!errors.Context}
+                errorMessage={errors.Context}
               />
             </ModalBody>
             <ModalFooter>

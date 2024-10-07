@@ -27,6 +27,7 @@ const TeacherRegister = () => {
     Section: "",
     Department: "",
     Birthday: "",
+    Age: "", // Add Age field
     Gender: "",
     Address: "",
     Status: "",
@@ -48,48 +49,20 @@ const TeacherRegister = () => {
     navigate("/register");
   };
 
-  function isNumber(input) {
-    return !isNaN(input);
-  }
-
-  function validatePassword(password) {
-    const minLength = 8;
-    const errors = [];
-
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasDigit = /\d/.test(password);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-    // Check if password is provided
-    if (!password) {
-      return "Password is required.";
+  // Helper function to calculate age based on birthday
+  const calculateAge = (birthday) => {
+    const birthDate = new Date(birthday);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--; // If birthday hasn't occurred this year, reduce age by 1
     }
-
-    // Validate the different criteria and accumulate errors
-    if (password.length < minLength) {
-      errors.push("Password must be at least 8 characters long.");
-    }
-    if (!hasUpperCase) {
-      errors.push("Password must contain at least one uppercase letter.");
-    }
-    if (!hasLowerCase) {
-      errors.push("Password must contain at least one lowercase letter.");
-    }
-    if (!hasDigit) {
-      errors.push("Password must contain at least one digit.");
-    }
-    if (!hasSpecialChar) {
-      errors.push("Password must contain at least one special character.");
-    }
-
-    // If there are any errors, return them as a combined string
-    if (errors.length > 0) {
-      return errors.join(" ");
-    }
-
-    return null; // No errors
-  }
+    return age;
+  };
 
   const validateInputs = () => {
     let isValid = true;
@@ -131,11 +104,7 @@ const TeacherRegister = () => {
       newErrors.ContactNumber = "Contact Number is required.";
       isValid = false;
     }
-    if (!isNumber(data.ContactNumber)) {
-      newErrors.ContactNumber = "Invalid Contact Number.";
-      isValid = false;
-    }
-    // Validate Contact Number (starts with 09 and 11 digits long)
+
     const phoneRegex = /^09\d{9}$/;
     if (!phoneRegex.test(data.ContactNumber)) {
       newErrors.ContactNumber = "Please enter a valid PH contact number.";
@@ -147,19 +116,15 @@ const TeacherRegister = () => {
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    // Validate email format
     if (!emailRegex.test(data.email)) {
       newErrors.email = "Invalid email format.";
-    }
-
-    const passwordError = validatePassword(data.password);
-    if (passwordError) {
-      newErrors.password = passwordError;
       isValid = false;
     }
 
-    // Validate passwords match
-    else if (data.password !== data.confirmPassword) {
+    if (!data.password) {
+      newErrors.password = "Password is required.";
+      isValid = false;
+    } else if (data.password !== data.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match.";
       isValid = false;
     }
@@ -189,12 +154,8 @@ const TeacherRegister = () => {
       email,
       password,
       confirmPassword,
+      Age, // Include Age in the submission
     } = data;
-
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
 
     try {
       const response = await axios.post("/api/registerTeacher", {
@@ -203,6 +164,7 @@ const TeacherRegister = () => {
         Section,
         Department,
         Birthday,
+        Age, // Send Age as well
         Address,
         Status,
         Gender,
@@ -210,12 +172,13 @@ const TeacherRegister = () => {
         email,
         password,
       });
+
       if (response.data.error) {
         toast.error(response.data.error);
       } else {
         setData({});
         toast.success(response.data.message);
-        localStorage.setItem("userId", response.data.data.userId); // Store userId for verification step
+        localStorage.setItem("userId", response.data.data.userId);
         navigate("/verifyEmail");
       }
     } catch (error) {
@@ -323,9 +286,11 @@ const TeacherRegister = () => {
                   label="Birthday"
                   variant="bordered"
                   value={data.Birthday}
-                  onChange={(e) =>
-                    setData({ ...data, Birthday: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const birthday = e.target.value;
+                    const age = calculateAge(birthday); // Calculate age
+                    setData({ ...data, Birthday: birthday, Age: age }); // Set both birthday and age
+                  }}
                   errorMessage={errors.Birthday}
                   isInvalid={!!errors.Birthday}
                 />
