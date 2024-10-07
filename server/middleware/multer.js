@@ -29,12 +29,12 @@ const fileFilter = (req, file, cb) => {
       if (
         file.mimetype === "image/jpeg" ||
         file.mimetype === "image/png" ||
-        file.mimetype === "image/svg"
+        file.mimetype === "image/svg+xml" // Corrected MIME type for SVG
       ) {
         return cb(null, true);
       } else {
         return cb(
-          new Error("Invalid file type. Only JPEG, PNG and SVG are allowed.")
+          new Error("Invalid file type. Only JPEG, PNG, and SVG are allowed.")
         );
       }
     } else if (

@@ -535,9 +535,9 @@ const userInputAudio = async (req, res) => {
 
   UserUpload(req, res, async function (err) {
     if (err instanceof multer.MulterError) {
-      return res.json({ error: `Multer Error: ${err.message}` });
+      return res.json({ error: `${err.message}` });
     } else if (err) {
-      return res.json({ error: `Error: ${err.message}` });
+      return res.json({ error: `${err.message}` });
     }
 
     try {
