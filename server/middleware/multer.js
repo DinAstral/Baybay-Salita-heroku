@@ -26,11 +26,15 @@ const fileFilter = (req, file, cb) => {
   try {
     // Check for image or audio type
     if (file.fieldname === "Image" || file.fieldname === "Profile") {
-      if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+      if (
+        file.mimetype === "image/jpeg" ||
+        file.mimetype === "image/png" ||
+        file.mimetype === "image/svg"
+      ) {
         return cb(null, true);
       } else {
         return cb(
-          new Error("Invalid file type. Only JPEG and PNG are allowed.")
+          new Error("Invalid file type. Only JPEG, PNG and SVG are allowed.")
         );
       }
     } else if (
