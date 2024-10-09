@@ -149,6 +149,7 @@ const transcribeAudioWithAssemblyAI = async (audioPath) => {
     },
     data: {
       audio_url: uploadUrl,
+      speech_model: "nano",
       language_code: "tl", // Filipino language code
     },
   });
