@@ -188,6 +188,14 @@ const stentWeightedAudioSimilarity = (mfccDistance, chromaDistance, zcr) => {
   );
 };
 
+// Function to compare the transcriptions
+const compareTranscriptions = (text1, text2) => {
+  if (!text1 || !text2) {
+    return false;
+  }
+  return text1.trim().toLowerCase() === text2.trim().toLowerCase();
+};
+
 // Main comparison function
 const run = async (defaultAudioUrl, userAudioUrl) => {
   try {
