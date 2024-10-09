@@ -529,7 +529,7 @@ const registerAdmin = async (req, res) => {
 
     const hashedPassword = await hashPassword(password); // Hash the password
 
-    // Create Parent and User records
+    // Create admin and User records
     const admin = new Admin({
       UserID: adminID,
       FirstName,

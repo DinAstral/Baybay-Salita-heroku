@@ -6,7 +6,7 @@ import {
   faCircleInfo,
 } from "@fortawesome/free-solid-svg-icons";
 import { Tooltip } from "@nextui-org/react";
-import { BarChart, LineChart } from "@mui/x-charts";
+import { BarChart } from "@mui/x-charts";
 import axios from "axios";
 import { UserContext } from "../../../context/userContext";
 
@@ -19,6 +19,15 @@ const BodyTeacherDashboard = () => {
   const [sectionCounts, setSectionCounts] = useState({});
   const [activityCounts, setActivityCounts] = useState({});
   const [performanceCounts, setPerformanceCounts] = useState([]);
+
+  const [statusCounts, setStatusCounts] = useState({
+    Incomplete: 0,
+    LowEmergingReader: 0,
+    HighEmergingReader: 0,
+    DevelopingReader: 0,
+    TransitioningReader: 0,
+    GradeLevelReader: 0,
+  });
 
   useEffect(() => {
     const fetchTeacher = async () => {
@@ -40,8 +49,43 @@ const BodyTeacherDashboard = () => {
         );
         setStudents(filteredStudents);
 
-        const sectionCount = filteredStudents.length;
-        setSectionCounts({ [teacher.Section]: sectionCount });
+        // Group students by their status and update the state
+        const statusGroups = {
+          Incomplete: 0,
+          LowEmergingReader: 0,
+          HighEmergingReader: 0,
+          DevelopingReader: 0,
+          TransitioningReader: 0,
+          GradeLevelReader: 0,
+        };
+
+        filteredStudents.forEach((student) => {
+          switch (student.status) {
+            case "Incomplete":
+              statusGroups.Incomplete += 1;
+              break;
+            case "Low Emerging Reader":
+              statusGroups.LowEmergingReader += 1;
+              break;
+            case "High Emerging Reader":
+              statusGroups.HighEmergingReader += 1;
+              break;
+            case "Developing Reader":
+              statusGroups.DevelopingReader += 1;
+              break;
+            case "Transitioning Reader":
+              statusGroups.TransitioningReader += 1;
+              break;
+            case "Grade Level Reader":
+              statusGroups.GradeLevelReader += 1;
+              break;
+            default:
+              break;
+          }
+        });
+
+        setStatusCounts(statusGroups);
+        setSectionCounts(filteredStudents);
       } catch (err) {
         console.error("Error fetching students:", err);
       }
@@ -91,18 +135,27 @@ const BodyTeacherDashboard = () => {
     fetchAssessments();
   }, [user.UserID, teacher.Section]);
 
-  useEffect(() => {
-    console.log("Performance Data: ", performanceCounts); // Debugging: Check performanceCounts
-  }, [performanceCounts]);
+  /// Prepare data for the dynamic student performance chart based on LRN
+  const studentsPerformanceData = students.map((student) => {
+    const studentPerformances = performanceCounts.filter(
+      (performance) => performance.LRN === student.LRN // Use LRN to filter performance
+    );
 
-  // Prepare data for the performance line chart
-  const assessmentLabels = performanceCounts.map((item) => item.Type); // Assessment types
+    // Ensure that we get a score for every assessment type, even if it's not present (default to 0)
+    const scoresByAssessment = assessments.map((assessment) => {
+      const studentAssessment = studentPerformances.find(
+        (perf) => perf.Type === assessment.Type
+      );
+      return studentAssessment ? parseInt(studentAssessment.Score, 10) : 0; // Default score 0 if no data
+    });
 
-  // Convert score to integer and ensure it's a valid number
-  const scoreData = performanceCounts.map((item) => {
-    const score = parseInt(item.Score, 10); // Convert to integer
-    return isNaN(score) ? 0 : score; // If score is NaN, default to 0
+    return {
+      studentName: student.Name,
+      scores: scoresByAssessment,
+    };
   });
+
+  const assessmentLabels = assessments.map((assessment) => assessment.Type); // Dynamic assessment labels
 
   return (
     <div className="p-6">
@@ -136,6 +189,7 @@ const BodyTeacherDashboard = () => {
             />
           </div>
         </div>
+
         <div className="bg-[#7668d2] rounded-lg shadow-2xl p-4 flex flex-row justify-between">
           <div className="text-white">
             <h2 className="text-xl font-semibold">Assessment</h2>
@@ -151,6 +205,7 @@ const BodyTeacherDashboard = () => {
             />
           </div>
         </div>
+
         <div className="bg-[#91c123] rounded-lg shadow-2xl p-4 flex flex-row justify-between">
           <div className="text-white">
             <h2 className="text-xl font-semibold">Performance</h2>
@@ -164,6 +219,103 @@ const BodyTeacherDashboard = () => {
               className="text-md"
               inverse
             />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6">
+        <h2 className="text-2xl font-semibold mb-4">Student Status</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="bg-[#f63845] rounded-lg shadow-2xl p-4 flex flex-row justify-between">
+            <div className="text-white">
+              <h2 className="text-xl font-semibold">Incomplete</h2>
+              <p className="text-5xl mt-2">{statusCounts.Incomplete}</p>
+            </div>
+            <div>
+              <FontAwesomeIcon
+                icon={faChildReaching}
+                size="2xl"
+                className="text-md"
+                inverse
+              />
+            </div>
+          </div>
+
+          <div className="bg-[#ff7828] rounded-lg shadow-2xl p-4 flex flex-row justify-between">
+            <div className="text-white">
+              <h2 className="text-xl font-semibold">Low Emerging Reader</h2>
+              <p className="text-5xl mt-2">{statusCounts.LowEmergingReader}</p>
+            </div>
+            <div>
+              <FontAwesomeIcon
+                icon={faChalkboardTeacher}
+                size="2xl"
+                className="text-md"
+                inverse
+              />
+            </div>
+          </div>
+
+          <div className="bg-[#DC84F3] rounded-lg shadow-2xl p-4 flex flex-row justify-between">
+            <div className="text-white">
+              <h2 className="text-xl font-semibold">High Emerging Reader</h2>
+              <p className="text-5xl mt-2">{statusCounts.HighEmergingReader}</p>
+            </div>
+            <div>
+              <FontAwesomeIcon
+                icon={faChalkboardTeacher}
+                size="2xl"
+                className="text-md"
+                inverse
+              />
+            </div>
+          </div>
+
+          <div className="bg-[#4b99f5] rounded-lg shadow-2xl p-4 flex flex-row justify-between">
+            <div className="text-white">
+              <h2 className="text-xl font-semibold">Developing Reader</h2>
+              <p className="text-5xl mt-2">{statusCounts.DevelopingReader}</p>
+            </div>
+            <div>
+              <FontAwesomeIcon
+                icon={faChildReaching}
+                size="2xl"
+                className="text-md"
+                inverse
+              />
+            </div>
+          </div>
+
+          <div className="bg-[#ffce1f] rounded-lg shadow-2xl p-4 flex flex-row justify-between">
+            <div className="text-white">
+              <h2 className="text-xl font-semibold">Transitioning Reader</h2>
+              <p className="text-5xl mt-2">
+                {statusCounts.TransitioningReader}
+              </p>
+            </div>
+            <div>
+              <FontAwesomeIcon
+                icon={faChildReaching}
+                size="2xl"
+                className="text-md"
+                inverse
+              />
+            </div>
+          </div>
+
+          <div className="bg-[#FF8080] rounded-lg shadow-2xl p-4 flex flex-row justify-between">
+            <div className="text-white">
+              <h2 className="text-xl font-semibold">Grade Level Reader</h2>
+              <p className="text-5xl mt-2">{statusCounts.GradeLevelReader}</p>
+            </div>
+            <div>
+              <FontAwesomeIcon
+                icon={faChildReaching}
+                size="2xl"
+                className="text-md"
+                inverse
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -205,33 +357,36 @@ const BodyTeacherDashboard = () => {
         </div>
       </div>
 
+      {/* Performance of students in a dynamic bar chart */}
       <div className="mt-6">
-        <h2 className="text-2xl font-semibold mb-4">Performance</h2>
+        <h2 className="text-2xl font-semibold mb-4">Performance of Students</h2>
         <div className="bg-white rounded-lg shadow-2xl p-4">
-          {performanceCounts.length > 0 ? (
-            <LineChart
+          {performanceCounts.length > 0 && students.length > 0 ? (
+            <BarChart
               xAxis={[
                 {
                   label: "Assessment Type",
                   data: assessmentLabels,
+                  scaleType: "band",
+                  tickSize: 10,
                 },
               ]}
               yAxis={[
                 {
                   label: "Score",
                   min: 0,
-                  max: 10, // Assuming the max score is 100
+                  max: 100, // Assuming scores are out of 100
+                  tickCount: 6,
+                  tickFormat: (value) => Math.floor(value),
                 },
               ]}
-              series={[
-                {
-                  data: scoreData, // Array of student scores
-                  label: "Scores", // A label for better understanding
-                  color: "#ff5733", // Line color
-                },
-              ]}
+              series={studentsPerformanceData.map((studentData) => ({
+                data: studentData.scores, // Array of scores per assessment
+                label: studentData.studentName, // Student name as label
+                color: `#${Math.floor(Math.random() * 16777215).toString(16)}`, // Random color for each student
+              }))}
               width={1500}
-              height={400}
+              height={500}
             />
           ) : (
             <p>No performance data available</p>

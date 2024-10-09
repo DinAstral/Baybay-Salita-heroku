@@ -85,16 +85,7 @@ const extractAudioFeatures = async (audioPath) => {
             // Extract features for each chunk and accumulate the results
             const totalChunks = audioChunks.length;
             const sumFeatures = audioChunks.reduce((acc, chunk, index) => {
-              const features = Meyda.extract(
-                [
-                  "mfcc",
-                  "chroma",
-                  "spectralCentroid",
-                  "zcr",
-                  "perceptualSpread",
-                ],
-                chunk
-              );
+              const features = Meyda.extract(["mfcc", "chroma", "zcr"], chunk);
 
               // Initialize the accumulator for the first chunk
               if (index === 0) {
@@ -159,9 +150,9 @@ const compareAudioFeatures = (features1, features2) => {
 
 // Function to compute Stent Weighted Audio Similarity with NaN handling and scaling to 0-100
 const stentWeightedAudioSimilarity = (mfccDistance, chromaDistance, zcr) => {
-  const weightMfcc = 0.8; // Adjust weights as needed
+  const weightMfcc = 0.7; // Adjust weights as needed
   const weightChroma = 0.1;
-  const weightZcr = 0.1;
+  const weightZcr = 0.2;
 
   // Calculate the weighted sum
   let similarityScore =
@@ -217,7 +208,8 @@ const runComparisonAndSaveResult = async (
   Section,
   Type,
   fileUrls,
-  defaultAudios
+  defaultAudios,
+  similarityThreshold = 25 // Add a default threshold
 ) => {
   try {
     const comparisonResults = [];
@@ -227,15 +219,13 @@ const runComparisonAndSaveResult = async (
       const userAudioUrl = fileUrls[`AudioURL${i + 1}`];
       const defaultAudioUrl = defaultAudios[i];
 
-      // Run the comparison using the main comparison function
       const result = await run(defaultAudioUrl, userAudioUrl);
 
-      // Calculate the score based on stentWeightedSimilarity being >= 80
-      if (result.weightedSimilarity >= 20) {
-        totalScore += 1; // Increment the score
+      // Check the threshold dynamically
+      if (result.weightedSimilarity <= similarityThreshold) {
+        totalScore += 1;
       }
 
-      // Save the detailed result for each audio comparison
       comparisonResults.push({
         ItemCode: `Itemcode${i + 1}`,
         mfccDistance: result.audioComparison.mfccDistance,
@@ -245,7 +235,6 @@ const runComparisonAndSaveResult = async (
       });
     }
 
-    // Save the comparison results in the database
     await CompareModel.create({
       UserInputId,
       ActivityCode,
@@ -255,7 +244,6 @@ const runComparisonAndSaveResult = async (
       Results: comparisonResults,
     });
 
-    // Return the total score
     return totalScore;
   } catch (error) {
     console.error("Error during audio comparison:", error);

@@ -129,7 +129,7 @@ const studentStatus = async (req, res) => {
       timeReadPercentage >= 76 &&
       performances.filter((p) => p.correctAnswers >= 4).length > 0
     ) {
-      status = "At Grade Level Reader";
+      status = "Grade Level Reader";
       comment = "Great job! You're reading at grade level!";
     }
 

@@ -114,6 +114,8 @@ const ParentRegister = () => {
     let isValid = true;
     let newErrors = {};
 
+    setErrors({});
+
     if (!data.FirstName) {
       newErrors.FirstName = "First Name is required.";
       isValid = false;
