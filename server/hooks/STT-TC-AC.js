@@ -3,7 +3,6 @@ const Meyda = require("meyda");
 const fs = require("fs");
 const ffmpeg = require("fluent-ffmpeg");
 const wav = require("wav-decoder");
-const mongoose = require("mongoose");
 const CompareModel = require("../models/ComparisonResult");
 
 const ASSEMBLYAI_API_KEY = process.env.ASSEMBLYAI_API_KEY; // Replace with your AssemblyAI API key
@@ -199,6 +198,33 @@ const stentWeightedAudioSimilarity = (mfccDistance, chromaDistance, zcr) => {
   return similarityScore;
 };
 
+// Function to compare audio features
+const compareAudioFeatures = (features1, features2) => {
+  const mfccDistance = calculateEuclideanDistance(
+    features1.mfcc,
+    features2.mfcc
+  );
+  const chromaDistance = calculateEuclideanDistance(
+    features1.chroma,
+    features2.chroma
+  );
+  const zcrDifference = Math.abs(features1.zcr[0] - features2.zcr[0]);
+
+  return {
+    mfccDistance,
+    chromaDistance,
+    zcr: zcrDifference,
+  };
+};
+
+// Helper function to calculate Euclidean distance between two arrays
+const calculateEuclideanDistance = (arr1, arr2) => {
+  if (!arr1 || !arr2 || arr1.length !== arr2.length) return 0;
+  return Math.sqrt(
+    arr1.reduce((sum, val, i) => sum + Math.pow(val - arr2[i], 2), 0)
+  );
+};
+
 // Main comparison function that accepts dynamic audio URLs
 const run = async (defaultAudioUrl, userAudioUrl) => {
   try {
@@ -258,49 +284,30 @@ const runComparisonAndSaveResult = async (
   similarityThreshold = 20 // Add a default threshold
 ) => {
   try {
-    const comparisonResults = [];
-    let totalScore = 0;
+    // Compare both audios
+    const { weightedSimilarity } = await run(fileUrls[0], defaultAudios[0]);
 
-    for (let i = 0; i < defaultAudios.length; i++) {
-      const userAudioUrl = fileUrls[`AudioURL${i + 1}`];
-      const defaultAudioUrl = defaultAudios[i];
-
-      const result = await run(defaultAudioUrl, userAudioUrl);
-
-      // If transcription failed or text didn't match, result.score would be 0
-      if (result.score === 0) {
-        console.log(`Text didn't match for Audio ${i + 1}. Score: 0`);
-      } else if (result.weightedSimilarity <= similarityThreshold) {
-        totalScore += 1; // Increment the score
-      }
-
-      // Push the result for this audio
-      comparisonResults.push({
-        ItemCode: `Itemcode${i + 1}`,
-        mfccDistance: result.audioComparison.mfccDistance,
-        chromaDistance: result.audioComparison.chromaDistance,
-        zcr: result.audioComparison.zcr,
-        stentWeightedSimilarity: result.weightedSimilarity,
-      });
-    }
-
-    // Save the comparison result to the database
-    await CompareModel.create({
-      UserInputId,
-      ActivityCode,
-      LRN,
-      Section,
-      Type,
-      Results: comparisonResults,
+    // Create a result object and save it
+    const result = new CompareModel({
+      userInputId: UserInputId,
+      activityCode: ActivityCode,
+      LRN: LRN,
+      section: Section,
+      type: Type,
+      weightedSimilarity: weightedSimilarity,
     });
 
-    return totalScore;
+    await result.save();
+
+    console.log("Comparison result saved successfully!");
+    return result;
   } catch (error) {
-    console.error("Error during audio comparison:", error);
+    console.error(
+      "Error during the comparison and saving process:",
+      error.message
+    );
     throw error;
   }
 };
 
-module.exports = {
-  runComparisonAndSaveResult,
-};
+module.exports = { runComparisonAndSaveResult };
