@@ -202,21 +202,34 @@ const run = async (defaultAudioUrl, userAudioUrl) => {
     const audioFile1 = "audio1.wav";
     const audioFile2 = "audio2.wav";
 
+    // Download the audio files
     await downloadAudio(defaultAudioUrl, audioFile1);
     await downloadAudio(userAudioUrl, audioFile2);
 
+    // Perform transcription for both audios
     const transcription1 = await transcribeAudioWithAssemblyAI(audioFile1);
     const transcription2 = await transcribeAudioWithAssemblyAI(audioFile2);
 
+    // If the transcriptions don't match, log it and continue
     if (!compareTranscriptions(transcription1, transcription2)) {
-      return { score: 0 };
+      console.log(
+        "Transcriptions don't match, but proceeding with feature comparison."
+      );
+      return {
+        transcriptionMatch: false,
+        audioComparison: null,
+        weightedSimilarity: null,
+      };
     }
 
+    // Extract audio features
     const features1 = await extractAudioFeatures(audioFile1);
     const features2 = await extractAudioFeatures(audioFile2);
 
+    // Compare the extracted features
     const audioComparison = compareAudioFeatures(features1, features2);
 
+    // Compute the Stent Weighted Audio Similarity
     const weightedSimilarity = stentWeightedAudioSimilarity(
       audioComparison.mfccDistance,
       audioComparison.chromaDistance,
@@ -224,6 +237,7 @@ const run = async (defaultAudioUrl, userAudioUrl) => {
     );
 
     return {
+      transcriptionMatch: true,
       audioComparison,
       weightedSimilarity,
     };
@@ -254,12 +268,25 @@ const runComparisonAndSaveResult = async (
 
       const result = await run(defaultAudioUrl, userAudioUrl);
 
-      if (result.score === 0) {
-        console.log(`Text didn't match for Audio ${i + 1}. Score: 0`);
-      } else if (result.weightedSimilarity <= similarityThreshold) {
+      // If the transcriptions don't match, skip the score increment, but continue feature comparison
+      if (!result.transcriptionMatch) {
+        console.log(`Text didn't match for Audio ${i + 1}`);
+        comparisonResults.push({
+          ItemCode: `Itemcode${i + 1}`,
+          mfccDistance: null,
+          chromaDistance: null,
+          zcr: null,
+          stentWeightedSimilarity: null,
+        });
+        continue; // Skip score increment but log result
+      }
+
+      // If the weighted similarity is below the threshold, increment score
+      if (result.weightedSimilarity <= similarityThreshold) {
         totalScore += 1;
       }
 
+      // Push the comparison result to the array
       comparisonResults.push({
         ItemCode: `Itemcode${i + 1}`,
         mfccDistance: result.audioComparison.mfccDistance,
@@ -269,6 +296,7 @@ const runComparisonAndSaveResult = async (
       });
     }
 
+    // Save the comparison result to the database
     await CompareModel.create({
       UserInputId,
       ActivityCode,
