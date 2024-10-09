@@ -225,9 +225,27 @@ const calculateEuclideanDistance = (arr1, arr2) => {
   );
 };
 
+// Helper function to validate URL
+const isValidUrl = (url) => {
+  try {
+    new URL(url); // This will throw if the URL is invalid
+    return true;
+  } catch (_) {
+    return false;
+  }
+};
+
 // Main comparison function that accepts dynamic audio URLs
 const run = async (defaultAudioUrl, userAudioUrl) => {
   try {
+    // Validate the URLs before proceeding
+    if (!isValidUrl(defaultAudioUrl)) {
+      throw new Error(`Invalid URL for default audio: ${defaultAudioUrl}`);
+    }
+    if (!isValidUrl(userAudioUrl)) {
+      throw new Error(`Invalid URL for user audio: ${userAudioUrl}`);
+    }
+
     const audioFile1 = "audio1.wav"; // Default audio
     const audioFile2 = "audio2.wav"; // User-uploaded audio
 
@@ -284,6 +302,11 @@ const runComparisonAndSaveResult = async (
   similarityThreshold = 20 // Add a default threshold
 ) => {
   try {
+    // Ensure both URLs are passed correctly
+    if (!fileUrls || !fileUrls[0] || !defaultAudios || !defaultAudios[0]) {
+      throw new Error("Missing audio URLs for comparison");
+    }
+
     // Compare both audios
     const { weightedSimilarity } = await run(fileUrls[0], defaultAudios[0]);
 
