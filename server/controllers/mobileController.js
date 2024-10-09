@@ -5,22 +5,22 @@ const jwt = require("jsonwebtoken");
 const mobileLogin = async (req, res) => {
   try {
     // Extract firstName and lastName from req.body
-    const { firstName, lastName } = req.body;
+    const { FirstName, LastName } = req.body;
 
     // Check if both firstName and lastName are provided
-    if (!firstName || !lastName) {
+    if (!FirstName || !LastName) {
       return res.status(400).json({
         error: "First Name and Last Name are required.",
       });
     }
 
     // Combine firstName and lastName for display or further use
-    const fullName = `${firstName} ${lastName}`;
+    const fullName = `${FirstName} ${LastName}`;
 
     // Find user by firstName and lastName (modify query based on your DB schema)
     const user = await Student.findOne({
-      FirstName: firstName,
-      LastName: lastName,
+      FirstName: FirstName,
+      LastName: LastName,
     });
 
     if (!user) {
@@ -33,8 +33,8 @@ const mobileLogin = async (req, res) => {
     jwt.sign(
       {
         LRN: user.LRN,
-        firstName: user.FirstName,
-        lastName: user.LastName,
+        FirstName: user.FirstName,
+        LastName: user.LastName,
       },
       process.env.JWT_SECRET,
       {},
