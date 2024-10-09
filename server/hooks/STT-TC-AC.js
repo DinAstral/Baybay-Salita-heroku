@@ -185,35 +185,47 @@ const compareTranscriptions = (text1, text2) => {
   return text1.trim().toLowerCase() === text2.trim().toLowerCase();
 };
 
+// Function to compute Stent Weighted Audio Similarity with NaN handling and scaling to 0-100
+const stentWeightedAudioSimilarity = (mfccDistance, chromaDistance, zcr) => {
+  const weightMfcc = 0.5; // Adjust weights as needed
+  const weightChroma = 0.3;
+  const weightZcr = 0.2;
+
+  // Calculate the weighted sum
+  let similarityScore =
+    weightMfcc * mfccDistance + weightChroma * chromaDistance + weightZcr * zcr;
+
+  return similarityScore;
+};
+
 // Main comparison function that accepts dynamic audio URLs
 const run = async (defaultAudioUrl, userAudioUrl) => {
   try {
-    // Local file paths for downloaded audio files
-    const audioFile1 = "audio1.wav"; // For the default audio
-    const audioFile2 = "audio2.wav"; // For the user-uploaded audio
+    const audioFile1 = "audio1.wav"; // Default audio
+    const audioFile2 = "audio2.wav"; // User-uploaded audio
 
-    // Download the audio files locally
+    // Download the audio files
     await downloadAudio(defaultAudioUrl, audioFile1);
     await downloadAudio(userAudioUrl, audioFile2);
 
-    // Convert both audios to text using AssemblyAI
+    // Perform transcription for both audios
     const transcription1 = await transcribeAudioWithAssemblyAI(audioFile1);
     const transcription2 = await transcribeAudioWithAssemblyAI(audioFile2);
 
-    // Compare the transcriptions
+    // Compare transcriptions
     if (!compareTranscriptions(transcription1, transcription2)) {
       console.log("Text doesn't match, score is 0");
       return { score: 0 };
     }
 
-    // Proceed with audio comparison if text matches
-    const features1 = await extractAudioFeatures(audioFile1); // Default audio
-    const features2 = await extractAudioFeatures(audioFile2); // User audio
+    // Extract audio features
+    const features1 = await extractAudioFeatures(audioFile1);
+    const features2 = await extractAudioFeatures(audioFile2);
 
-    // Compare the extracted audio features
+    // Compare the extracted features
     const audioComparison = compareAudioFeatures(features1, features2);
 
-    // Compute Stent Weighted Audio Similarity
+    // Compute the Stent Weighted Audio Similarity
     const weightedSimilarity = stentWeightedAudioSimilarity(
       audioComparison.mfccDistance,
       audioComparison.chromaDistance,
@@ -223,14 +235,13 @@ const run = async (defaultAudioUrl, userAudioUrl) => {
     console.log("Mfcc Distance:", audioComparison.mfccDistance);
     console.log("Stent Weighted Audio Similarity:", weightedSimilarity);
 
-    // Return the comparison results
     return {
       audioComparison,
       weightedSimilarity,
     };
   } catch (error) {
     console.error("Error during audio comparison:", error.message);
-    throw error; // Ensure errors are caught and handled
+    throw error;
   }
 };
 
@@ -243,7 +254,7 @@ const runComparisonAndSaveResult = async (
   Type,
   fileUrls,
   defaultAudios,
-  similarityThreshold = 25 // Add a default threshold
+  similarityThreshold = 20 // Add a default threshold
 ) => {
   try {
     const comparisonResults = [];
