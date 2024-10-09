@@ -6,11 +6,7 @@ const wav = require("wav-decoder");
 const mongoose = require("mongoose");
 const CompareModel = require("../models/ComparisonResult");
 
-// URLs to the audio files (you can replace these with dynamic URLs)
-const audioUrl1 =
-  "http://res.cloudinary.com/dvcqnbkwb/video/upload/v1726210673/user_audio/audioUser/user_hello1.wav.wav";
-const audioUrl2 =
-  "http://res.cloudinary.com/dvcqnbkwb/video/upload/v1726210690/user_audio/audioUser/user_hello2.wav.wav";
+const ASSEMBLYAI_API_KEY = process.env.ASSEMBLYAI_API_KEY; // Replace with your AssemblyAI API key
 
 // Function to download and save audio files locally
 const downloadAudio = async (url, filename) => {
@@ -126,39 +122,67 @@ const extractAudioFeatures = async (audioPath) => {
   });
 };
 
-// Function to compare audio features
-const compareAudioFeatures = (features1, features2) => {
-  // Simple comparison by calculating the Euclidean distance between feature vectors
-  const euclideanDistance = (vector1, vector2) => {
-    const sumSquares = vector1.reduce(
-      (acc, val, idx) => acc + Math.pow(val - vector2[idx], 2),
-      0
-    );
-    return Math.sqrt(sumSquares);
-  };
+// Function to perform Speech-to-Text conversion using AssemblyAI
+const transcribeAudioWithAssemblyAI = async (audioPath) => {
+  const audioFile = fs.readFileSync(audioPath);
 
-  const mfccDistance = euclideanDistance(features1.mfcc, features2.mfcc);
-  const chromaDistance = euclideanDistance(features1.chroma, features2.chroma);
-  const zcr = euclideanDistance(features1.zcr, features2.zcr);
+  // Upload the audio file to AssemblyAI
+  const uploadResponse = await axios({
+    method: "POST",
+    url: "https://api.assemblyai.com/v2/upload",
+    headers: {
+      authorization: ASSEMBLYAI_API_KEY,
+      "content-type": "application/octet-stream",
+    },
+    data: audioFile,
+  });
 
-  return {
-    mfccDistance,
-    chromaDistance,
-    zcr,
-  };
+  const uploadUrl = uploadResponse.data.upload_url;
+
+  // Request transcription
+  const transcriptionResponse = await axios({
+    method: "POST",
+    url: "https://api.assemblyai.com/v2/transcript",
+    headers: {
+      authorization: ASSEMBLYAI_API_KEY,
+      "content-type": "application/json",
+    },
+    data: {
+      audio_url: uploadUrl,
+      language_code: "fil", // Filipino language code
+    },
+  });
+
+  const transcriptId = transcriptionResponse.data.id;
+
+  // Wait for the transcription to complete
+  let transcriptionResult = null;
+  while (true) {
+    const statusResponse = await axios({
+      method: "GET",
+      url: `https://api.assemblyai.com/v2/transcript/${transcriptId}`,
+      headers: {
+        authorization: ASSEMBLYAI_API_KEY,
+      },
+    });
+
+    if (statusResponse.data.status === "completed") {
+      transcriptionResult = statusResponse.data.text;
+      break;
+    } else if (statusResponse.data.status === "failed") {
+      throw new Error("Transcription failed.");
+    }
+
+    // Poll every 5 seconds
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+  }
+
+  return transcriptionResult;
 };
 
-// Function to compute Stent Weighted Audio Similarity with NaN handling and scaling to 0-100
-const stentWeightedAudioSimilarity = (mfccDistance, chromaDistance, zcr) => {
-  const weightMfcc = 0.6; // Adjust weights as needed
-  const weightChroma = 0.2;
-  const weightZcr = 0.2;
-
-  // Calculate the weighted sum
-  let similarityScore =
-    weightMfcc * mfccDistance + weightChroma * chromaDistance + weightZcr * zcr;
-
-  return similarityScore;
+// Function to compare the transcriptions
+const compareTranscriptions = (text1, text2) => {
+  return text1.trim().toLowerCase() === text2.trim().toLowerCase();
 };
 
 // Main comparison function that accepts dynamic audio URLs
@@ -172,13 +196,22 @@ const run = async (defaultAudioUrl, userAudioUrl) => {
     await downloadAudio(defaultAudioUrl, audioFile1);
     await downloadAudio(userAudioUrl, audioFile2);
 
-    // Extract audio features from both files
+    // Convert both audios to text using AssemblyAI
+    const transcription1 = await transcribeAudioWithAssemblyAI(audioFile1);
+    const transcription2 = await transcribeAudioWithAssemblyAI(audioFile2);
+
+    // Compare the transcriptions
+    if (!compareTranscriptions(transcription1, transcription2)) {
+      console.log("Text doesn't match, score is 0");
+      return { score: 0 };
+    }
+
+    // Proceed with audio comparison if text matches
     const features1 = await extractAudioFeatures(audioFile1); // Default audio
     const features2 = await extractAudioFeatures(audioFile2); // User audio
 
     // Compare the extracted audio features
     const audioComparison = compareAudioFeatures(features1, features2);
-    console.log("Audio Feature Comparison:", audioComparison);
 
     // Compute Stent Weighted Audio Similarity
     const weightedSimilarity = stentWeightedAudioSimilarity(
@@ -201,6 +234,7 @@ const run = async (defaultAudioUrl, userAudioUrl) => {
   }
 };
 
+// Function to compare and save the result
 const runComparisonAndSaveResult = async (
   UserInputId,
   ActivityCode,
@@ -221,11 +255,14 @@ const runComparisonAndSaveResult = async (
 
       const result = await run(defaultAudioUrl, userAudioUrl);
 
-      // Check the threshold dynamically
-      if (result.weightedSimilarity <= similarityThreshold) {
-        totalScore += 1;
+      // If transcription failed or text didn't match, result.score would be 0
+      if (result.score === 0) {
+        console.log(`Text didn't match for Audio ${i + 1}. Score: 0`);
+      } else if (result.weightedSimilarity <= similarityThreshold) {
+        totalScore += 1; // Increment the score
       }
 
+      // Push the result for this audio
       comparisonResults.push({
         ItemCode: `Itemcode${i + 1}`,
         mfccDistance: result.audioComparison.mfccDistance,
@@ -235,6 +272,7 @@ const runComparisonAndSaveResult = async (
       });
     }
 
+    // Save the comparison result to the database
     await CompareModel.create({
       UserInputId,
       ActivityCode,
