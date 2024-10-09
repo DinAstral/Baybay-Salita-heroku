@@ -43,7 +43,7 @@ const BodyManageStudent = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [usersPerPage] = useState(10);
-  const [selectedRole, setSelectedRole] = useState("");
+  const [selectedRole, setSelectedRole] = useState(""); // Filter state for Status
   const [searchQuery, setSearchQuery] = useState("");
 
   const tableRef = useRef(null);
@@ -76,7 +76,7 @@ const BodyManageStudent = () => {
       .catch((err) => console.log(err));
   }, []);
 
-  // Filter students by section and search query
+  // Filter students by section, search query, and status (selectedRole)
   useEffect(() => {
     let filtered = students;
 
@@ -98,8 +98,8 @@ const BodyManageStudent = () => {
     }
 
     if (selectedRole) {
-      // Optionally filter by selected role
-      filtered = filtered.filter((student) => student.Section === selectedRole);
+      // Filter by status
+      filtered = filtered.filter((student) => student.status === selectedRole);
     }
 
     setFilteredStudents(filtered);
@@ -221,30 +221,59 @@ const BodyManageStudent = () => {
           <div className="col">
             <div className="card mt-1 border-0">
               <div className="list-header-drop-score">
-                <div className="w-[40%] flex pt-4">
-                  <Input
-                    type="text"
-                    placeholder="Search Student Name or LRN"
+                <div className="flex flex-row gap-5 justify-start w-[100%]">
+                  <div className="w-[40%] flex pt-4">
+                    <Input
+                      type="text"
+                      className="pt-4"
+                      placeholder="Search Student Name or LRN"
+                      variant="bordered"
+                      startContent={
+                        <FontAwesomeIcon
+                          icon={faSearch}
+                          size="1x"
+                          inverse
+                          className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      }
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+
+                  <Select
+                    className="w-[20%]"
+                    labelPlacement="outside"
+                    label="Status"
                     variant="bordered"
-                    startContent={
-                      <FontAwesomeIcon
-                        icon={faSearch}
-                        size="1x"
-                        inverse
-                        className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                      />
-                    }
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
+                    onChange={(e) => setSelectedRole(e.target.value)} // Add this line to update the selectedRole
+                    defaultSelectedKeys={""}
+                  >
+                    <SelectItem key="">All</SelectItem>
+                    <SelectItem key="Incomplete">Incomplete</SelectItem>
+                    <SelectItem key="Low Emerging Reader">
+                      Low Emerging
+                    </SelectItem>
+                    <SelectItem key="High Emerging Reader">
+                      High Emerging
+                    </SelectItem>
+                    <SelectItem key="Developing Reader">Developing</SelectItem>
+                    <SelectItem key="Transitioning Reader">
+                      Transitioning
+                    </SelectItem>
+                    <SelectItem key="Grade Ready Reader">
+                      Grade Ready
+                    </SelectItem>
+                  </Select>
                 </div>
               </div>
 
-              <div className="card-body scrollable-table scrollable-container">
+              <div className="mt-4">
                 <Table
                   ref={tableRef}
                   removeWrapper
                   color="primary"
                   selectionMode="single"
+                  aria-label="Manage Students Table"
                 >
                   <TableHeader>
                     <TableColumn>LRN</TableColumn>
@@ -298,15 +327,16 @@ const BodyManageStudent = () => {
                 </Table>
 
                 <ReactPaginate
-                  previousLabel={"Previous"}
-                  nextLabel={"Next"}
+                  previousLabel={"previous"}
+                  nextLabel={"next"}
                   breakLabel={"..."}
                   breakClassName={"break-me"}
                   pageCount={Math.ceil(filteredStudents.length / usersPerPage)}
                   marginPagesDisplayed={2}
-                  pageRangeDisplayed={10}
+                  pageRangeDisplayed={5}
                   onPageChange={handlePageClick}
                   containerClassName={"pagination"}
+                  subContainerClassName={"pages pagination"}
                   activeClassName={"active"}
                 />
               </div>

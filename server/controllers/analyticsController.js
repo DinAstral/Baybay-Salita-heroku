@@ -91,13 +91,18 @@ const studentStatus = async (req, res) => {
     // Calculate weighted average score as a percentage
     const averageScore = (totalScore / totalPossibleScore) * 100;
 
+    // Initial status and comment
     let status = "Low Emerging Reader";
     let comment = "Keep practicing to improve your reading skills.";
+    let recommendation =
+      "Practice reading daily to strengthen foundational skills.";
 
     // Assign status based on the new criteria including TimeRead percentage
     if (averageScore >= 0 && averageScore <= 16) {
       status = "Low Emerging Reader";
       comment = "Focus on improving your foundational reading skills.";
+      recommendation =
+        "Engage in one-on-one tutoring sessions and practice reading aloud.";
     } else if (
       averageScore >= 17 &&
       averageScore <= 30 &&
@@ -105,6 +110,8 @@ const studentStatus = async (req, res) => {
     ) {
       status = "High Emerging Reader";
       comment = "You're progressing! Keep working on your reading fluency.";
+      recommendation =
+        "Try reading stories with a peer and focus on fluency exercises.";
     } else if (
       averageScore >= 17 &&
       averageScore <= 30 &&
@@ -114,6 +121,8 @@ const studentStatus = async (req, res) => {
     ) {
       status = "Developing Reader";
       comment = "Good progress! You are answering questions correctly.";
+      recommendation =
+        "Start reading comprehension exercises to build on your understanding of texts.";
     } else if (
       averageScore >= 17 &&
       averageScore <= 30 &&
@@ -123,6 +132,8 @@ const studentStatus = async (req, res) => {
     ) {
       status = "Transitioning Reader";
       comment = "You're transitioning well, answering more questions!";
+      recommendation =
+        "Continue reading longer texts and focus on improving comprehension and speed.";
     } else if (
       averageScore >= 17 &&
       averageScore <= 30 &&
@@ -131,12 +142,14 @@ const studentStatus = async (req, res) => {
     ) {
       status = "Grade Level Reader";
       comment = "Great job! You're reading at grade level!";
+      recommendation =
+        "Maintain your progress by reading a variety of genres and challenging materials.";
     }
 
     // Update student status based on calculated score and time read
     await Student.findByIdAndUpdate(student._id, { status });
 
-    // Return the response with the status and comment
+    // Return the response with the status, comment, and recommendations
     return res.status(200).json({
       message: `Status updated to ${status}`,
       totalScore,
@@ -144,6 +157,7 @@ const studentStatus = async (req, res) => {
       timeReadPercentage,
       comment, // Include the comment in the response
       status,
+      recommendation, // Include the recommendation in the response
     });
   } catch (error) {
     console.error(error);

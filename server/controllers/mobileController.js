@@ -4,20 +4,37 @@ const jwt = require("jsonwebtoken");
 
 const mobileLogin = async (req, res) => {
   try {
-    const { LRN } = req.body;
+    // Extract firstName and lastName from req.body
+    const { firstName, lastName } = req.body;
 
-    const user = await Student.findOne({ LRN });
-
-    if (!LRN) {
-      return res.json({
-        error: "LRN is Required.",
+    // Check if both firstName and lastName are provided
+    if (!firstName || !lastName) {
+      return res.status(400).json({
+        error: "First Name and Last Name are required.",
       });
     }
 
-    //check password match
+    // Combine firstName and lastName for display or further use
+    const fullName = `${firstName} ${lastName}`;
+
+    // Find user by firstName and lastName (modify query based on your DB schema)
+    const user = await Student.findOne({
+      FirstName: firstName,
+      LastName: lastName,
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        error: "User not found.",
+      });
+    }
+
+    // Generate JWT token
     jwt.sign(
       {
         LRN: user.LRN,
+        firstName: user.FirstName,
+        lastName: user.LastName,
       },
       process.env.JWT_SECRET,
       {},

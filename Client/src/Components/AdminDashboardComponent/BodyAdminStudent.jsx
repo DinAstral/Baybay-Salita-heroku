@@ -232,6 +232,29 @@ const BodyAdminStudent = () => {
                   <SelectItem key="Tulip">Tulip</SelectItem>
                   <SelectItem key="SSC">SSC</SelectItem>
                 </Select>
+
+                <Select
+                  className="w-[20%]"
+                  labelPlacement="outside"
+                  label="Status"
+                  variant="bordered"
+                  onChange={(e) => setSelectedRole(e.target.value)} // Add this line to update the selectedRole
+                  defaultSelectedKeys={""}
+                >
+                  <SelectItem key="">All</SelectItem>
+                  <SelectItem key="Incomplete">Incomplete</SelectItem>
+                  <SelectItem key="Low Emerging Reader">
+                    Low Emerging
+                  </SelectItem>
+                  <SelectItem key="High Emerging Reader">
+                    High Emerging
+                  </SelectItem>
+                  <SelectItem key="Developing Reader">Developing</SelectItem>
+                  <SelectItem key="Transitioning Reader">
+                    Transitioning
+                  </SelectItem>
+                  <SelectItem key="Grade Ready Reader">Grade Ready</SelectItem>
+                </Select>
                 <div className="w-[40%] flex pt-8">
                   <Input
                     type="text"

@@ -375,7 +375,7 @@ const BodyTeacherDashboard = () => {
                 {
                   label: "Score",
                   min: 0,
-                  max: 100, // Assuming scores are out of 100
+                  max: 10, // Assuming scores are out of 100
                   tickCount: 6,
                   tickFormat: (value) => Math.floor(value),
                 },
