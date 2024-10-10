@@ -8,15 +8,9 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import StudentStatus from "../Modals/StudentStatus";
 
-// Lazy load the image component with fallback
+// Lazy load the image component
 const LazyProfileImage = ({ src, alt }) => (
-  <img
-    loading="lazy"
-    src={src}
-    alt={alt}
-    onError={(e) => (e.target.src = profile)} // Fallback to default profile image on error
-    className="w-32 h-32 rounded-full"
-  />
+  <img loading="lazy" src={src} alt={alt} className="w-32 h-32 rounded-full" />
 );
 
 const BodyViewStudent = () => {
@@ -44,7 +38,7 @@ const BodyViewStudent = () => {
         );
         setPerformance(performanceResponse.data);
       } catch (err) {
-        toast.error("Failed to fetch student data. Please try again later.");
+        toast.error("Failed to fetch data. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -82,7 +76,7 @@ const BodyViewStudent = () => {
       <StudentStatus
         show={modalShowStatus}
         onHide={() => setModalShowStatus(false)}
-        LRN={data?.LRN}
+        LRN={data.LRN}
         onStatusUpdate={handleStatusSuccess} // Pass callback for status update
       />
       <div className="flex items-center justify-start gap-2 mb-5">
@@ -133,7 +127,7 @@ const BodyViewStudent = () => {
                       : status === "Developing Reader"
                       ? "bg-yellow-200 text-yellow-800"
                       : status === "Incomplete"
-                      ? "bg-gray-200 text-gray-800"
+                      ? "bg-gray-200 text-gray-800" // New color for "Incomplete" status
                       : "bg-red-200 text-red-800" // Default fallback for other statuses
                   }`}
                 >
@@ -191,37 +185,31 @@ const BodyViewStudent = () => {
                   <span className="block text-sm text-gray-600">
                     First Name:
                   </span>
-                  <p className="text-gray-800">{data?.FirstName || "N/A"}</p>
+                  <p className="text-gray-800">{data.FirstName || "N/A"}</p>
                 </div>
                 <div>
                   <span className="block text-sm text-gray-600">
                     Last Name:
                   </span>
-                  <p className="text-gray-800">{data?.LastName || "N/A"}</p>
+                  <p className="text-gray-800">{data.LastName || "N/A"}</p>
                 </div>
                 <div>
                   <span className="block text-sm text-gray-600">Gender:</span>
-                  <p className="text-gray-800">{data?.Gender || "N/A"}</p>
+                  <p className="text-gray-800">{data.Gender || "N/A"}</p>
                 </div>
                 <div>
                   <span className="block text-sm text-gray-600">Birthday:</span>
-                  <p className="text-gray-800">{data?.Birthday || "N/A"}</p>
-                </div>
-                <div>
-                  <span className="block text-sm text-gray-600">Age:</span>
-                  <p className="text-gray-800">{data?.Age || "N/A"}</p>
+                  <p className="text-gray-800">{data.Birthday || "N/A"}</p>
                 </div>
                 <div>
                   <span className="block text-sm text-gray-600">Address:</span>
-                  <p className="text-gray-800">{data?.Address || "N/A"}</p>
+                  <p className="text-gray-800">{data.Address || "N/A"}</p>
                 </div>
                 <div>
                   <span className="block text-sm text-gray-600">
                     Contact Number:
                   </span>
-                  <p className="text-gray-800">
-                    {data?.ContactNumber || "N/A"}
-                  </p>
+                  <p className="text-gray-800">{data.ContactNumber || "N/A"}</p>
                 </div>
               </div>
             </div>

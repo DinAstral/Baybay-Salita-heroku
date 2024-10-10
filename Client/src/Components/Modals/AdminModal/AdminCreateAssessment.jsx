@@ -66,6 +66,47 @@ const AdminCreateAssessment = ({ show, handleClose, userId }) => {
     Item10: "",
   });
 
+  const [errors, setErrors] = useState({}); // Validation state
+
+  const validate = () => {
+    let isValid = true;
+    const newErrors = {};
+
+    if (!data.Section) {
+      newErrors.Section = "Please select a section.";
+      isValid = false;
+    }
+
+    if (!data.Period) {
+      newErrors.Period = "Please select a grading period.";
+      isValid = false;
+    }
+
+    if (!data.Type) {
+      newErrors.Type = "Please select a type of assessment.";
+      isValid = false;
+    }
+
+    // Title is required for Pagbabasa
+    if (data.Type === "Pagbabasa" && !data.Title) {
+      newErrors.Title = "Title is required for Pagbabasa.";
+      isValid = false;
+    }
+
+    // Only validate items if the type is NOT Pagbabasa
+    if (data.Type !== "Pagbabasa") {
+      for (let i = 1; i <= 10; i++) {
+        if (!data[`Item${i}`]) {
+          newErrors[`Item${i}`] = `Item ${i} is required.`;
+          isValid = false;
+        }
+      }
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const fetchImportWord = () => {
     axios
       .get("/api/getImportWord")
@@ -108,6 +149,11 @@ const AdminCreateAssessment = ({ show, handleClose, userId }) => {
 
   const createAct = async (e) => {
     e.preventDefault();
+
+    if (!validate()) {
+      return toast.error("Please fill out all required fields.");
+    }
+
     const { Period, Type, Title, Section } = data; // Use Title in the submission
 
     try {
@@ -185,6 +231,8 @@ const AdminCreateAssessment = ({ show, handleClose, userId }) => {
                 value={data.Period}
                 onChange={(e) => setData({ ...data, Period: e.target.value })}
                 className="w-full my-2"
+                isInvalid={!!errors.Period}
+                errorMessage={errors.Period}
               >
                 <SelectItem key="1">Grading Period 1</SelectItem>
                 <SelectItem key="2">Grading Period 2</SelectItem>
@@ -199,6 +247,8 @@ const AdminCreateAssessment = ({ show, handleClose, userId }) => {
                 className="w-full my-2"
                 value={data.Section}
                 onChange={(e) => setData({ ...data, Section: e.target.value })}
+                isInvalid={!!errors.Section}
+                errorMessage={errors.Section}
               >
                 <SelectItem key="" disabled>
                   Select Section
@@ -221,6 +271,8 @@ const AdminCreateAssessment = ({ show, handleClose, userId }) => {
                 value={data.Type}
                 onChange={(e) => setData({ ...data, Type: e.target.value })}
                 className="w-full my-2"
+                isInvalid={!!errors.Type}
+                errorMessage={errors.Type}
               >
                 <SelectItem key="Pagbabaybay">
                   Assessment 1: Pagbabaybay Tunog at Letra
@@ -230,8 +282,8 @@ const AdminCreateAssessment = ({ show, handleClose, userId }) => {
                 <SelectItem key="Pagbabasa">Assessment 4: Pagbabasa</SelectItem>
               </Select>
 
-              {/* Conditional content based on Type */}
-              {data.Type === "Pagbabasa" ? (
+              {/* Only show title if type is Pagbabasa */}
+              {data.Type === "Pagbabasa" && (
                 <Select
                   labelPlacement="outside"
                   label="Title"
@@ -239,6 +291,8 @@ const AdminCreateAssessment = ({ show, handleClose, userId }) => {
                   placeholder="Select a Title:"
                   onChange={(e) => setData({ ...data, Title: e.target.value })}
                   className="w-full my-2"
+                  isInvalid={!!errors.Title}
+                  errorMessage={errors.Title}
                 >
                   {sentences.map((sentence) => (
                     <SelectItem key={sentence.Title} value={sentence.Title}>
@@ -246,7 +300,10 @@ const AdminCreateAssessment = ({ show, handleClose, userId }) => {
                     </SelectItem>
                   ))}
                 </Select>
-              ) : (
+              )}
+
+              {/* Only show the item selection if type is NOT Pagbabasa */}
+              {data.Type !== "Pagbabasa" && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[...Array(10)].map((_, i) => (
                     <Select
@@ -259,6 +316,8 @@ const AdminCreateAssessment = ({ show, handleClose, userId }) => {
                         handleWordChange(`Item${i + 1}`, e.target.value)
                       }
                       className="w-full my-2"
+                      isInvalid={!!errors[`Item${i + 1}`]}
+                      errorMessage={errors[`Item${i + 1}`]}
                     >
                       {filteredWords.map((word) => (
                         <SelectItem key={word.ItemCode} value={word.Word}>

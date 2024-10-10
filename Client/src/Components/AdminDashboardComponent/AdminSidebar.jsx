@@ -62,7 +62,7 @@ const AdminSidebar = () => {
             },
             {
               icon: faEye,
-              text: "View Performance",
+              text: "Manage Performance",
               link: "/adminViewPerformance",
             },
           ].map((item, index) => (

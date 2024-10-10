@@ -49,14 +49,14 @@ const ParentSidebar = () => {
               link: "/parentDashboard",
             },
             {
-              icon: faComment,
-              text: "Feedback of Teacher",
-              link: "/parentFeedbackTeacher",
-            },
-            {
               icon: faEye,
               text: "Student Progress",
               link: "/parentStudentProgress",
+            },
+            {
+              icon: faComment,
+              text: "Feedback of Teacher",
+              link: "/parentFeedbackTeacher",
             },
           ].map((item, index) => (
             <Link

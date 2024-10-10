@@ -194,18 +194,16 @@ const BodyAdminViewStudent = () => {
                   <p className="text-gray-800">{data.LastName || "N/A"}</p>
                 </div>
                 <div>
-                  <span className="block text-sm text-gray-600">
-                    Civil Status:
-                  </span>
-                  <p className="text-gray-800">{data.Status || "N/A"}</p>
-                </div>
-                <div>
                   <span className="block text-sm text-gray-600">Gender:</span>
                   <p className="text-gray-800">{data.Gender || "N/A"}</p>
                 </div>
                 <div>
                   <span className="block text-sm text-gray-600">Birthday:</span>
                   <p className="text-gray-800">{data.Birthday || "N/A"}</p>
+                </div>
+                <div>
+                  <span className="block text-sm text-gray-600">Age:</span>
+                  <p className="text-gray-800">{data.Age || "N/A"}</p>
                 </div>
                 <div>
                   <span className="block text-sm text-gray-600">Address:</span>

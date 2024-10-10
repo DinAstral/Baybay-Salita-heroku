@@ -1,11 +1,14 @@
 import { useState, useEffect, useContext } from "react";
 import { Button, Tooltip } from "@nextui-org/react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 
+import { UserContext } from "../../../context/userContext";
+
 import axios from "axios";
 import toast from "react-hot-toast";
+import AddFeedback from "../Modals/AddFeedback";
 
 // Utility function to convert seconds to MM:SS format
 const formatTimeRead = (secondsString) => {
@@ -22,16 +25,17 @@ const formatTimeRead = (secondsString) => {
 
 const BodyAdminViewPerformance = () => {
   const { UserInputId } = useParams();
+
   const [data, setData] = useState({
     UserInputId: "",
     LRN: "",
     Section: "",
     ActivityCode: "",
     Type: "",
-    PerformanceItems: [], // For items other than 'Pagbabasa'
-    Questions: [], // For 'Pagbabasa' questions
-    Score: "", // Student score
-    TimeRead: "", // Time the student spent reading (in seconds)
+    PerformanceItems: [],
+    Questions: [],
+    Score: "",
+    TimeRead: "",
   });
 
   useEffect(() => {
@@ -49,8 +53,20 @@ const BodyAdminViewPerformance = () => {
     fetchPerformanceData();
   }, [UserInputId]);
 
+  const handleViewClick = () => {
+    setModalShowView(true);
+  };
+
   return (
     <div className="p-10">
+      <AddFeedback
+        show={modalShowView}
+        onHide={() => setModalShowView(false)}
+        actCode={data.ActivityCode}
+        userid={user.UserID}
+        lrn={data.LRN}
+        section={data.Section}
+      />
       <div className="flex items-center justify-start gap-2 mb-5">
         <h1 className="text-3xl font-semibold">View Performance</h1>
         <Tooltip
@@ -85,27 +101,30 @@ const BodyAdminViewPerformance = () => {
           </p>
         </div>
 
+        {/* Display Score for all assessments */}
+        <div className="mb-6">
+          <p className="text-gray-700">
+            <strong>Score:</strong> {data.Score || "N/A"}
+          </p>
+        </div>
+
         {/* If the assessment type is 'Pagbabasa' */}
         {data.Type === "Pagbabasa" && (
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-4">
               Questions and Answers
             </h2>
-
-            {/* Display Score */}
-            <p className="text-gray-700">
-              <strong>Score:</strong> {data.Score || "N/A"}
-            </p>
-
-            {/* Display TimeRead, converted to MM:SS */}
             <p className="text-gray-700">
               <strong>Time Read:</strong> {formatTimeRead(data.TimeRead)}
             </p>
 
             {data.Questions && data.Questions.length > 0 ? (
-              <ul className="list-none pl-0 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {data.Questions.map((questionObj, index) => (
-                  <li key={index} className="bg-gray-100 p-4 rounded-lg shadow">
+                  <div
+                    key={index}
+                    className="bg-gray-100 p-4 rounded-lg shadow"
+                  >
                     <p className="text-gray-800">
                       <strong>Question {index + 1}:</strong>{" "}
                       {questionObj.Question || "N/A"}
@@ -113,9 +132,9 @@ const BodyAdminViewPerformance = () => {
                     <p className="text-gray-800">
                       <strong>Answer:</strong> {questionObj.Answer || "N/A"}
                     </p>
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             ) : (
               <p className="text-gray-700">
                 No questions available for this assessment.
@@ -129,56 +148,62 @@ const BodyAdminViewPerformance = () => {
           <div>
             <h2 className="text-xl font-semibold">Items</h2>
             {data.PerformanceItems && data.PerformanceItems.length > 0 ? (
-              <ul className="list-none pl-0 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {data.PerformanceItems.map((item, index) => (
-                  <li key={index} className="bg-gray-100 p-4 rounded-lg shadow">
+                  <div
+                    key={index}
+                    className="bg-gray-100 p-4 rounded-lg shadow"
+                  >
                     <p className="text-gray-800">
                       <strong>Item Code:</strong> {item.ItemCode}
                     </p>
                     <p className="text-gray-800">
                       <strong>Word:</strong> {item.Word || "N/A"}
                     </p>
-                    <p className="text-gray-800">
-                      <strong>User Audio:</strong>
-                      {item.UserAudioURL ? (
-                        <Tooltip content="Play User Audio">
-                          <Button
-                            as="a"
-                            href={item.UserAudioURL}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            color="primary"
-                            size="sm"
-                            className="ml-2 my-2"
-                          >
-                            Play User Audio
-                          </Button>
-                        </Tooltip>
-                      ) : (
-                        "No audio uploaded"
-                      )}
-                    </p>
-                    <p className="text-gray-800">
-                      <strong>Default Audio:</strong>
-                      {item.DefaultAudio && (
-                        <Tooltip content="Play Default Audio">
-                          <Button
-                            as="a"
-                            href={item.DefaultAudio}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            color="primary"
-                            size="sm"
-                            className="ml-2 my-2"
-                          >
-                            Play Default Audio
-                          </Button>
-                        </Tooltip>
-                      )}
-                    </p>
-                  </li>
+
+                    {/* Flex container for audio buttons */}
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2">
+                        {item.UserAudioURL ? (
+                          <Tooltip content="Play User Audio">
+                            <Button
+                              as="a"
+                              href={item.UserAudioURL}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              color="primary"
+                              size="sm"
+                            >
+                              Play User Audio
+                            </Button>
+                          </Tooltip>
+                        ) : (
+                          "No audio uploaded"
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {item.DefaultAudio ? (
+                          <Tooltip content="Play Default Audio">
+                            <Button
+                              as="a"
+                              href={item.DefaultAudio}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              color="primary"
+                              size="sm"
+                            >
+                              Play Default Audio
+                            </Button>
+                          </Tooltip>
+                        ) : (
+                          "No default audio available"
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             ) : (
               <p className="text-gray-700">
                 No items available for this assessment.
@@ -186,6 +211,12 @@ const BodyAdminViewPerformance = () => {
             )}
           </div>
         )}
+
+        <div className="mt-6 gap-5 flex">
+          <Button color="danger" onClick={() => navigate(-1)} className="my-4">
+            Back
+          </Button>
+        </div>
       </div>
     </div>
   );

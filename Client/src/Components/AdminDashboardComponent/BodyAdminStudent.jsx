@@ -42,6 +42,12 @@ const BodyAdminStudent = () => {
   const [usersPerPage] = useState(10);
   const [selectedRole, setSelectedRole] = useState("");
   const [searchQuery, setSearchQuery] = useState(""); // Added state for search query
+  const [selectedStatus, setSelectedStatus] = useState(""); // State for status filter
+
+  const [sortDirection, setSortDirection] = useState("asc");
+  const [sortAgeDirection, setSortAgeDirection] = useState("asc");
+  const [sortLastNameDirection, setSortLastNameDirection] = useState("asc");
+  const [sortSectionDirection, setSortSectionDirection] = useState("asc");
 
   const tableRef = useRef(null);
 
@@ -62,9 +68,9 @@ const BodyAdminStudent = () => {
   }, []);
 
   useEffect(() => {
-    // Filter students based on search query and selected role
     let filtered = students;
 
+    // Filter by search query
     if (searchQuery) {
       filtered = filtered.filter(
         (student) =>
@@ -74,12 +80,20 @@ const BodyAdminStudent = () => {
       );
     }
 
+    // Filter by section (role)
     if (selectedRole) {
       filtered = filtered.filter((student) => student.Section === selectedRole);
     }
 
+    // Filter by status
+    if (selectedStatus) {
+      filtered = filtered.filter(
+        (student) => student.status === selectedStatus
+      );
+    }
+
     setFilteredRoles(filtered);
-  }, [searchQuery, selectedRole, students]);
+  }, [searchQuery, selectedRole, selectedStatus, students]);
 
   const handlePrintClick = () => {
     setModalShowPrint(true);
@@ -139,6 +153,60 @@ const BodyAdminStudent = () => {
       default:
         return "text-black"; // Default color
     }
+  };
+
+  const sortByLastName = () => {
+    const sortedStudents = [...filteredRoles].sort((a, b) => {
+      const comparison = a.LastName.localeCompare(b.LastName);
+      return sortLastNameDirection === "asc" ? comparison : -comparison;
+    });
+
+    setFilteredRoles(sortedStudents);
+    setSortLastNameDirection(sortLastNameDirection === "asc" ? "desc" : "asc");
+  };
+
+  const sortBySection = () => {
+    const sortedStudents = [...filteredRoles].sort((a, b) => {
+      const comparison = a.Section.localeCompare(b.Section);
+      return sortSectionDirection === "asc" ? comparison : -comparison;
+    });
+
+    setFilteredRoles(sortedStudents);
+    setSortSectionDirection(sortSectionDirection === "asc" ? "desc" : "asc");
+  };
+
+  const sortByAge = () => {
+    const sortedStudents = [...filteredRoles].sort((a, b) => {
+      const comparison = a.Age - b.Age;
+      return sortAgeDirection === "asc" ? comparison : -comparison;
+    });
+
+    setFilteredRoles(sortedStudents);
+    setSortAgeDirection(sortAgeDirection === "asc" ? "desc" : "asc");
+  };
+
+  const sortByStatus = () => {
+    const sortedStudents = [...filteredRoles].sort((a, b) => {
+      const statusOrder = [
+        "Incomplete",
+        "Low Emerging Reader",
+        "High Emerging Reader",
+        "Developing Reader",
+        "Transitioning Reader",
+        "Grade Ready Reader",
+      ];
+
+      const statusA = a.status || "";
+      const statusB = b.status || "";
+
+      const comparison =
+        statusOrder.indexOf(statusA) - statusOrder.indexOf(statusB);
+
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+
+    setFilteredRoles(sortedStudents);
+    setSortDirection(sortDirection === "asc" ? "desc" : "asc");
   };
 
   return (
@@ -238,8 +306,8 @@ const BodyAdminStudent = () => {
                   labelPlacement="outside"
                   label="Status"
                   variant="bordered"
-                  onChange={(e) => setSelectedRole(e.target.value)} // Add this line to update the selectedRole
-                  defaultSelectedKeys={""}
+                  onChange={(e) => setSelectedStatus(e.target.value)} // Add this line to update the selectedRole
+                  defaultSelectedKeys={[""]}
                 >
                   <SelectItem key="">All</SelectItem>
                   <SelectItem key="Incomplete">Incomplete</SelectItem>
@@ -292,17 +360,23 @@ const BodyAdminStudent = () => {
                   <TableHeader>
                     <TableColumn>LRN</TableColumn>
                     <TableColumn>First Name</TableColumn>
-                    <TableColumn>Last Name</TableColumn>
-                    <TableColumn>Age</TableColumn>
-                    <TableColumn>Section</TableColumn>
-                    <TableColumn>Birthday</TableColumn>
+                    <TableColumn onClick={sortByLastName}>
+                      Last Name {sortLastNameDirection === "asc" ? "↑" : "↓"}
+                    </TableColumn>
+                    <TableColumn onClick={sortByAge}>
+                      Age {sortAgeDirection === "asc" ? "↑" : "↓"}
+                    </TableColumn>
+                    <TableColumn onClick={sortBySection}>
+                      Section {sortSectionDirection === "asc" ? "↑" : "↓"}
+                    </TableColumn>
                     <TableColumn>Mother Tongue</TableColumn>
                     <TableColumn>Gender</TableColumn>
-                    <TableColumn>Status</TableColumn>{" "}
-                    {/* Added Status Column */}
+                    <TableColumn onClick={sortByStatus}>
+                      Status {sortDirection === "asc" ? "↑" : "↓"}
+                    </TableColumn>
                     <TableColumn className="text-center">Actions</TableColumn>
                   </TableHeader>
-                  <TableBody emptyContent={"No rows to display."}>
+                  <TableBody emptyContent={"No student data to display."}>
                     {currentUsers.map((student) => (
                       <TableRow key={student._id}>
                         <TableCell>{student.LRN}</TableCell>
@@ -310,7 +384,6 @@ const BodyAdminStudent = () => {
                         <TableCell>{student.LastName}</TableCell>
                         <TableCell>{student.Age}</TableCell>
                         <TableCell>{student.Section}</TableCell>
-                        <TableCell>{student.Birthday}</TableCell>
                         <TableCell>{student.MotherTongue}</TableCell>
                         <TableCell>{student.Gender}</TableCell>
                         {/* Apply color to the status based on student performance */}

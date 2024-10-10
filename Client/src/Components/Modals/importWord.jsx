@@ -56,20 +56,44 @@ const ImportWord = ({ show, onHide }) => {
     Image: null,
     Audio: null,
   });
+  const [errors, setErrors] = useState({}); // State for validation errors
+
+  // Validate the form fields
+  const validate = () => {
+    const newErrors = {};
+
+    if (!data.Type) {
+      newErrors.Type = "Please select a word assessment type.";
+    }
+
+    if (!data.Word) {
+      newErrors.Word = "Please input a word.";
+    }
+
+    if (!data.Image) {
+      newErrors.Image = "Please upload an image.";
+    }
+
+    if (!data.Audio) {
+      newErrors.Audio = "Please upload an audio file.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; // Returns true if no errors
+  };
 
   const importWord = async (e) => {
     e.preventDefault();
-    const { Type, Word, Image, Audio } = data;
 
-    if (!Type || !Word || !Image || !Audio) {
-      return toast.error("All fields are required.");
+    if (!validate()) {
+      return toast.error("Please fill out all required fields.");
     }
 
     const formData = new FormData();
-    formData.append("Type", Type);
-    formData.append("Word", Word);
-    formData.append("Image", Image);
-    formData.append("Audio", Audio);
+    formData.append("Type", data.Type);
+    formData.append("Word", data.Word);
+    formData.append("Image", data.Image);
+    formData.append("Audio", data.Audio);
 
     try {
       const response = await axios.post("/api/importWord", formData, {
@@ -122,6 +146,8 @@ const ImportWord = ({ show, onHide }) => {
                 value={data.Type}
                 variant="bordered"
                 className="bg-transparent py-1 my-1"
+                isInvalid={!!errors.Type}
+                errorMessage={errors.Type}
                 onChange={(e) => setData({ ...data, Type: e.target.value })}
               >
                 <SelectItem key="Pagbabaybay">
@@ -140,6 +166,8 @@ const ImportWord = ({ show, onHide }) => {
                 className="bg-transparent py-1 my-1"
                 value={data.Word}
                 onChange={(e) => setData({ ...data, Word: e.target.value })}
+                isInvalid={!!errors.Word}
+                errorMessage={errors.Word}
                 endContent={
                   <FontAwesomeIcon
                     icon={faUser}
@@ -147,12 +175,15 @@ const ImportWord = ({ show, onHide }) => {
                   />
                 }
               />
+
               <Input
                 type="file"
                 label="Insert an Image"
                 variant="bordered"
                 className="bg-transparent py-1 my-1"
                 onChange={(e) => setData({ ...data, Image: e.target.files[0] })}
+                isInvalid={!!errors.Image}
+                errorMessage={errors.Image}
                 endContent={
                   <FontAwesomeIcon
                     icon={faUser}
@@ -160,12 +191,15 @@ const ImportWord = ({ show, onHide }) => {
                   />
                 }
               />
+
               <Input
                 type="file"
                 label="Insert an Audio"
                 variant="bordered"
                 className="bg-transparent py-1 my-1"
                 onChange={(e) => setData({ ...data, Audio: e.target.files[0] })}
+                isInvalid={!!errors.Audio}
+                errorMessage={errors.Audio}
                 endContent={
                   <FontAwesomeIcon
                     icon={faUser}

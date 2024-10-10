@@ -48,7 +48,7 @@ const BodyInformationKid = () => {
     if (parent && parent.LRN) {
       setLoading(true);
       axios
-        .get(`/api/getStudentParent/${parent.LRN}`)
+        .get(`/api/getStudent/${parent.LRN}`)
         .then((response) => {
           setStudent(response.data);
         })
