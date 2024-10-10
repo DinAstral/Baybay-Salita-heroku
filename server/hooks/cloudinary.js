@@ -66,17 +66,28 @@ const cloudinaryUploaderUser = async (req, res) => {
     User10: files["User10"] ? files["User10"][0] : null,
   };
 
-  // Try to upload the files if they exist, otherwise skip
   try {
     const uploadPromises = Object.keys(audioFiles).map(async (key) => {
-      if (audioFiles[key]) {
-        return await cloudinary.uploader.upload(audioFiles[key].path, {
-          resource_type: "auto",
-          public_id: `audioUser/${audioFiles[key].filename}`,
-          folder: "user_audio",
-        });
+      const file = audioFiles[key];
+      if (file) {
+        // Check if the file is empty (size == 0 bytes)
+        if (file.size === 0) {
+          console.log(`${key} file is empty.`);
+          return `${key} file is empty`; // Skip uploading empty files
+        }
+        try {
+          // Attempt to upload to Cloudinary if the file is not empty
+          return await cloudinary.uploader.upload(file.path, {
+            resource_type: "auto",
+            public_id: `audioUser/${file.filename}`,
+            folder: "user_audio",
+          });
+        } catch (uploadError) {
+          console.log(`Error uploading ${key}:`, uploadError);
+          return null; // Return null if there's an issue with this specific upload
+        }
       }
-      return null; // Return null if there's no file for this user
+      return `${key} file not provided`; // If no file exists, return this message
     });
 
     const [
@@ -105,7 +116,7 @@ const cloudinaryUploaderUser = async (req, res) => {
       uploadAudioUser10,
     };
   } catch (error) {
-    console.log(error);
+    console.log("Error during upload process:", error);
     throw new Error("Cloudinary upload failed");
   }
 };
