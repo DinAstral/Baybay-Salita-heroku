@@ -617,25 +617,49 @@ const userInputAudio = async (req, res) => {
       // Create an array of items with their corresponding data
       const assessmentItems = itemCodes.map((itemCode, index) => {
         const material = materials.find((m) => m.ItemCode === itemCode);
+        const userAudioURL = fileUrls[`AudioURL${index + 1}`];
+        const wordMatched =
+          req.body[`spokenWord${index + 1}`]?.toLowerCase() ===
+          material?.Word?.toLowerCase();
+
         return {
           ItemCode: itemCode,
           Word: material?.Word || "",
           Audio: material?.Audio || "",
           SecureAudio: material?.SecureAudio || "",
-          UserAudioURL: fileUrls[`AudioURL${index + 1}`],
+          UserAudioURL: userAudioURL,
+          SkipComparison: !wordMatched, // If word doesn't match, skip comparison
+          Score: wordMatched ? null : 0, // Set score to 0 if word is incorrect
         };
       });
 
-      // Run audio comparison and save the results to the database, get the score
-      const score = await runComparisonAndSaveResult(
+      // Filter out the items where comparison is skipped (due to incorrect word)
+      const itemsForComparison = assessmentItems
+        .filter((item) => !item.SkipComparison)
+        .map((item) => item.Audio); // Extract audios for comparison only if valid
+
+      // Run audio comparison for valid items and save results to the database
+      const comparisonScores = await runComparisonAndSaveResult(
         InputID,
         ActivityCode,
         LRN,
         Section,
         Type,
         fileUrls,
-        assessmentItems.map((item) => item.Audio) // Extract default audios
+        itemsForComparison
       );
+
+      // Assign the score for each item after comparison
+      let totalScore = 0;
+      assessmentItems.forEach((item, index) => {
+        if (!item.SkipComparison) {
+          item.Score = comparisonScores[index];
+          totalScore += comparisonScores[index];
+        } else {
+          // Skip evaluation, score remains 0 for this item
+          item.Score = 0;
+        }
+      });
 
       // Prepare the data for insertion into the Performance model
       const performanceData = {
@@ -644,14 +668,15 @@ const userInputAudio = async (req, res) => {
         LRN,
         Section,
         Type,
-        Score: score, // Store the total score
+        Score: totalScore, // Store the total score
         Result: "Submitted",
-        PerformanceItems: assessmentItems.map((item, index) => ({
+        PerformanceItems: assessmentItems.map((item) => ({
           ItemCode: item.ItemCode,
           Word: item.Word,
           UserAudioURL: item.UserAudioURL,
           DefaultAudio: item.Audio,
           SecureAudio: item.SecureAudio,
+          Score: item.Score, // Include the score for each item
         })),
       };
 
