@@ -558,10 +558,10 @@ const userInputAudio = async (req, res) => {
         Itemcode10,
       } = req.body;
 
-      // Upload user input audio files to cloudinary
+      // Upload user input audio files to Cloudinary
       const uploadResponse = await cloudinaryUploaderUser(req, res);
 
-      // Get uploaded URLs for each user input audio
+      // Get uploaded URLs for each user input audio, or assign empty string if no upload happened
       const fileUrls = {
         AudioURL1: uploadResponse.uploadAudioUser1
           ? uploadResponse.uploadAudioUser1.secure_url
@@ -673,7 +673,7 @@ const userInputAudio = async (req, res) => {
         PerformanceItems: assessmentItems.map((item) => ({
           ItemCode: item.ItemCode,
           Word: item.Word,
-          UserAudioURL: item.UserAudioURL,
+          UserAudioURL: item.UserAudioURL || "", // Use empty string if no audio uploaded
           DefaultAudio: item.Audio,
           SecureAudio: item.SecureAudio,
           Score: item.Score, // Include the score for each item

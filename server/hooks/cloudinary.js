@@ -66,21 +66,18 @@ const cloudinaryUploaderUser = async (req, res) => {
     User10: files["User10"] ? files["User10"][0] : null,
   };
 
-  // Check if at least one file exists
-  const fileKeys = Object.keys(audioFiles);
-  const allFiles = fileKeys.every((key) => audioFiles[key]);
-  if (!allFiles) {
-    return res.json({ error: "One or more files are missing" });
-  }
-
+  // Try to upload the files if they exist, otherwise skip
   try {
-    const uploadPromises = fileKeys.map((key) =>
-      cloudinary.uploader.upload(audioFiles[key].path, {
-        resource_type: "auto",
-        public_id: `audioUser/${audioFiles[key].filename}`,
-        folder: "user_audio",
-      })
-    );
+    const uploadPromises = Object.keys(audioFiles).map(async (key) => {
+      if (audioFiles[key]) {
+        return await cloudinary.uploader.upload(audioFiles[key].path, {
+          resource_type: "auto",
+          public_id: `audioUser/${audioFiles[key].filename}`,
+          folder: "user_audio",
+        });
+      }
+      return null; // Return null if there's no file for this user
+    });
 
     const [
       uploadAudioUser1,
