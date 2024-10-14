@@ -109,7 +109,9 @@ const submitAssessment = async (req, res) => {
         ItemCode: itemCode,
         Word: material?.Word || "",
         Image: material?.Image || "",
+        SecureImage: material?.SecureImage || "",
         Audio: material?.Audio || "",
+        SecureAudio: material?.SecureAudio || "",
       };
     });
 

@@ -12,27 +12,34 @@ import {
   Button,
 } from "@nextui-org/react";
 
-const DeleteActivitySuccess = ({ show, onHide }) => (
-  <Modal
-    isOpen={show}
-    onClose={onHide}
-    aria-labelledby="contained-modal-title-vcenter"
-    isDismissable={false}
-    isKeyboardDismissDisabled={true}
-  >
-    <ModalContent>
-      <ModalHeader>Delete Student Performance Successfully</ModalHeader>
-      <ModalBody>
-        <p>You have deleted the performance for the student successfully.</p>
-      </ModalBody>
-      <ModalFooter>
-        <Button color="primary" onClick={onHide}>
-          Close
-        </Button>
-      </ModalFooter>
-    </ModalContent>
-  </Modal>
-);
+const DeleteActivitySuccess = ({ show, onHide }) => {
+  const handleSuccessClick = () => {
+    onHide();
+    window.location.reload(); // You might want to change this to a more efficient state update instead of reloading the page.
+  };
+
+  return (
+    <Modal
+      isOpen={show}
+      onClose={onHide}
+      aria-labelledby="contained-modal-title-vcenter"
+      isDismissable={false}
+      isKeyboardDismissDisabled={true}
+    >
+      <ModalContent>
+        <ModalHeader>Delete Student Performance Successfully</ModalHeader>
+        <ModalBody>
+          <p>You have deleted the performance for the student successfully.</p>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={handleSuccessClick}>
+            Close
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+};
 
 const DeletePerformance = ({
   show,

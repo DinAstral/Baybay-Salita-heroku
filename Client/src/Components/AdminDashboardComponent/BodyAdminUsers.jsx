@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import "../ContentDasboard/Content.css";
+import "../ContentDasboard/Content.css"; // Ensure CSS handles responsive layouts
 import PrintRecord from "../Modals/PrintRecord";
 import AddUser from "../Modals/AdminModal/AddUserModal";
 import EditUser from "../Modals/AdminModal/EditUser";
@@ -106,7 +106,7 @@ const BodyAdminUsers = () => {
   };
 
   return (
-    <div className="px-9">
+    <div className="px-4 md:px-9">
       <AddUser
         show={modalState.add}
         onHide={() => handleModalStateChange("add", false)}
@@ -148,8 +148,8 @@ const BodyAdminUsers = () => {
         onDeleteSuccess={fetchUsers}
       />
 
-      <div className="content-title-header">
-        <div>
+      <div className="flex justify-between items-center mb-6">
+        <div className="text-2xl md:text-3xl font-semibold">
           Manage User
           <Tooltip
             showArrow={true}
@@ -166,11 +166,11 @@ const BodyAdminUsers = () => {
             <FontAwesomeIcon
               icon={faCircleInfo}
               size="1x"
-              className="help-icon"
+              className="ml-2 cursor-pointer text-lg"
             />
           </Tooltip>
         </div>
-        <div className="generate-report">
+        <div className="cursor-pointer flex items-center">
           <Tooltip
             showArrow={true}
             content={
@@ -183,128 +183,129 @@ const BodyAdminUsers = () => {
             <FontAwesomeIcon
               icon={faPrint}
               size="1x"
-              className="print-icon"
+              className="ml-2 cursor-pointer text-lg"
               onClick={() => handleModalStateChange("print", true)}
             />
           </Tooltip>
         </div>
       </div>
 
-      <div className="content-container">
-        <div className="row">
-          <div className="col">
-            <div className="card mt-1 border-0">
-              <div className="list-header-drop-score">
-                <Select
-                  labelPlacement="outside"
-                  label="Role"
-                  variant="bordered"
-                  className="bg-transparent w-[20%]"
-                  onChange={(e) => setSelectedRole(e.target.value)}
-                  value={selectedRole}
-                >
-                  <SelectItem key="default">All</SelectItem>
-                  <SelectItem key="Admin">Admin</SelectItem>
-                  <SelectItem key="Parent">Parent</SelectItem>
-                  <SelectItem key="Teacher">Teacher</SelectItem>
-                </Select>
-                <div className="w-[40%] flex pt-8">
-                  <Input
-                    variant="bordered"
-                    type="text"
-                    placeholder="Enter User Email"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    startContent={
-                      <FontAwesomeIcon
-                        icon={faSearch}
-                        size="1x"
-                        inverse
-                        className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                      />
-                    }
-                  />
-                </div>
-                <div className="back-button-profile">
-                  <Button
-                    color="primary"
-                    className="w-[120px] text-md p-1"
-                    onClick={() => handleModalStateChange("add", true)}
-                  >
-                    Add User
-                  </Button>
-                </div>
-              </div>
+      <div className="max-w-full bg-white p-4 md:p-6 rounded-lg">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+          <Select
+            labelPlacement="outside"
+            label="Role"
+            variant="bordered"
+            className="bg-transparent w-full md:w-1/5"
+            onChange={(e) => setSelectedRole(e.target.value)}
+            value={selectedRole}
+          >
+            <SelectItem key="default">All</SelectItem>
+            <SelectItem key="Admin">Admin</SelectItem>
+            <SelectItem key="Parent">Parent</SelectItem>
+            <SelectItem key="Teacher">Teacher</SelectItem>
+          </Select>
 
-              <div className="card-body scrollable-table scrollable-container">
-                <Table
-                  aria-label="Assessment Table"
-                  ref={tableRef}
-                  removeWrapper
-                  color="primary"
-                  selectionMode="single"
-                >
-                  <TableHeader>
-                    <TableColumn>UserID</TableColumn>
-                    <TableColumn>Email</TableColumn>
-                    <TableColumn>Role</TableColumn>
-                    <TableColumn className="text-center">Actions</TableColumn>
-                  </TableHeader>
-                  <TableBody emptyContent={"No rows to display."}>
-                    {currentUsers.map((user) => (
-                      <TableRow key={user._id}>
-                        <TableCell>{user.UserID}</TableCell>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell>{user.role}</TableCell>
-                        <TableCell className="text-center">
-                          <div className="table-buttons">
-                            <Button
-                              color="default"
-                              onClick={() => {
-                                setSelectedUser(user); // Set the selected user
-                                if (user.role === "Teacher") {
-                                  handleModalStateChange("viewTeacher", true);
-                                } else if (user.role === "Parent") {
-                                  handleModalStateChange("viewParent", true);
-                                }
-                              }}
-                            >
-                              View
-                            </Button>
-                            <Button
-                              color="primary"
-                              onClick={() =>
-                                setSelectedUser(user) ||
-                                handleModalStateChange("editUser", true)
-                              }
-                            >
-                              Update
-                            </Button>
-                            <Button
-                              color="danger"
-                              onClick={() =>
-                                setSelectedUser(user) ||
-                                handleModalStateChange("delete", true)
-                              }
-                            >
-                              Delete
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </div>
-            <ReactPaginate
-              pageCount={Math.ceil(filteredUsers.length / usersPerPage)}
-              onPageChange={handlePageClick}
-              containerClassName={"pagination"}
-              activeClassName={"active"}
+          <div className="w-full md:w-[40%] flex items-center mt-4 md:mt-0">
+            <Input
+              variant="bordered"
+              type="text"
+              placeholder="Enter User Email"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              startContent={
+                <FontAwesomeIcon
+                  icon={faSearch}
+                  size="1x"
+                  inverse
+                  className="text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                />
+              }
             />
           </div>
+
+          <div className="mt-4 md:mt-0">
+            <Button
+              color="primary"
+              className="w-full md:w-[120px] text-md"
+              onClick={() => handleModalStateChange("add", true)}
+            >
+              Add User
+            </Button>
+          </div>
         </div>
+
+        <div className="overflow-auto max-h-[600px]">
+          <Table
+            aria-label="User Table"
+            ref={tableRef}
+            removeWrapper
+            color="primary"
+            selectionMode="single"
+            className="w-full whitespace-nowrap"
+          >
+            <TableHeader>
+              <TableColumn>UserID</TableColumn>
+              <TableColumn>Email</TableColumn>
+              <TableColumn>Role</TableColumn>
+              <TableColumn className="text-center">Actions</TableColumn>
+            </TableHeader>
+            <TableBody emptyContent={"No rows to display."}>
+              {currentUsers.map((user) => (
+                <TableRow key={user._id}>
+                  <TableCell>{user.UserID}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.role}</TableCell>
+                  <TableCell className="text-center">
+                    <div className="flex justify-center space-x-2">
+                      <Button
+                        color="default"
+                        onClick={() => {
+                          setSelectedUser(user);
+                          if (user.role === "Teacher") {
+                            handleModalStateChange("viewTeacher", true);
+                          } else if (user.role === "Parent") {
+                            handleModalStateChange("viewParent", true);
+                          }
+                        }}
+                      >
+                        View
+                      </Button>
+                      <Button
+                        color="primary"
+                        onClick={() =>
+                          setSelectedUser(user) ||
+                          handleModalStateChange("editUser", true)
+                        }
+                      >
+                        Update
+                      </Button>
+                      <Button
+                        color="danger"
+                        onClick={() =>
+                          setSelectedUser(user) ||
+                          handleModalStateChange("delete", true)
+                        }
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        <ReactPaginate
+          pageCount={Math.ceil(filteredUsers.length / usersPerPage)}
+          onPageChange={handlePageClick}
+          containerClassName={"flex justify-center mt-4 space-x-2"}
+          activeClassName={"text-white bg-blue-600 px-3 py-1 rounded"}
+          pageLinkClassName={"px-2 py-1 border rounded hover:bg-gray-200"}
+          previousLinkClassName={"px-2 py-1 border rounded"}
+          nextLinkClassName={"px-2 py-1 border rounded"}
+        />
       </div>
     </div>
   );

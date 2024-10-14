@@ -253,15 +253,15 @@ const AdminCreateAssessment = ({ show, handleClose, userId }) => {
                 <SelectItem key="" disabled>
                   Select Section
                 </SelectItem>
+                <SelectItem key="Aster">Aster</SelectItem>
                 <SelectItem key="Camia">Camia</SelectItem>
-                <SelectItem key="Daffodil">Daffodil</SelectItem>
-                <SelectItem key="Daisy">Daisy</SelectItem>
-                <SelectItem key="Gumamela">Gumamela</SelectItem>
-                <SelectItem key="Lily">Lily</SelectItem>
-                <SelectItem key="Rosal">Rosal</SelectItem>
+                <SelectItem key="Dahlia">Dahlia</SelectItem>
+                <SelectItem key="Iris">Iris</SelectItem>
+                <SelectItem key="Jasmin">Jasmin</SelectItem>
+                <SelectItem key="Orchid">Orchid</SelectItem>
                 <SelectItem key="Rose">Rose</SelectItem>
-                <SelectItem key="Santan">Santan</SelectItem>
-                <SelectItem key="Special">Special</SelectItem>
+                <SelectItem key="Tulip">Tulip</SelectItem>
+                <SelectItem key="SSC">SSC</SelectItem>
               </Select>
 
               <Select

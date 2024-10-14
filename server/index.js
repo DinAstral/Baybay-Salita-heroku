@@ -6,14 +6,13 @@ const cookieParser = require("cookie-parser");
 const path = require("path");
 const cloudinary = require("cloudinary").v2;
 const compression = require("compression");
+const helmet = require("helmet"); // Import Helmet
 
 const app = express();
 
 // Middleware to force HTTPS
 app.use((req, res, next) => {
-  // Check if request is forwarded via HTTPS (for apps behind proxy/load balancer like Heroku)
   if (req.header("x-forwarded-proto") !== "https") {
-    // Redirect to the HTTPS version of the request
     return res.redirect(`https://${req.header("host")}${req.url}`);
   }
   next();
@@ -21,6 +20,33 @@ app.use((req, res, next) => {
 
 // Enable compression for better performance
 app.use(compression());
+
+// Apply security headers using Helmet
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "https://apis.google.com"], // Customize script sources
+        styleSrc: ["'self'", "https://fonts.googleapis.com"], // Customize style sources
+        imgSrc: ["'self'", "data:", "https://res.cloudinary.com"], // Example for images
+        audSrc: ["'self'", "data:", "https://res.cloudinary.com"],
+      },
+    },
+    referrerPolicy: { policy: "no-referrer" }, // Referrer-Policy
+    frameguard: { action: "deny" }, // X-Frame-Options to prevent clickjacking
+    hsts: { maxAge: 63072000, includeSubDomains: true }, // Strict-Transport-Security (HSTS)
+    xssFilter: true, // X-XSS-Protection
+    noSniff: true, // X-Content-Type-Options to prevent MIME-sniffing
+    permissionsPolicy: {
+      features: {
+        geolocation: ["'none'"], // Example Permissions-Policy rule
+        camera: ["'none'"],
+        microphone: ["'none'"],
+      },
+    },
+  })
+);
 
 // Database connection
 const uri = process.env.MONGODB_URI;

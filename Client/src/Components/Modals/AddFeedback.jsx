@@ -19,6 +19,7 @@ import {
 const AddSuccess = ({ show, onHide }) => {
   const handleSuccessClick = () => {
     onHide();
+    window.location.reload(); // You might want to change this to a more efficient state update instead of reloading the page.
   };
 
   return (
