@@ -26,21 +26,36 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "https://apis.google.com"], // Customize script sources
-        styleSrc: ["'self'", "https://fonts.googleapis.com"], // Customize style sources
-        imgSrc: ["'self'", "data:", "https://res.cloudinary.com"], // Example for images
-        audSrc: ["'self'", "data:", "https://res.cloudinary.com"],
+        defaultSrc: ["'self'"], // Allow self-hosted content
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "'unsafe-eval'",
+          "https://apis.google.com",
+        ], // Allow inline/eval for certain cases
+        styleSrc: [
+          "'self'",
+          "'unsafe-inline'", // TailwindCSS and NextUI often use inline styles
+          "https://fonts.googleapis.com", // Allow Google Fonts for NextUI
+        ],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"], // Allow fonts from Google Fonts
+        imgSrc: ["'self'", "data:", "https://res.cloudinary.com"], // Allow images from Cloudinary
+        connectSrc: ["'self'", "https://api.your-external-source.com"], // Allow connections to APIs
+        frameSrc: ["'self'"], // For iframes (optional, if used)
+        childSrc: ["'self'"], // For embedded content (optional)
+        audioSrc: ["'self'", "https://res.cloudinary.com"], // Corrected audio directive
+        mediaSrc: ["'self'"], // For media content
+        objectSrc: ["'none'"], // Disallow embedding of objects (security)
       },
     },
-    referrerPolicy: { policy: "no-referrer" }, // Referrer-Policy
-    frameguard: { action: "deny" }, // X-Frame-Options to prevent clickjacking
-    hsts: { maxAge: 63072000, includeSubDomains: true }, // Strict-Transport-Security (HSTS)
-    xssFilter: true, // X-XSS-Protection
-    noSniff: true, // X-Content-Type-Options to prevent MIME-sniffing
+    referrerPolicy: { policy: "no-referrer" },
+    frameguard: { action: "deny" },
+    hsts: { maxAge: 63072000, includeSubDomains: true },
+    xssFilter: true,
+    noSniff: true,
     permissionsPolicy: {
       features: {
-        geolocation: ["'none'"], // Example Permissions-Policy rule
+        geolocation: ["'none'"],
         camera: ["'none'"],
         microphone: ["'none'"],
       },

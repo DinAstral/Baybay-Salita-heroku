@@ -161,7 +161,7 @@ const BodyAdminViewAssessment = () => {
                             color="primary"
                             size="sm"
                             className="my-2"
-                            onPress={() => openModal("image", item.Image)}
+                            onPress={() => openModal("image", item.SecureImage)}
                           >
                             View Image
                           </Button>
@@ -173,7 +173,7 @@ const BodyAdminViewAssessment = () => {
                             color="primary"
                             size="sm"
                             className="my-2"
-                            onPress={() => openModal("audio", item.Audio)}
+                            onPress={() => openModal("audio", item.SecureAudio)}
                           >
                             Play Audio
                           </Button>
