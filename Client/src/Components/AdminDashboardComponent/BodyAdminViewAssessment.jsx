@@ -7,7 +7,6 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  useDisclosure,
 } from "@nextui-org/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -93,7 +92,6 @@ const BodyAdminViewAssessment = () => {
           </p>
         </div>
 
-        {/* If the assessment type is 'Pagbabasa' */}
         {data.Type === "Pagbabasa" && (
           <div className="mb-6 bg-gray-100 p-4 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-4">Reading Activity</h2>
@@ -106,7 +104,6 @@ const BodyAdminViewAssessment = () => {
           </div>
         )}
 
-        {/* Display Questions in a 3-column grid if assessment type is 'Pagbabasa' */}
         {data.Type === "Pagbabasa" && (
           <div>
             <h2 className="text-xl font-semibold mb-4">Questions</h2>
@@ -135,7 +132,6 @@ const BodyAdminViewAssessment = () => {
           </div>
         )}
 
-        {/* Display Items in a 3-column grid for non-Pagbabasa assessments */}
         {data.Type !== "Pagbabasa" && (
           <div>
             <h2 className="text-xl font-semibold mb-4">Items</h2>
@@ -153,7 +149,6 @@ const BodyAdminViewAssessment = () => {
                       <strong>Word:</strong> {item.Word || "N/A"}
                     </p>
 
-                    {/* Flex container for Image and Audio buttons */}
                     <div className="flex items-center space-x-4">
                       {item.Image && (
                         <Tooltip content="View Image">
@@ -192,13 +187,12 @@ const BodyAdminViewAssessment = () => {
         )}
 
         <div className="mt-6">
-          <Button color="primary" onClick={() => navigate(-1)} className="my-4">
+          <Button color="primary" onPress={() => navigate(-1)} className="my-4">
             Back
           </Button>
         </div>
       </div>
 
-      {/* Modal to display either Image or Audio */}
       <Modal
         isOpen={modalVisible}
         onClose={closeModal}

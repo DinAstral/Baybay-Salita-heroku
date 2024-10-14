@@ -1,10 +1,8 @@
-/* eslint-disable react/no-unescaped-entities */
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Tooltip } from "@nextui-org/react";
+import { Tooltip, Button, Input, Select, SelectItem } from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
-import "../ContentDasboard/Content.css";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -37,6 +35,8 @@ const BodyAdminAddUser = () => {
 
   const [data, setData] = useState({
     UserID: "",
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
     role: "",
@@ -44,9 +44,9 @@ const BodyAdminAddUser = () => {
 
   const addUser = async (e) => {
     e.preventDefault();
-    const { email, password, role } = data;
+    const { firstName, lastName, email, password, role } = data;
 
-    if (!email || !password || !role) {
+    if (!firstName || !lastName || !email || !password || !role) {
       toast.error("All fields are required.");
       return;
     }
@@ -56,6 +56,8 @@ const BodyAdminAddUser = () => {
     try {
       const response = await axios.post("/api/addUser", {
         UserID,
+        firstName,
+        lastName,
         email,
         password,
         role,
@@ -64,8 +66,15 @@ const BodyAdminAddUser = () => {
       if (response.data.error) {
         toast.error(response.data.error);
       } else {
-        setData({ UserID: "", email: "", password: "", role: "" });
-        toast.success("Added User Successfully.");
+        setData({
+          UserID: "",
+          firstName: "",
+          lastName: "",
+          email: "",
+          password: "",
+          role: "",
+        });
+        toast.success("User added successfully.");
         navigate("/adminUsers");
       }
     } catch (error) {
@@ -75,9 +84,9 @@ const BodyAdminAddUser = () => {
   };
 
   return (
-    <div className="content-body">
-      <div className="content-title-header">
-        <div>
+    <div className="container mx-auto px-6 pt-[4rem]">
+      <div className="bg-white shadow-md rounded-md px-8 pt-6 pb-8 mb-4 flex flex-col">
+        <h2 className="mb-6 text-3xl font-bold text-gray-700 flex items-center gap-2">
           Add User's Information
           <Tooltip
             showArrow={true}
@@ -85,68 +94,78 @@ const BodyAdminAddUser = () => {
               <div className="px-1 py-2">
                 <div className="text-small font-bold">Add User</div>
                 <div className="text-tiny">
-                  This function will add the information of the user in system.
+                  This function will add the information of the user to the
+                  system.
                 </div>
               </div>
             }
           >
             <FontAwesomeIcon
               icon={faCircleInfo}
-              size="1x"
-              className="help-icon"
+              size="sm"
+              className="text-gray-700 text-[20px]"
             />
           </Tooltip>
-        </div>
-      </div>
-      <form onSubmit={addUser}>
-        <div className="content-container">
-          <div className="back-button-profile">
-            <div className="btn-back" onClick={() => navigate(-1)}>
-              Back
-            </div>
+        </h2>
+        <form onSubmit={addUser}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* First Name */}
+            <Input
+              label="First Name"
+              type="text"
+              placeholder="Enter First Name"
+              value={data.firstName}
+              onChange={(e) => setData({ ...data, firstName: e.target.value })}
+            />
+            {/* Last Name */}
+            <Input
+              label="Last Name"
+              type="text"
+              placeholder="Enter Last Name"
+              value={data.lastName}
+              onChange={(e) => setData({ ...data, lastName: e.target.value })}
+            />
+            {/* Email */}
+            <Input
+              label="Email"
+              type="email"
+              placeholder="Enter Email"
+              value={data.email}
+              onChange={(e) => setData({ ...data, email: e.target.value })}
+            />
+            {/* Password */}
+            <Input
+              label="Password"
+              type="password"
+              placeholder="Set Password"
+              value={data.password}
+              onChange={(e) => setData({ ...data, password: e.target.value })}
+            />
+            {/* Role */}
+            <Select
+              label="Role"
+              placeholder="Select Role"
+              value={data.role}
+              onChange={(e) => setData({ ...data, role: e })}
+            >
+              <SelectItem key="Admin" value="Admin">
+                Admin
+              </SelectItem>
+              <SelectItem key="Teacher" value="Teacher">
+                Teacher
+              </SelectItem>
+              <SelectItem key="Parent" value="Parent">
+                Parent
+              </SelectItem>
+            </Select>
           </div>
-          <div className="add-inputs">
-            <div className="add-input">
-              <div className="label-add">Email</div>
-              <input
-                type="email"
-                placeholder="Enter the User's Email"
-                value={data.email}
-                onChange={(e) => setData({ ...data, email: e.target.value })}
-              />
-            </div>
-            <div className="add-input">
-              <div className="label-add">Password</div>
-              <input
-                type="password"
-                placeholder="Set Password"
-                value={data.password}
-                onChange={(e) => setData({ ...data, password: e.target.value })}
-              />
-            </div>
-            <div className="add-input">
-              <div className="label-add">Role</div>
-              <select
-                className="select-gender"
-                value={data.role}
-                onChange={(e) => setData({ ...data, role: e.target.value })}
-              >
-                <option value="" disabled>
-                  Select Role
-                </option>
-                <option value="Admin">Admin</option>
-                <option value="Teacher">Teacher</option>
-                <option value="Parent">Parent</option>
-              </select>
-            </div>
-          </div>
-          <div className="add-student">
-            <button className="btn-add" type="submit">
+          <div className="mt-6">
+            <Button type="submit" color="primary" size="lg" radius="sm">
               Add User
-            </button>
+            </Button>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

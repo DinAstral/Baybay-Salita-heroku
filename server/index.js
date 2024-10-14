@@ -47,7 +47,6 @@ app.use(
         ], // Allow connections to APIs
         frameSrc: ["'self'"], // For iframes (optional, if used)
         childSrc: ["'self'"], // For embedded content (optional)
-        audioSrc: ["'self'", "https://res.cloudinary.com"], // Corrected audio directive
         mediaSrc: ["'self'", "data:", "https://res.cloudinary.com"], // For media content
         objectSrc: ["'none'"], // Disallow embedding of objects (security)
       },
@@ -59,9 +58,12 @@ app.use(
     noSniff: true,
     permissionsPolicy: {
       features: {
-        geolocation: ["'none'"],
-        camera: ["'none'"],
-        microphone: ["'none'"],
+        geolocation: ["'none'"], // Disable geolocation access
+        camera: ["'none'"], // Disable camera access
+        microphone: ["'none'"], // Disable microphone access
+        payment: ["'none'"], // Disable Payment API
+        usb: ["'none'"], // Block access to USB devices
+        accelerometer: ["'none'"], // Disable access to motion sensors
       },
     },
   })
