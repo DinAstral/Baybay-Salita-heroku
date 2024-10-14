@@ -39,6 +39,7 @@ const StudentStatus = ({ show, onHide, LRN, onStatusUpdate }) => {
   const [modalSubmitSuccess, setModalSubmitSuccess] = useState(false);
   const [status, setStatus] = useState(""); // State to store the status
   const [comment, setComment] = useState(""); // State to store the comment
+  const [recommendation, setRecommendation] = useState(""); // State to store the comment
 
   // Handle status update on button click
   const handleAssessClick = async () => {
@@ -46,11 +47,12 @@ const StudentStatus = ({ show, onHide, LRN, onStatusUpdate }) => {
       const response = await axios.patch(`/api/studentStatus/${LRN}`);
       console.log("Response data:", response.data); // Log the API response
 
-      const { status, comment } = response.data;
+      const { status, comment, recommendation } = response.data;
 
       onStatusUpdate(status);
       setStatus(status);
       setComment(comment);
+      setRecommendation(recommendation);
       setModalSubmitSuccess(true);
     } catch (error) {
       toast.error("Error updating student status");
@@ -94,6 +96,7 @@ const StudentStatus = ({ show, onHide, LRN, onStatusUpdate }) => {
         }}
         status={status} // Pass the status to ShowStatus
         comment={comment} // Pass the comment to ShowStatus
+        recommendation={recommendation} // Pass the recommendation to ShowStatus
       />
     </>
   );

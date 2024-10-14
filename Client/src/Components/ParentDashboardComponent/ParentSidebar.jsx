@@ -24,8 +24,8 @@ const ParentSidebar = () => {
   useEffect(() => {
     const menuItem = [
       "/parentDashboard",
-      "/parentFeedbackTeacher",
       "/parentStudentProgress",
+      "/parentFeedbackTeacher",
     ];
     const index = menuItem.findIndex((item) => item === location.pathname);
     setActiveIndex(index);

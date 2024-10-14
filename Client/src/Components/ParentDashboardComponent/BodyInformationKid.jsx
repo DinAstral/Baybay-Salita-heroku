@@ -1,12 +1,17 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Button, Tooltip } from "@nextui-org/react";
 import profile from "./../../assets/profile.png";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAddressCard, faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import { UserContext } from "../../../context/userContext";
 import axios from "axios";
 import toast from "react-hot-toast";
+
+// Define or import LazyProfileImage component
+const LazyProfileImage = ({ src, alt }) => (
+  <img loading="lazy" src={src} alt={alt} className="w-32 h-32 rounded-full" />
+);
 
 const BodyInformationKid = () => {
   const location = useLocation();
@@ -15,7 +20,7 @@ const BodyInformationKid = () => {
   const [error, setError] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const { user } = useContext(UserContext);
-  const [parent, setParent] = useState([]);
+  const [parent, setParent] = useState(null);
 
   const [student, setStudent] = useState({
     FirstName: "",
@@ -34,7 +39,7 @@ const BodyInformationKid = () => {
     axios
       .get(`/api/getParent/${user.UserID}`)
       .then((response) => {
-        setParent(response.data);
+        setParent(response.data); // Parent data includes the `Student` array
       })
       .catch((err) => {
         setError("Failed to load parent data.");
@@ -45,10 +50,13 @@ const BodyInformationKid = () => {
   }, [user.UserID]);
 
   useEffect(() => {
-    if (parent && parent.LRN) {
+    // Access the LRN from the first student in the Student array, if it exists
+    const LRN = parent?.Student?.[0]?.LRN;
+
+    if (LRN) {
       setLoading(true);
       axios
-        .get(`/api/getStudent/${parent.LRN}`)
+        .get(`/api/getStudent/${LRN}`)
         .then((response) => {
           setStudent(response.data);
         })
@@ -64,14 +72,6 @@ const BodyInformationKid = () => {
   const toggleActive = (index) => {
     setActiveIndex(index);
   };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>{error}</div>;
-  }
 
   return (
     <div className="p-10">
@@ -93,10 +93,13 @@ const BodyInformationKid = () => {
         </Tooltip>
       </div>
 
-      <div className="w-full max-w-8xl mx-auto bg-white shadow-lg rounded-lg p-8">
+      <div className="w-full max-w-8xl mx-auto bg-white shadow-lg rounded-lg p-[3rem]">
         {/* Profile Header */}
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-          <img src={profile} className="w-32 h-32 rounded-full" alt="Profile" />
+          <LazyProfileImage
+            src={student?.profileImage || profile}
+            alt="Profile"
+          />
           <div className="flex-1">
             <h2 className="text-2xl font-bold">
               {`${student.FirstName} ${student.LastName}`}
@@ -108,7 +111,26 @@ const BodyInformationKid = () => {
                   icon={faAddressCard}
                   className="text-gray-600"
                 />
-                <span>Learner Reference Number: {student.LRN}</span>
+                <span>Learner Reference Number: {student.LRN || "N/A"}</span>
+              </div>
+              {/* Student Status Highlight */}
+              <div className="mt-4">
+                <span className="text-sm font-bold">Status:</span>
+                <span
+                  className={`ml-2 px-2 py-1 rounded-full ${
+                    student.Status === "Grade Ready Reader"
+                      ? "bg-green-200 text-green-800"
+                      : student.Status === "Transitioning Reader"
+                      ? "bg-blue-200 text-blue-800"
+                      : student.Status === "Developing Reader"
+                      ? "bg-yellow-200 text-yellow-800"
+                      : student.Status === "Incomplete"
+                      ? "bg-gray-200 text-gray-800" // New color for "Incomplete" status
+                      : "bg-red-200 text-red-800" // Default fallback for other statuses
+                  }`}
+                >
+                  {student.Status || "N/A"}
+                </span>
               </div>
             </div>
           </div>
@@ -144,12 +166,6 @@ const BodyInformationKid = () => {
                     Last Name:
                   </span>
                   <p className="text-gray-800">{student.LastName || "N/A"}</p>
-                </div>
-                <div>
-                  <span className="block text-sm text-gray-600">
-                    Civil Status:
-                  </span>
-                  <p className="text-gray-800">{student.Status || "N/A"}</p>
                 </div>
                 <div>
                   <span className="block text-sm text-gray-600">Gender:</span>

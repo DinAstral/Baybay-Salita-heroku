@@ -16,7 +16,7 @@ import toast from "react-hot-toast";
 const BodyFeedbackParentTeacher = () => {
   const { user } = useContext(UserContext);
   const [feedbacks, setFeedbacks] = useState([]);
-  const [parent, setParent] = useState(null); // Changed to null for clarity
+  const [parent, setParent] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,7 +24,6 @@ const BodyFeedbackParentTeacher = () => {
       .get(`/api/getParent/${user.UserID}`)
       .then((response) => {
         setParent(response.data);
-        console.log("Parent Data:", response.data); // Debug log
       })
       .catch((err) => {
         toast.error("Failed to load parent data.");
@@ -35,17 +34,13 @@ const BodyFeedbackParentTeacher = () => {
   }, [user.UserID]);
 
   useEffect(() => {
-    const fetchParentAndFeedbacks = async () => {
+    const fetchFeedbacks = async () => {
       try {
         const feedbackResponse = await axios.get(`/api/getFeedbacks`);
-        console.log("Feedback Data:", feedbackResponse.data); // Debug log
-
         const studentFeedbacks = feedbackResponse.data.filter(
-          (feedback) => feedback.LRN === parent.LRN
+          (feedback) => feedback.LRN === parent?.Student?.[0]?.LRN
         );
-
         setFeedbacks(studentFeedbacks);
-        console.log("Filtered Feedbacks:", studentFeedbacks); // Debug log
       } catch (error) {
         toast.error("Failed to load feedbacks. Please try again.");
       } finally {
@@ -53,32 +48,34 @@ const BodyFeedbackParentTeacher = () => {
       }
     };
 
-    if (user && parent && parent.LRN) {
-      fetchParentAndFeedbacks();
+    if (parent?.LRN) {
+      fetchFeedbacks();
     }
-  }, [user, parent]);
+  }, [parent]);
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-full">
+      <div className="flex justify-center items-center h-screen">
         <Spinner size="lg" color="primary" />
       </div>
     );
   }
 
   return (
-    <div className="content-body px-9 py-6">
+    <div className="content-body px-4 md:px-9 py-2">
       <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center justify-start gap-2">
-          <h1 className="text-3xl font-semibold">Student Information</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl md:text-3xl font-semibold">
+            Student Feedback
+          </h1>
           <Tooltip
             showArrow={true}
             content={
               <div className="p-2">
                 <div className="text-sm font-bold">View Feedback</div>
                 <div className="text-xs">
-                  This function allows you to view the teachers's feedback in
-                  the assessment.
+                  This function allows you to view the teachers' feedback in the
+                  assessments.
                 </div>
               </div>
             }
@@ -89,16 +86,18 @@ const BodyFeedbackParentTeacher = () => {
       </div>
 
       <div className="content-container">
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {feedbacks.length > 0 ? (
-            feedbacks.map((feedback) => (
-              <Card key={feedback._id} className="shadow-lg hover:shadow-2xl">
+        {feedbacks.length > 0 ? (
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {feedbacks.map((feedback) => (
+              <Card
+                key={feedback._id}
+                className="shadow-lg hover:shadow-2xl transition-shadow"
+              >
                 <CardHeader className="pb-0 pt-4 px-4 flex-col items-start">
                   <p className="text-lg uppercase font-bold text-primary">
                     {feedback.Title}
                   </p>
                   <small className="text-default-900">
-                    {" "}
                     Assessment Type: {feedback.Type}
                   </small>
                   <h4 className="font-bold text-sm mt-1">
@@ -109,32 +108,27 @@ const BodyFeedbackParentTeacher = () => {
                   <p className="mb-1">
                     <span className="font-semibold text-sm">
                       LRN: {feedback.LRN}
-                    </span>{" "}
+                    </span>
                   </p>
                   <p className="mb-1">
                     <span className="font-semibold text-sm">
                       Date: {feedback.Feedback_Date}
-                    </span>{" "}
+                    </span>
                   </p>
                   <p>
                     <span className="font-semibold text-sm">
                       Context: {feedback.Context}
-                    </span>{" "}
+                    </span>
                   </p>
                 </CardBody>
-                <div className="card-footer flex justify-end px-4 pb-4">
-                  <Button size="sm" color="primary" className="w-full">
-                    View Details
-                  </Button>
-                </div>
               </Card>
-            ))
-          ) : (
-            <p className="text-center text-gray-600 font-medium">
-              No feedback available for this student.
-            </p>
-          )}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-600 font-medium">
+            No feedback available for this student.
+          </p>
+        )}
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Button, Tooltip } from "@nextui-org/react";
 import profile from "./../../assets/profile.png";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAddressCard, faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import { UserContext } from "../../../context/userContext";
@@ -9,14 +9,10 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const BodyStudentProgress = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const { user } = useContext(UserContext);
-  const [parent, setParent] = useState([]);
-
+  const [parent, setParent] = useState(null);
   const [student, setStudent] = useState({
     FirstName: "",
     LastName: "",
@@ -29,49 +25,48 @@ const BodyStudentProgress = () => {
     Address: "",
     ContactNumber: "",
   });
+  const [performance, setPerformance] = useState([]); // Added state for performance
 
   useEffect(() => {
-    axios
-      .get(`/api/getParent/${user.UserID}`)
-      .then((response) => {
+    // Fetch parent data based on user.UserID
+    const fetchParentData = async () => {
+      try {
+        const response = await axios.get(`/api/getParent/${user.UserID}`);
         setParent(response.data);
-      })
-      .catch((err) => {
+      } catch (err) {
         setError("Failed to load parent data.");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      }
+    };
+
+    if (user.UserID) {
+      fetchParentData();
+    }
   }, [user.UserID]);
 
   useEffect(() => {
-    if (parent && parent.LRN) {
-      setLoading(true);
-      axios
-        .get(`/api/getStudentParent/${parent.LRN}`)
-        .then((response) => {
-          setStudent(response.data);
-        })
-        .catch((err) => {
-          setError("Failed to load student data.");
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+    // Fetch student data based on parent data
+    const fetchStudentData = async (LRN) => {
+      try {
+        const studentResponse = await axios.get(`/api/getStudentParent/${LRN}`);
+        setStudent(studentResponse.data);
+
+        const performanceResponse = await axios.get(
+          `/api/getPerformanceStudent/${LRN}`
+        );
+        setPerformance(performanceResponse.data);
+      } catch (err) {
+        setError("Failed to load student data.");
+      }
+    };
+
+    if (parent && parent.Student?.[0]?.LRN) {
+      fetchStudentData(parent.Student[0].LRN);
     }
   }, [parent]);
 
   const toggleActive = (index) => {
     setActiveIndex(index);
   };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>{error}</div>;
-  }
 
   return (
     <div className="p-10">
@@ -125,53 +120,38 @@ const BodyStudentProgress = () => {
               }`}
               onClick={() => toggleActive(0)}
             >
-              Basic Information
+              Progress
             </Button>
           </div>
 
           {/* Content Based on Active Tab */}
           {activeIndex === 0 && (
-            <div className="mt-6 bg-[#faf9f4] p-6 rounded-lg shadow">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <span className="block text-sm text-gray-600">
-                    First Name:
-                  </span>
-                  <p className="text-gray-800">{student.FirstName || "N/A"}</p>
+            <div className="mt-6 bg-[#f9f9f9] p-6 rounded-lg shadow">
+              <h2 className="text-lg font-semibold mb-4">Student Progress</h2>
+              {performance.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {performance.map((assessment, index) => (
+                    <div
+                      key={index}
+                      className="p-4 bg-white rounded-lg shadow-md"
+                    >
+                      <div className="mb-2">
+                        <span className="block text-sm text-gray-600">
+                          Assessment: {assessment.Type || "N/A"}
+                        </span>
+                        <span className="block text-sm text-gray-600">
+                          Activity Code: {assessment.ActivityCode || "N/A"}
+                        </span>
+                      </div>
+                      <p className="text-gray-800">
+                        Score: {assessment.Score || "N/A"}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-                <div>
-                  <span className="block text-sm text-gray-600">
-                    Last Name:
-                  </span>
-                  <p className="text-gray-800">{student.LastName || "N/A"}</p>
-                </div>
-                <div>
-                  <span className="block text-sm text-gray-600">
-                    Civil Status:
-                  </span>
-                  <p className="text-gray-800">{student.Status || "N/A"}</p>
-                </div>
-                <div>
-                  <span className="block text-sm text-gray-600">Gender:</span>
-                  <p className="text-gray-800">{student.Gender || "N/A"}</p>
-                </div>
-                <div>
-                  <span className="block text-sm text-gray-600">Birthday:</span>
-                  <p className="text-gray-800">{student.Birthday || "N/A"}</p>
-                </div>
-                <div>
-                  <span className="block text-sm text-gray-600">Address:</span>
-                  <p className="text-gray-800">{student.Address || "N/A"}</p>
-                </div>
-                <div>
-                  <span className="block text-sm text-gray-600">
-                    Contact Number:
-                  </span>
-                  <p className="text-gray-800">
-                    {student.ContactNumber || "N/A"}
-                  </p>
-                </div>
-              </div>
+              ) : (
+                <p className="text-gray-800">No performance data available.</p>
+              )}
             </div>
           )}
         </div>

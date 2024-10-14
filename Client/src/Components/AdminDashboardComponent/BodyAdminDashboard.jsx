@@ -7,7 +7,7 @@ import {
   faCircleInfo,
   faHouse,
 } from "@fortawesome/free-solid-svg-icons";
-import { Table, Button, Tooltip } from "@nextui-org/react";
+import { Table, Button, Tooltip, Select, SelectItem } from "@nextui-org/react";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { LineChart } from "@mui/x-charts/LineChart";
@@ -20,10 +20,25 @@ const BodyAdminDashboard = () => {
   const [teachersCount, setTeachersCount] = useState(0);
   const [parentsCount, setParentsCount] = useState(0);
   const [performanceData, setPerformanceData] = useState([]);
-  const [selectedAssessment, setSelectedAssessment] = useState("Assessment 1");
+  const [selectedAssessment, setSelectedAssessment] = useState("Pagbabaybay");
   const [performanceCounts, setPerformanceCounts] = useState([]);
 
+  const [averageScores, setAverageScores] = useState({});
+  const [selectedSection, setSelectedSection] = useState("All Sections");
+
   const [sectionStatusCounts, setSectionStatusCounts] = useState({});
+
+  const sections = [
+    "Aster",
+    "Camia",
+    "Dahlia",
+    "Iris",
+    "Jasmin",
+    "Orchid",
+    "Rose",
+    "Tulip",
+    "SSC",
+  ];
 
   const [sectionCounts, setSectionCounts] = useState({
     Aster: 0,
@@ -64,6 +79,7 @@ const BodyAdminDashboard = () => {
       try {
         await Promise.all([fetchUsers(), fetchStudents(), fetchAssessment()]);
         await fetchPerformance(); // Fetch performance data separately
+        computeAverageScores();
       } catch (err) {
         console.error("Error fetching data:", err);
       }
@@ -276,6 +292,55 @@ const BodyAdminDashboard = () => {
   });
 
   const assessmentLabels = assessments.map((assessment) => assessment.Type); // Dynamic assessment labels
+
+  const computeAverageScores = () => {
+    const sectionScores = {};
+
+    // Initialize each section with an array to accumulate scores
+    sections.forEach((section) => {
+      sectionScores[section] = [];
+    });
+
+    // Filter performance counts based on selected assessment
+    performanceCounts.forEach((performance) => {
+      const student = students.find((s) => s.LRN === performance.LRN);
+      if (student && student.Section) {
+        const section = student.Section;
+        if (performance.Type === selectedAssessment) {
+          sectionScores[section].push(parseInt(performance.Score, 10));
+        }
+      }
+    });
+
+    // Calculate the average score per section
+    const avgScores = {};
+    sections.forEach((section) => {
+      const scores = sectionScores[section];
+      avgScores[section] = scores.length
+        ? scores.reduce((acc, score) => acc + score, 0) / scores.length
+        : 0;
+    });
+
+    setAverageScores(avgScores);
+  };
+
+  // Handle dynamic data based on section selection
+  const getChartData = () => {
+    if (selectedSection === "All Sections") {
+      return {
+        labels: Object.keys(averageScores),
+        data: Object.values(averageScores),
+      };
+    } else {
+      return {
+        labels: [selectedSection],
+        data: [averageScores[selectedSection] || 0],
+      };
+    }
+  };
+
+  // Prepare data for the chart
+  const { labels: sectionLabel, data: sectionData } = getChartData();
 
   return (
     <div className="px-9">
@@ -575,49 +640,83 @@ const BodyAdminDashboard = () => {
               series={[
                 {
                   data: Object.values(activityCounts),
-                  color: "#ffce1f", // Primary color for bars
+                  color: "#7668d2", // Primary color for bars
                   label: "Assessments", // Label for better clarity
                 },
               ]}
               barsize={40} // Increase bar size for better visuals
               gap={30} // Increase gap between bars for a cleaner look
-              height={400}
+              height={500}
             />
           </div>
 
           <div className="col-span-1 lg:col-span-3 bg-slate-100 rounded-lg shadow-md p-4 mt-6">
-            <h2 className="text-xl font-semibold">Performance of Students</h2>
-            {performanceCounts.length > 0 && students.length > 0 ? (
-              <BarChart
-                xAxis={[
-                  {
-                    label: "Assessment Type",
-                    data: assessmentLabels,
-                    scaleType: "band",
-                    tickSize: 10,
-                  },
-                ]}
-                yAxis={[
-                  {
-                    label: "Score",
-                    min: 0,
-                    max: 10, // Assuming scores are out of 100
-                    tickCount: 6,
-                    tickFormat: (value) => Math.floor(value),
-                  },
-                ]}
-                series={studentsPerformanceData.map((studentData) => ({
-                  data: studentData.scores, // Array of scores per assessment
-                  label: studentData.studentName, // Student name as label
-                  color: `#${Math.floor(Math.random() * 16777215).toString(
-                    16
-                  )}`, // Random color for each student
-                }))}
-                height={400}
-              />
-            ) : (
-              <p>No performance data available</p>
-            )}
+            {/* Dropdown or Buttons to Select Section */}
+            <div className="flex justify-start gap-4 mb-4">
+              <div>
+                <h2 className="text-2xl font-semibold">Select Section:</h2>
+                <Select
+                  variant="bordered"
+                  className="bg-white rounded-sm"
+                  placeholder="All Sections"
+                  value={selectedSection}
+                  onChange={(e) => setSelectedSection(e.target.value)}
+                >
+                  <SelectItem key="All Sections">All Sections</SelectItem>
+                  {sections.map((section) => (
+                    <SelectItem key={section}>{section}</SelectItem>
+                  ))}
+                </Select>
+              </div>
+
+              {/* Dropdown to Select Assessment */}
+              <div>
+                <h2 className="text-2xl font-semibold">Select Assessment:</h2>
+                <Select
+                  variant="bordered"
+                  className="bg-white rounded-sm"
+                  placeholder="Select Assessment"
+                  value={selectedAssessment}
+                  onChange={(e) => setSelectedAssessment(e.target.value)}
+                >
+                  <SelectItem key="Pagbabaybay">Assessment 1</SelectItem>
+                  <SelectItem key="Pantig">Assessment 2</SelectItem>
+                  <SelectItem key="Salita">Assessment 3</SelectItem>
+                  <SelectItem key="Pagbabasa">Assessment 4</SelectItem>
+                </Select>
+              </div>
+            </div>
+
+            <h2 className="text-xl font-semibold">
+              Average Scores in {selectedAssessment} Assessment
+            </h2>
+            <BarChart
+              xAxis={[
+                {
+                  label: "Sections",
+                  scaleType: "band",
+                  data: sectionLabel,
+                  tickSize: 10,
+                },
+              ]}
+              yAxis={[
+                {
+                  label: "Average Score",
+                  min: 0,
+                  max: 10, // Assuming the max score is 100
+                  tickCount: 6,
+                  tickFormat: (value) => Math.floor(value),
+                },
+              ]}
+              series={[
+                {
+                  data: sectionData, // Average scores per section or per selected section
+                  color: "#91c123",
+                  label: "Average Score",
+                },
+              ]}
+              height={500}
+            />
           </div>
         </div>
       </div>
