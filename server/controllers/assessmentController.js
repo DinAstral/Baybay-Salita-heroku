@@ -359,7 +359,7 @@ const importWord = async (req, res) => {
       const imageFile = uploadResponse.uploadImage.url;
       const securedImageFile = uploadResponse.uploadImage.secure_url;
       const audioFile = uploadResponse.uploadAudio.url;
-      const securedAudioFile = uploadResponse.uploadImage.secure_url;
+      const securedAudioFile = uploadResponse.uploadAudio.secure_url;
 
       // Creating a new Material object
       const material = new Material({

@@ -40,11 +40,15 @@ app.use(
         ],
         fontSrc: ["'self'", "https://fonts.gstatic.com"], // Allow fonts from Google Fonts
         imgSrc: ["'self'", "data:", "https://res.cloudinary.com"], // Allow images from Cloudinary
-        connectSrc: ["'self'", "https://api.your-external-source.com"], // Allow connections to APIs
+        connectSrc: [
+          "'self'",
+          "https://baybay-salita-heroku-8c328f3ddd0f.herokuapp.com",
+          "https://api.your-external-source.com",
+        ], // Allow connections to APIs
         frameSrc: ["'self'"], // For iframes (optional, if used)
         childSrc: ["'self'"], // For embedded content (optional)
         audioSrc: ["'self'", "https://res.cloudinary.com"], // Corrected audio directive
-        mediaSrc: ["'self'"], // For media content
+        mediaSrc: ["'self'", "data:", "https://res.cloudinary.com"], // For media content
         objectSrc: ["'none'"], // Disallow embedding of objects (security)
       },
     },
