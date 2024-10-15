@@ -69,6 +69,14 @@ app.use(
   })
 );
 
+app.use((req, res, next) => {
+  res.setHeader(
+    "Permissions-Policy",
+    "geolocation=(self), camera=(), microphone=()"
+  ); // Adjust as needed
+  next();
+});
+
 // Database connection
 const uri = process.env.MONGODB_URI;
 mongoose

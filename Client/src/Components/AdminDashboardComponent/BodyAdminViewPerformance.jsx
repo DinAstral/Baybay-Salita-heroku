@@ -25,7 +25,10 @@ const formatTimeRead = (secondsString) => {
 
 const BodyAdminViewPerformance = () => {
   const { UserInputId } = useParams();
+  const navigate = useNavigate(); // Initialize useNavigate hook
+  const { user } = useContext(UserContext); // Access user from UserContext
 
+  const [modalShowView, setModalShowView] = useState(false); // Add state for modal
   const [data, setData] = useState({
     UserInputId: "",
     LRN: "",
