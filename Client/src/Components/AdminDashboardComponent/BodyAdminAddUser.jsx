@@ -39,8 +39,11 @@ const BodyAdminAddUser = () => {
     LastName: "",
     email: "",
     password: "",
+    confirmPassword: "", // Added confirm password
     role: "",
   });
+
+  const [errors, setErrors] = useState({}); // Initialize errors state
 
   function validatePassword(password) {
     const minLength = 8;
@@ -51,12 +54,10 @@ const BodyAdminAddUser = () => {
     const hasDigit = /\d/.test(password);
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
-    // Check if password is provided
     if (!password) {
       return "Password is required.";
     }
 
-    // Validate the different criteria and accumulate errors
     if (password.length < minLength) {
       errors.push("Password must be at least 8 characters long.");
     }
@@ -73,7 +74,6 @@ const BodyAdminAddUser = () => {
       errors.push("Password must contain at least one special character.");
     }
 
-    // If there are any errors, return them as a combined string
     if (errors.length > 0) {
       return errors.join(" ");
     }
@@ -85,8 +85,7 @@ const BodyAdminAddUser = () => {
     let isValid = true;
     let newErrors = {};
 
-    // Clear previous errors before validation
-    setErrors({});
+    setErrors({}); // Clear previous errors
 
     if (!data.FirstName) {
       newErrors.FirstName = "First Name is required.";
@@ -125,20 +124,20 @@ const BodyAdminAddUser = () => {
     e.preventDefault();
 
     if (!validateInputs()) {
-      toast.error("Please fill out this form.");
+      toast.error("Please fill out the form correctly.");
       return;
     }
 
-    const UserID = generateRandomCode(role, 6);
+    const UserID = generateRandomCode(data.role, 6);
 
     try {
       const response = await axios.post("/api/addUser", {
         UserID,
-        FirstName,
-        LastName,
-        email,
-        password,
-        role,
+        FirstName: data.FirstName,
+        LastName: data.LastName,
+        email: data.email,
+        password: data.password,
+        role: data.role,
       });
 
       if (response.data.error) {
@@ -150,6 +149,7 @@ const BodyAdminAddUser = () => {
           LastName: "",
           email: "",
           password: "",
+          confirmPassword: "",
           role: "",
         });
         toast.success("User added successfully.");
@@ -187,7 +187,6 @@ const BodyAdminAddUser = () => {
         </h2>
         <form onSubmit={addUser}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* First Name */}
             <Input
               label="First Name"
               type="text"
@@ -197,7 +196,6 @@ const BodyAdminAddUser = () => {
               isInvalid={!!errors.FirstName}
               onChange={(e) => setData({ ...data, FirstName: e.target.value })}
             />
-            {/* Last Name */}
             <Input
               label="Last Name"
               type="text"
@@ -207,7 +205,6 @@ const BodyAdminAddUser = () => {
               isInvalid={!!errors.LastName}
               onChange={(e) => setData({ ...data, LastName: e.target.value })}
             />
-            {/* Email */}
             <Input
               label="Email"
               type="email"
@@ -217,7 +214,6 @@ const BodyAdminAddUser = () => {
               isInvalid={!!errors.email}
               onChange={(e) => setData({ ...data, email: e.target.value })}
             />
-            {/* Password */}
             <Input
               label="Password"
               type="password"
@@ -227,7 +223,17 @@ const BodyAdminAddUser = () => {
               isInvalid={!!errors.password}
               onChange={(e) => setData({ ...data, password: e.target.value })}
             />
-            {/* Role */}
+            <Input
+              label="Confirm Password"
+              type="password"
+              placeholder="Confirm Password"
+              value={data.confirmPassword}
+              errorMessage={errors.confirmPassword}
+              isInvalid={!!errors.confirmPassword}
+              onChange={(e) =>
+                setData({ ...data, confirmPassword: e.target.value })
+              }
+            />
             <Select
               label="Role"
               placeholder="Select Role"
