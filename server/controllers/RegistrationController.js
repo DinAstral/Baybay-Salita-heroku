@@ -611,6 +611,14 @@ const loginUser = async (req, res) => {
       });
     }
 
+    // Check if the user's account is verified
+    if (!user.verified) {
+      return res.json({
+        error:
+          "Account is not verified. Please verify your email before logging in.",
+      });
+    }
+
     //check password match
     const match = await comparePassword(password, user.password);
     if (match) {

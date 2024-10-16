@@ -17,6 +17,54 @@ let transporter = nodemailer.createTransport({
   },
 });
 
+const sendVerificationEmail = async ({ UserID, email }, res) => {
+  try {
+    const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
+
+    const mailOptions = {
+      from: process.env.AUTH_EMAIL,
+      to: email,
+      subject: "Verify Your Email",
+      html: `<p><i>Mabuhay!</i></p>
+              <p>We received a registration request to your account. To verify your account, please use the following One-Time Password (OTP) code.</p>
+              <h3>OTP: ${otp}</h3>
+              <p>This code will <b>expire in 1 hour.</b></p>
+              <p>Please enter this code on the OTP verification page to complete the process. If you didn't initiate this request, please disregard this email.</p>
+              <p>If you need any assistance, please don't hesitate to contact our team.</p>
+              <p>Thank you.</p>
+              <br>
+              <p>Best regards,<br>
+              <b>BaybaySalita</b>`,
+    };
+
+    const saltrounds = 10;
+
+    const hashedOTP = await bcrypt.hash(otp, saltrounds);
+    const newOTPVerification = await new UserOTPVerification({
+      userId: UserID,
+      otp: hashedOTP,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 3600000,
+    });
+    await newOTPVerification.save();
+    transporter.sendMail(mailOptions);
+    console.log("Success");
+    res.json({
+      status: "PENDING",
+      message: "Verification otp email sent",
+      data: {
+        userId: UserID,
+        email,
+      },
+    });
+  } catch (error) {
+    res.json({
+      status: "FAILED",
+      message: error.message,
+    });
+  }
+};
+
 const sendCredentialEmail = async ({ email, password, role }, res) => {
   try {
     const mailOptions = {
@@ -449,6 +497,7 @@ const addUser = async (req, res) => {
     user
       .save()
       .then((result) => {
+        sendVerificationEmail(result, res);
         sendCredentialEmail({ email, password, role }, res); // Send plain password
       })
       .catch((err) => {

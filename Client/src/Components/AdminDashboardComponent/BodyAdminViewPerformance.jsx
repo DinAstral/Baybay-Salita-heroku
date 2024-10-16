@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 
 import { UserContext } from "../../../context/userContext";
-
 import axios from "axios";
 import toast from "react-hot-toast";
 import AddFeedback from "../Modals/AddFeedback";
@@ -25,10 +24,10 @@ const formatTimeRead = (secondsString) => {
 
 const BodyAdminViewPerformance = () => {
   const { UserInputId } = useParams();
-  const navigate = useNavigate(); // Initialize useNavigate hook
-  const { user } = useContext(UserContext); // Access user from UserContext
+  const navigate = useNavigate();
+  const { user } = useContext(UserContext);
 
-  const [modalShowView, setModalShowView] = useState(false); // Add state for modal
+  const [modalShowView, setModalShowView] = useState(false);
   const [data, setData] = useState({
     UserInputId: "",
     LRN: "",
@@ -66,7 +65,7 @@ const BodyAdminViewPerformance = () => {
         show={modalShowView}
         onHide={() => setModalShowView(false)}
         actCode={data.ActivityCode}
-        userid={user.UserID}
+        userid={user?.UserID || ""}
         lrn={data.LRN}
         section={data.Section}
       />
@@ -215,8 +214,8 @@ const BodyAdminViewPerformance = () => {
           </div>
         )}
 
-        <div className="mt-6 gap-5 flex">
-          <Button color="danger" onClick={() => navigate(-1)} className="my-4">
+        <div className="mt-6 flex gap-5">
+          <Button color="danger" onClick={() => navigate(-1)} className="mt-4">
             Back
           </Button>
         </div>

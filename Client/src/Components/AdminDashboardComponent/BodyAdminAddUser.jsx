@@ -35,19 +35,97 @@ const BodyAdminAddUser = () => {
 
   const [data, setData] = useState({
     UserID: "",
-    firstName: "",
-    lastName: "",
+    FirstName: "",
+    LastName: "",
     email: "",
     password: "",
     role: "",
   });
 
+  function validatePassword(password) {
+    const minLength = 8;
+    const errors = [];
+
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasDigit = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    // Check if password is provided
+    if (!password) {
+      return "Password is required.";
+    }
+
+    // Validate the different criteria and accumulate errors
+    if (password.length < minLength) {
+      errors.push("Password must be at least 8 characters long.");
+    }
+    if (!hasUpperCase) {
+      errors.push("Password must contain at least one uppercase letter.");
+    }
+    if (!hasLowerCase) {
+      errors.push("Password must contain at least one lowercase letter.");
+    }
+    if (!hasDigit) {
+      errors.push("Password must contain at least one digit.");
+    }
+    if (!hasSpecialChar) {
+      errors.push("Password must contain at least one special character.");
+    }
+
+    // If there are any errors, return them as a combined string
+    if (errors.length > 0) {
+      return errors.join(" ");
+    }
+
+    return null; // No errors
+  }
+
+  const validateInputs = () => {
+    let isValid = true;
+    let newErrors = {};
+
+    // Clear previous errors before validation
+    setErrors({});
+
+    if (!data.FirstName) {
+      newErrors.FirstName = "First Name is required.";
+      isValid = false;
+    }
+    if (!data.LastName) {
+      newErrors.LastName = "Last Name is required.";
+      isValid = false;
+    }
+    if (!data.email) {
+      newErrors.email = "Email is required.";
+      isValid = false;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email)) {
+      newErrors.email = "Invalid email format.";
+      isValid = false;
+    }
+
+    const passwordError = validatePassword(data.password);
+    if (passwordError) {
+      newErrors.password = passwordError;
+      isValid = false;
+    }
+
+    if (data.password !== data.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match.";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const addUser = async (e) => {
     e.preventDefault();
-    const { firstName, lastName, email, password, role } = data;
 
-    if (!firstName || !lastName || !email || !password || !role) {
-      toast.error("All fields are required.");
+    if (!validateInputs()) {
+      toast.error("Please fill out this form.");
       return;
     }
 
@@ -56,8 +134,8 @@ const BodyAdminAddUser = () => {
     try {
       const response = await axios.post("/api/addUser", {
         UserID,
-        firstName,
-        lastName,
+        FirstName,
+        LastName,
         email,
         password,
         role,
@@ -68,8 +146,8 @@ const BodyAdminAddUser = () => {
       } else {
         setData({
           UserID: "",
-          firstName: "",
-          lastName: "",
+          FirstName: "",
+          LastName: "",
           email: "",
           password: "",
           role: "",
@@ -114,16 +192,20 @@ const BodyAdminAddUser = () => {
               label="First Name"
               type="text"
               placeholder="Enter First Name"
-              value={data.firstName}
-              onChange={(e) => setData({ ...data, firstName: e.target.value })}
+              value={data.FirstName}
+              errorMessage={errors.FirstName}
+              isInvalid={!!errors.FirstName}
+              onChange={(e) => setData({ ...data, FirstName: e.target.value })}
             />
             {/* Last Name */}
             <Input
               label="Last Name"
               type="text"
               placeholder="Enter Last Name"
-              value={data.lastName}
-              onChange={(e) => setData({ ...data, lastName: e.target.value })}
+              value={data.LastName}
+              errorMessage={errors.LastName}
+              isInvalid={!!errors.LastName}
+              onChange={(e) => setData({ ...data, LastName: e.target.value })}
             />
             {/* Email */}
             <Input
@@ -131,6 +213,8 @@ const BodyAdminAddUser = () => {
               type="email"
               placeholder="Enter Email"
               value={data.email}
+              errorMessage={errors.email}
+              isInvalid={!!errors.email}
               onChange={(e) => setData({ ...data, email: e.target.value })}
             />
             {/* Password */}
@@ -139,6 +223,8 @@ const BodyAdminAddUser = () => {
               type="password"
               placeholder="Set Password"
               value={data.password}
+              errorMessage={errors.password}
+              isInvalid={!!errors.password}
               onChange={(e) => setData({ ...data, password: e.target.value })}
             />
             {/* Role */}
@@ -146,6 +232,8 @@ const BodyAdminAddUser = () => {
               label="Role"
               placeholder="Select Role"
               value={data.role}
+              errorMessage={errors.role}
+              isInvalid={!!errors.role}
               onChange={(e) => setData({ ...data, role: e })}
             >
               <SelectItem key="Admin" value="Admin">

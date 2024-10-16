@@ -68,6 +68,45 @@ const TeacherRegister = () => {
     return age;
   };
 
+  function validatePassword(password) {
+    const minLength = 8;
+    const errors = [];
+
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasDigit = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    // Check if password is provided
+    if (!password) {
+      return "Password is required.";
+    }
+
+    // Validate the different criteria and accumulate errors
+    if (password.length < minLength) {
+      errors.push("Password must be at least 8 characters long.");
+    }
+    if (!hasUpperCase) {
+      errors.push("Password must contain at least one uppercase letter.");
+    }
+    if (!hasLowerCase) {
+      errors.push("Password must contain at least one lowercase letter.");
+    }
+    if (!hasDigit) {
+      errors.push("Password must contain at least one digit.");
+    }
+    if (!hasSpecialChar) {
+      errors.push("Password must contain at least one special character.");
+    }
+
+    // If there are any errors, return them as a combined string
+    if (errors.length > 0) {
+      return errors.join(" ");
+    }
+
+    return null; // No errors
+  }
+
   const validateInputs = () => {
     let isValid = true;
     let newErrors = {};
@@ -130,11 +169,12 @@ const TeacherRegister = () => {
       newErrors.email = "Invalid email format.";
       isValid = false;
     }
-    if (!data.password) {
-      newErrors.password = "Password is required.";
+
+    const passwordError = validatePassword(data.password);
+    if (passwordError) {
+      newErrors.password = passwordError;
       isValid = false;
-    }
-    if (data.password !== data.confirmPassword) {
+    } else if (data.password !== data.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match.";
       isValid = false;
     }
