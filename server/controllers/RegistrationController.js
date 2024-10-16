@@ -117,7 +117,7 @@ const sendForgotPasswordEmail = async ({ email, link }, res) => {
       html: `<p><i>Mabuhay!</i></p>
              <p><b><i>This is BaybaySalita Admin!</i></b></p>
               <p>To reset you account password please follow this link! This link is only valid for 30 minutes before it expires.</p>
-              <h3>Link: <a href="${link}">Reset Password</a> </h3>
+              <h4>Link: <a href="${link}">Reset Password</a> </h4>
               <p>If you need any assistance, please don't hesitate to contact our team.</p>
               <p>Thank you.</p>
               <br>
@@ -611,11 +611,14 @@ const loginUser = async (req, res) => {
       });
     }
 
-    // Check if the user's account is verified
+    // Check if the user is verified
     if (!user.verified) {
+      // Send verification email
+      await sendVerificationEmail({ UserID: user._id, email: user.email }, res);
+
       return res.json({
-        error:
-          "Account is not verified. Please verify your email before logging in.",
+        error: "Account is not verified. A verification email has been sent.",
+        data: { userId: user._id },
       });
     }
 

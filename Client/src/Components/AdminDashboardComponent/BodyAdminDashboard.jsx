@@ -232,7 +232,7 @@ const BodyAdminDashboard = () => {
   const getColorForStatus = (status) => {
     switch (status) {
       case "Incomplete":
-        return "#f63845";
+        return "#ff505b";
       case "Low Emerging Reader":
         return "#ff7828";
       case "High Emerging Reader":
@@ -459,7 +459,7 @@ const BodyAdminDashboard = () => {
           Student Status
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="bg-[#f63845] rounded-lg shadow-md p-4 flex flex-row justify-between">
+          <div className="bg-[#ff505b] rounded-lg shadow-md p-4 flex flex-row justify-between">
             <div className="text-white">
               <h2 className="text-xl font-semibold">Incomplete</h2>
               <p className="text-5xl mt-2">{statusCounts.Incomplete}</p>

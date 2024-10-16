@@ -10,9 +10,6 @@ function generateRandomCode(role, length) {
   const characters = "0123456789";
   let prefix = "";
   switch (role) {
-    case "Parent":
-      prefix = "parentID_";
-      break;
     case "Teacher":
       prefix = "teacherID_";
       break;
@@ -39,7 +36,7 @@ const BodyAdminAddUser = () => {
     LastName: "",
     email: "",
     password: "",
-    confirmPassword: "", // Added confirm password
+    confirmPassword: "",
     role: "",
   });
 
@@ -120,33 +117,30 @@ const BodyAdminAddUser = () => {
     return isValid;
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
   const addUser = async (e) => {
     e.preventDefault();
-
-    // Ensure that only the necessary fields (like strings) are included
-    const { FirstName, LastName, email, password, role } = data; // Ensure data contains only form inputs
 
     if (!validateInputs()) {
       toast.error("Please fill out the form correctly.");
       return;
     }
 
-    const UserID = generateRandomCode(role, 6);
+    const UserID = generateRandomCode(data.role, 6);
 
     try {
       const response = await axios.post("/api/addUser", {
+        ...data,
         UserID,
-        FirstName,
-        LastName,
-        email,
-        password,
-        role, // Only primitives being sent
       });
 
       if (response.data.error) {
         toast.error(response.data.error);
       } else {
-        // Reset the form state
         setData({
           UserID: "",
           FirstName: "",
@@ -156,12 +150,15 @@ const BodyAdminAddUser = () => {
           confirmPassword: "",
           role: "",
         });
-        toast.success("User added successfully.");
+        toast.success("User added successfully.", { duration: 4000 });
         navigate("/adminUsers");
       }
     } catch (error) {
       console.error("There was an error adding the user:", error);
-      toast.error("Failed to add user. Please try again later.");
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to add user. Please try again later."
+      );
     }
   };
 
@@ -194,49 +191,52 @@ const BodyAdminAddUser = () => {
             <Input
               label="First Name"
               type="text"
+              name="FirstName"
               placeholder="Enter First Name"
               value={data.FirstName}
               errorMessage={errors.FirstName}
               isInvalid={!!errors.FirstName}
-              onChange={(e) => setData({ ...data, FirstName: e.target.value })}
+              onChange={handleChange}
             />
             <Input
               label="Last Name"
               type="text"
+              name="LastName"
               placeholder="Enter Last Name"
               value={data.LastName}
               errorMessage={errors.LastName}
               isInvalid={!!errors.LastName}
-              onChange={(e) => setData({ ...data, LastName: e.target.value })}
+              onChange={handleChange}
             />
             <Input
               label="Email"
               type="email"
+              name="email"
               placeholder="Enter Email"
               value={data.email}
               errorMessage={errors.email}
               isInvalid={!!errors.email}
-              onChange={(e) => setData({ ...data, email: e.target.value })}
+              onChange={handleChange}
             />
             <Input
               label="Password"
               type="password"
+              name="password"
               placeholder="Set Password"
               value={data.password}
               errorMessage={errors.password}
               isInvalid={!!errors.password}
-              onChange={(e) => setData({ ...data, password: e.target.value })}
+              onChange={handleChange}
             />
             <Input
               label="Confirm Password"
               type="password"
+              name="confirmPassword"
               placeholder="Confirm Password"
               value={data.confirmPassword}
               errorMessage={errors.confirmPassword}
               isInvalid={!!errors.confirmPassword}
-              onChange={(e) =>
-                setData({ ...data, confirmPassword: e.target.value })
-              }
+              onChange={handleChange}
             />
             <Select
               label="Role"
@@ -244,16 +244,13 @@ const BodyAdminAddUser = () => {
               value={data.role}
               errorMessage={errors.role}
               isInvalid={!!errors.role}
-              onChange={(e) => setData({ ...data, role: e })}
+              onChange={(e) => setData({ ...data, role: e.target.value })}
             >
               <SelectItem key="Admin" value="Admin">
                 Admin
               </SelectItem>
               <SelectItem key="Teacher" value="Teacher">
                 Teacher
-              </SelectItem>
-              <SelectItem key="Parent" value="Parent">
-                Parent
               </SelectItem>
             </Select>
           </div>

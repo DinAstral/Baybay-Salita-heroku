@@ -29,7 +29,7 @@ const ViewPerformance = ({ show, onHide, performance }) => {
           <Button color="danger" variant="light" onClick={onHide}>
             Cancel
           </Button>
-          <Link to={`/adminViewPerformance/${performance?.UserInputId}`}>
+          <Link to={`/AdminViewStudentPerformance/${performance?.UserInputId}`}>
             <Button color="primary">View</Button>
           </Link>
         </ModalFooter>

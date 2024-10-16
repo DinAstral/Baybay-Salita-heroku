@@ -281,7 +281,7 @@ const BodyAdminUsers = () => {
                         Update
                       </Button>
                       <Button
-                        color="danger"
+                        className="bg-[#ff505b] text-white"
                         onClick={() =>
                           setSelectedUser(user) ||
                           handleModalStateChange("delete", true)

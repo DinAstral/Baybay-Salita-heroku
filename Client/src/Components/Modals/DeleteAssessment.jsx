@@ -13,10 +13,6 @@ import {
 } from "@nextui-org/react";
 
 const DeleteActivitySuccess = ({ show, onHide }) => {
-  const handleSuccessClick = () => {
-    onHide();
-    window.location.reload(); // You might want to change this to a more efficient state update instead of reloading the page.
-  };
   return (
     <Modal
       isOpen={show}
@@ -31,7 +27,7 @@ const DeleteActivitySuccess = ({ show, onHide }) => {
           <p>You have deleted the activity for the student successfully.</p>
         </ModalBody>
         <ModalFooter>
-          <Button color="primary" onClick={handleSuccessClick}>
+          <Button color="primary" onClick={onHide}>
             Close
           </Button>
         </ModalFooter>
@@ -40,13 +36,14 @@ const DeleteActivitySuccess = ({ show, onHide }) => {
   );
 };
 
-const DeleteAssessment = ({ show, onHide, activity }) => {
+const DeleteAssessment = ({ show, onHide, activity, onDeleteSuccess }) => {
   const [modalSubmitSuccess, setModalSubmitSuccess] = useState(false);
 
   const deleteActivity = async () => {
     try {
       await axios.delete(`/api/deleteAssessment/${activity._id}`);
       setModalSubmitSuccess(true);
+      onDeleteSuccess();
     } catch (err) {
       console.error("Error deleting activity:", err);
       toast.error("Failed to delete activity. Please try again later.");

@@ -29,7 +29,6 @@ const Login = () => {
   const registerButton = () => {
     navigate("/register");
   };
-
   const loginUser = async (e) => {
     e.preventDefault();
     try {
@@ -38,35 +37,38 @@ const Login = () => {
         password: data.password,
       });
 
-      const responseData = response.data;
-      if (responseData.error) {
-        toast.error(responseData.error);
-      } else {
-        localStorage.setItem("token", responseData.token);
-        localStorage.setItem("user", JSON.stringify(responseData.user));
+      // Ensure response data exists before processing
+      if (response && response.data) {
+        const responseData = response.data;
 
-        setUser(responseData.user);
-
-        setData({
-          email: "",
-          password: "",
-        });
-
-        if (responseData.role === "Parent") {
-          toast.success("Login Successful.");
-          navigate("/parentDashboard");
-        } else if (responseData.role === "Teacher") {
-          toast.success("Login Successful.");
-          navigate("/teacherDashboard");
-        } else if (responseData.role === "Admin") {
-          toast.success("Login Successful.");
-          navigate("/AdminDashboard");
+        if (responseData.error) {
+          // Handle unverified user case
+          if (responseData.data && responseData.data.userId) {
+            localStorage.setItem("userId", responseData.data.userId);
+            toast.error(responseData.error);
+            navigate("/verify-email");
+          } else {
+            toast.error(responseData.error);
+          }
         } else {
-          toast.error(responseData.error || "Login failed.");
+          localStorage.setItem("token", responseData.token);
+          localStorage.setItem("user", JSON.stringify(responseData.user));
+          setUser(responseData.user);
+          toast.success("Login Successful.");
+
+          if (responseData.role === "Parent") {
+            navigate("/parentDashboard");
+          } else if (responseData.role === "Teacher") {
+            navigate("/teacherDashboard");
+          } else if (responseData.role === "Admin") {
+            navigate("/AdminDashboard");
+          }
         }
+      } else {
+        toast.error("Invalid server response. Please try again.");
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error("Error occurred while logging in.");
     }
   };

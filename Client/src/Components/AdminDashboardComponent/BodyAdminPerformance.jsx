@@ -262,7 +262,7 @@ const BodyAdminPerformance = () => {
                               View
                             </Button>
                             <Button
-                              color="danger"
+                              className="bg-[#ff505b] text-white"
                               onClick={() => handleDeleteClick(performance)}
                             >
                               Delete

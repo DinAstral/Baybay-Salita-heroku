@@ -6,7 +6,7 @@ import {
   faEye,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import logo from "../../assets/Sidebar_Final_Logo.png";
+import logo from "../../assets/Sidebar_Final_cut.png";
 import { UserContext } from "../../../context/userContext"; // Import UserContext
 import { Button } from "@nextui-org/react";
 
@@ -41,7 +41,7 @@ const ParentSidebar = () => {
         {/* Separation Line */}
         <hr className="border-gray-600 border-t-1" />
 
-        <div className="flex flex-col gap-3 p-3">
+        <div className="flex flex-col gap-3 p-3 mb-6 pt-16">
           {[
             {
               icon: faBookOpenReader,
@@ -76,7 +76,7 @@ const ParentSidebar = () => {
         </div>
 
         {/* Logout Button */}
-        <div className="flex flex-col px-5">
+        <div className="px-3 pt-[14rem]">
           <Button
             color="error"
             className="w-full text-md font-semibold py-3 rounded-lg shadow-md transition-all duration-150 text-white bg-[#ff505b] hover:bg-red-600"

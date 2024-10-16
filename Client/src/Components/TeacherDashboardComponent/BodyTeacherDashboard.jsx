@@ -226,7 +226,7 @@ const BodyTeacherDashboard = () => {
       <div className="mt-6">
         <h2 className="text-2xl font-semibold mb-4">Student Status</h2>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="bg-[#f63845] rounded-lg shadow-2xl p-4 flex flex-row justify-between">
+          <div className="bg-[#ff505b] rounded-lg shadow-2xl p-4 flex flex-row justify-between">
             <div className="text-white">
               <h2 className="text-xl font-semibold">Incomplete</h2>
               <p className="text-5xl mt-2">{statusCounts.Incomplete}</p>

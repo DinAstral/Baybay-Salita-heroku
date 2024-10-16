@@ -1,5 +1,6 @@
 const User = require("../models/users");
-const Student = require("../models/student");
+const StudentModel = require("../models/student");
+const Teacher = require("../models/teachers");
 const Admin = require("../models/admin");
 const UserOTPVerification = require("../models/UserOTPVerification");
 const { hashPassword, comparePassword } = require("../helpers/auth");
@@ -30,6 +31,7 @@ const sendVerificationEmail = async ({ UserID, email }, res) => {
               <p>We received a registration request for your account. To verify your account, please use the following One-Time Password (OTP) code.</p>
               <h3>OTP: ${otp}</h3>
               <p>This code will <b>expire in 1 hour.</b></p>
+              <h4>Link: <a href="https://baybay-salita-heroku-8c328f3ddd0f.herokuapp.com/verifyEmail">Verify your email</a> </h4>
               <p>If you didn't initiate this request, please disregard this email.</p>
               <p>Thank you.</p>
               <br>
@@ -38,7 +40,7 @@ const sendVerificationEmail = async ({ UserID, email }, res) => {
     };
 
     // Hash OTP
-    const hashedOTP = await bcrypt.hash(otp, saltrounds);
+    const hashedOTP = await bcrypt.hash(otp, 10);
 
     // Save OTP to DB
     const newOTPVerification = new UserOTPVerification({
@@ -215,7 +217,7 @@ const addStudent = async (req, res) => {
     }
 
     // Check if the LRN is already in use
-    const exist = await Student.findOne({ LRN });
+    const exist = await StudentModel.findOne({ LRN });
     if (exist) {
       return errorResponse("LRN is already taken.");
     }
@@ -237,7 +239,7 @@ const addStudent = async (req, res) => {
     }
 
     // Create student in the database
-    const student = await Student.create({
+    const student = await StudentModel.create({
       LRN,
       FirstName,
       LastName,
@@ -261,7 +263,7 @@ const addStudent = async (req, res) => {
 
 // Gets the whole data of the Students
 const getStudents = (req, res) => {
-  Student.find()
+  StudentModel.find()
     .then((students) => res.json(students))
     .catch((err) => res.status(500).json({ error: err.message }));
 };
@@ -275,7 +277,7 @@ const getStudent = async (req, res) => {
   }
 
   try {
-    const student = await Student.findById(req.params.id);
+    const student = await StudentModel.findById(req.params.id);
     if (!student) {
       return res.status(404).json({
         message: "No account found",
@@ -300,7 +302,7 @@ const deleteStudent = async (req, res) => {
   }
 
   try {
-    const student = await Student.findByIdAndDelete({ _id: id });
+    const student = await StudentModel.findByIdAndDelete({ _id: id });
     if (!student) {
       return res.status(404).json({
         message: "No account found",
@@ -344,7 +346,7 @@ const updateStudent = async (req, res) => {
       return res.json({ error: "LRN must 12 numbers long" });
     }
 
-    const student = await Student.findByIdAndUpdate(
+    const student = await StudentModel.findByIdAndUpdate(
       { _id: id },
       { ...req.body }
     ); // Update credentials in database
@@ -479,19 +481,29 @@ const addUser = async (req, res) => {
       email,
       password: hashedPassword,
       role,
+      verified: false,
     });
 
-    const savedUser = await user.save();
+    await user.save();
 
-    // Send verification email
-    await sendVerificationEmail(savedUser, res);
+    // If role is Teacher, save to TeacherModel
+    if (role === "Teacher") {
+      const teacher = new Teacher({
+        UserID: user.UserID,
+        email: user.email,
+        createdAt: new Date(),
+      });
+
+      await teacher.save();
+      console.log("Teacher saved successfully");
+    }
 
     // Send plain password via credentials email
     await sendCredentialEmail({ email, password, role }, res);
 
     res.json({
       status: "SUCCESS",
-      message: "User created successfully, verification email sent",
+      message: "User created successfully",
     });
   } catch (error) {
     console.error("Error adding user:", error);
@@ -583,20 +595,27 @@ const deleteUser = async (req, res) => {
   const { email } = req.params;
 
   try {
+    // Step 1: Find and delete the user by email
     const user = await User.findOneAndDelete({ email });
 
-    if (user) {
-      res.status(200).json({
-        message: "User deleted successfully",
-        user,
-      });
-    } else {
-      return res.status(404).json({
+    if (!user) {
+      return res.json({
         message: "No User found with this email",
       });
     }
+
+    // Step 2: Find and delete the parent if the user's email matches
+    const teacher = await Teacher.findOne({ email });
+
+    // Step 6: Respond with success message after deletion
+    res.json({
+      message: "User and associated data deleted successfully",
+      user,
+      parentDeleted: !!teacher,
+    });
   } catch (error) {
-    res.status(500).json({
+    // Error handling
+    res.json({
       message: error.message,
     });
   }

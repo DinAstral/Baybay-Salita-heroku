@@ -187,7 +187,11 @@ const BodyAdminViewAssessment = () => {
         )}
 
         <div className="mt-6">
-          <Button color="primary" onPress={() => navigate(-1)} className="my-4">
+          <Button
+            color="primary"
+            onPress={() => navigate("/adminStudentAssessment")}
+            className="my-4"
+          >
             Back
           </Button>
         </div>

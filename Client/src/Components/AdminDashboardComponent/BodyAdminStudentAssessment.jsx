@@ -139,6 +139,7 @@ const BodyAdminStudentAssessment = () => {
         show={modalShowSubmit}
         activity={selectedActivity}
         onHide={() => setModalShowSubmit(false)}
+        onDeleteSuccess={refreshActivities}
       />
       <div className="content-title-header">
         <div>
@@ -269,7 +270,7 @@ const BodyAdminStudentAssessment = () => {
                               View
                             </Button>
                             <Button
-                              color="danger"
+                              className="bg-[#ff505b] text-white"
                               onClick={() => {
                                 setSelectedActivity(activity);
                                 setModalShowSubmit(true);

@@ -342,9 +342,9 @@ const importWord = async (req, res) => {
 
   wordUpload(req, res, async function (err) {
     if (err instanceof multer.MulterError) {
-      return res.status(400).json({ error: `Multer Error: ${err.message}` });
+      return res.json({ error: `Multer Error: ${err.message}` });
     } else if (err) {
-      return res.status(400).json({ error: `Error: ${err.message}` });
+      return res.json({ error: `Error: ${err.message}` });
     }
 
     try {
