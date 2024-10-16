@@ -123,26 +123,30 @@ const BodyAdminAddUser = () => {
   const addUser = async (e) => {
     e.preventDefault();
 
+    // Ensure that only the necessary fields (like strings) are included
+    const { FirstName, LastName, email, password, role } = data; // Ensure data contains only form inputs
+
     if (!validateInputs()) {
       toast.error("Please fill out the form correctly.");
       return;
     }
 
-    const UserID = generateRandomCode(data.role, 6);
+    const UserID = generateRandomCode(role, 6);
 
     try {
       const response = await axios.post("/api/addUser", {
         UserID,
-        FirstName: data.FirstName,
-        LastName: data.LastName,
-        email: data.email,
-        password: data.password,
-        role: data.role,
+        FirstName,
+        LastName,
+        email,
+        password,
+        role, // Only primitives being sent
       });
 
       if (response.data.error) {
         toast.error(response.data.error);
       } else {
+        // Reset the form state
         setData({
           UserID: "",
           FirstName: "",
