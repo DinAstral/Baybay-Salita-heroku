@@ -17,6 +17,7 @@ let transporter = nodemailer.createTransport({
   },
 });
 
+// Send verification email
 const sendVerificationEmail = async ({ UserID, email }, res) => {
   try {
     const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
@@ -26,45 +27,43 @@ const sendVerificationEmail = async ({ UserID, email }, res) => {
       to: email,
       subject: "Verify Your Email",
       html: `<p><i>Mabuhay!</i></p>
-              <p>We received a registration request to your account. To verify your account, please use the following One-Time Password (OTP) code.</p>
+              <p>We received a registration request for your account. To verify your account, please use the following One-Time Password (OTP) code.</p>
               <h3>OTP: ${otp}</h3>
               <p>This code will <b>expire in 1 hour.</b></p>
-              <p>Please enter this code on the OTP verification page to complete the process. If you didn't initiate this request, please disregard this email.</p>
-              <p>If you need any assistance, please don't hesitate to contact our team.</p>
+              <p>If you didn't initiate this request, please disregard this email.</p>
               <p>Thank you.</p>
               <br>
               <p>Best regards,<br>
-              <b>BaybaySalita</b>`,
+              <b>BaybaySalita</b></p>`,
     };
 
-    const saltrounds = 10;
-
+    // Hash OTP
     const hashedOTP = await bcrypt.hash(otp, saltrounds);
-    const newOTPVerification = await new UserOTPVerification({
+
+    // Save OTP to DB
+    const newOTPVerification = new UserOTPVerification({
       userId: UserID,
       otp: hashedOTP,
       createdAt: Date.now(),
-      expiresAt: Date.now() + 3600000,
+      expiresAt: Date.now() + 3600000, // 1 hour expiration
     });
+
     await newOTPVerification.save();
-    transporter.sendMail(mailOptions);
-    console.log("Success");
-    res.json({
-      status: "PENDING",
-      message: "Verification otp email sent",
-      data: {
-        userId: UserID,
-        email,
-      },
-    });
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+
+    console.log("Verification email sent");
   } catch (error) {
+    console.error("Error sending verification email:", error);
     res.json({
       status: "FAILED",
-      message: error.message,
+      message: "Failed to send verification email",
     });
   }
 };
 
+// Send credential email with plain password
 const sendCredentialEmail = async ({ email, password, role }, res) => {
   try {
     const mailOptions = {
@@ -72,29 +71,26 @@ const sendCredentialEmail = async ({ email, password, role }, res) => {
       to: email,
       subject: "Credentials for Your Account",
       html: `<p><i>Mabuhay!</i></p>
-            <p>You have been created an account for the application. Here's the details of your account for the BAYBAY SALITA System:</p>
+            <p>You have been created an account for the application. Here are your account details for the BAYBAY SALITA System:</p>
             <h3>Email: ${email}</h3>
             <h3>Password: ${password}</h3>
             <h3>Role: ${role}</h3>
-            <p>To verify your account please use these credentials to login and input the verification code that will be given to you.</p>
-            <p>If you need any assistance, please don't hesitate to contact our team.</p>
+            <p>Please use these credentials to log in.</p>
             <p>Thank you.</p>
             <br>
             <p>Best regards,<br>
             <b>Technical Team</b></p>`,
     };
 
-    transporter.sendMail(mailOptions);
-    console.log("Success");
-    res.json({
-      status: "SUCCESS",
-      message: "Credential email sent",
-      data: { email, password },
-    });
+    // Send email
+    await transporter.sendMail(mailOptions);
+
+    console.log("Credential email sent");
   } catch (error) {
+    console.error("Error sending credential email:", error);
     res.json({
       status: "FAILED",
-      message: error.message,
+      message: "Failed to send credential email",
     });
   }
 };
@@ -333,20 +329,7 @@ const updateStudent = async (req, res) => {
   }
 
   try {
-    const {
-      LRN,
-      FirstName,
-      MiddleName,
-      LastName,
-      Age,
-      Level,
-      Section,
-      Birthday,
-      Address,
-      MotherTongue,
-      Nationality,
-      Gender,
-    } = req.body;
+    const { LRN } = req.body;
 
     // Check if name is entered
     if (!LRN) {
@@ -462,31 +445,35 @@ const addUser = async (req, res) => {
   try {
     const { UserID, email, password, role } = req.body;
 
+    // Validate email and required fields
     if (!email) {
       return res.json({ error: "Email is required" });
-    }
-
-    const exist = await User.findOne({ email });
-    if (exist) {
-      return res.json({ error: "Email is already taken" });
     }
 
     if (!password) {
       return res.json({ error: "Password is required" });
     }
 
+    if (!role) {
+      return res.json({ error: "Role is required" });
+    }
+
+    // Check if email already exists
+    const exist = await User.findOne({ email });
+    if (exist) {
+      return res.json({ error: "Email is already taken" });
+    }
+
+    // Validate password
     const passwordError = validatePassword(password);
     if (passwordError) {
       return res.json({ error: passwordError });
     }
 
-    if (!role) {
-      return res.json({ error: "Role is required" });
-    }
-
+    // Hash the password
     const hashedPassword = await hashPassword(password);
 
-    // Create user in database (Table)
+    // Create and save new user
     const user = new User({
       UserID,
       email,
@@ -494,22 +481,21 @@ const addUser = async (req, res) => {
       role,
     });
 
-    user
-      .save()
-      .then((result) => {
-        sendVerificationEmail(result, res);
-        sendCredentialEmail({ email, password, role }, res); // Send plain password
-      })
-      .catch((err) => {
-        console.log(err);
-        res.json({
-          status: "FAILED",
-          message: "An error occurred while saving your account!",
-        });
-      });
+    const savedUser = await user.save();
+
+    // Send verification email
+    await sendVerificationEmail(savedUser, res);
+
+    // Send plain password via credentials email
+    await sendCredentialEmail({ email, password, role }, res);
+
+    res.json({
+      status: "SUCCESS",
+      message: "User created successfully, verification email sent",
+    });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: "Server error" }); // Add proper error response
+    console.error("Error adding user:", error);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
