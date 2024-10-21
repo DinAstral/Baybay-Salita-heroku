@@ -560,10 +560,10 @@ const userInputAudio = async (req, res) => {
         Itemcode10,
       } = req.body;
 
-      // Upload user input audio files to Cloudinary
+      // Upload user input audio files to cloudinary
       const uploadResponse = await cloudinaryUploaderUser(req, res);
 
-      // Get uploaded URLs for each user input audio, or assign empty string if no upload happened
+      // Get uploaded URLs for each user input audio
       const fileUrls = {
         AudioURL1: uploadResponse.uploadAudioUser1
           ? uploadResponse.uploadAudioUser1.secure_url
@@ -619,49 +619,25 @@ const userInputAudio = async (req, res) => {
       // Create an array of items with their corresponding data
       const assessmentItems = itemCodes.map((itemCode, index) => {
         const material = materials.find((m) => m.ItemCode === itemCode);
-        const userAudioURL = fileUrls[`AudioURL${index + 1}`];
-        const wordMatched =
-          req.body[`spokenWord${index + 1}`]?.toLowerCase() ===
-          material?.Word?.toLowerCase();
-
         return {
           ItemCode: itemCode,
           Word: material?.Word || "",
           Audio: material?.Audio || "",
           SecureAudio: material?.SecureAudio || "",
-          UserAudioURL: userAudioURL,
-          SkipComparison: !wordMatched, // If word doesn't match, skip comparison
-          Score: wordMatched ? null : 0, // Set score to 0 if word is incorrect
+          UserAudioURL: fileUrls[`AudioURL${index + 1}`],
         };
       });
 
-      // Filter out the items where comparison is skipped (due to incorrect word)
-      const itemsForComparison = assessmentItems
-        .filter((item) => !item.SkipComparison)
-        .map((item) => item.Audio); // Extract audios for comparison only if valid
-
-      // Run audio comparison for valid items and save results to the database
-      const comparisonScores = await runComparisonAndSaveResult(
+      // Run audio comparison and save the results to the database, get the score
+      const score = await runComparisonAndSaveResult(
         InputID,
         ActivityCode,
         LRN,
         Section,
         Type,
         fileUrls,
-        itemsForComparison
+        assessmentItems.map((item) => item.Audio) // Extract default audios
       );
-
-      // Assign the score for each item after comparison
-      let totalScore = 0;
-      assessmentItems.forEach((item, index) => {
-        if (!item.SkipComparison) {
-          item.Score = comparisonScores[index];
-          totalScore += comparisonScores[index];
-        } else {
-          // Skip evaluation, score remains 0 for this item
-          item.Score = 0;
-        }
-      });
 
       // Prepare the data for insertion into the Performance model
       const performanceData = {
@@ -670,15 +646,14 @@ const userInputAudio = async (req, res) => {
         LRN,
         Section,
         Type,
-        Score: totalScore, // Store the total score
+        Score: score, // Store the total score
         Result: "Submitted",
-        PerformanceItems: assessmentItems.map((item) => ({
+        PerformanceItems: assessmentItems.map((item, index) => ({
           ItemCode: item.ItemCode,
           Word: item.Word,
-          UserAudioURL: item.UserAudioURL || "", // Use empty string if no audio uploaded
+          UserAudioURL: item.UserAudioURL,
           DefaultAudio: item.Audio,
           SecureAudio: item.SecureAudio,
-          Score: item.Score, // Include the score for each item
         })),
       };
 

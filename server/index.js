@@ -10,14 +10,6 @@ const helmet = require("helmet"); // Import Helmet
 
 const app = express();
 
-// Middleware to force HTTPS
-app.use((req, res, next) => {
-  if (req.header("x-forwarded-proto") !== "https") {
-    return res.redirect(`https://${req.header("host")}${req.url}`);
-  }
-  next();
-});
-
 // Enable compression for better performance
 app.use(compression());
 
@@ -43,7 +35,7 @@ app.use(
         connectSrc: [
           "'self'",
           "https://baybay-salita-heroku-8c328f3ddd0f.herokuapp.com",
-          "https://api.your-external-source.com",
+          "https://api.web3forms.com",
         ], // Allow connections to APIs
         frameSrc: ["'self'"], // For iframes (optional, if used)
         childSrc: ["'self'"], // For embedded content (optional)
