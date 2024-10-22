@@ -397,21 +397,18 @@ const BodyAdminStudent = () => {
                           <div className="flex justify-center gap-2">
                             <Button
                               color="default"
-                              size="sm"
                               onClick={() => handleViewClick(student)}
                             >
                               View
                             </Button>
                             <Button
                               color="primary"
-                              size="sm"
                               onClick={() => handleEditClick(student)}
                             >
                               Update
                             </Button>
                             <Button
                               className="bg-[#ff505b] text-white"
-                              size="sm"
                               onClick={() => handleDeleteClick(student)}
                             >
                               Delete

@@ -32,7 +32,7 @@ const EditUser = ({ show, onHide, user }) => {
           <Button variant="light" color="danger" onClick={onHide}>
             Cancel
           </Button>
-          <Link to={`/AdminEditUser/${user?._id}`}>
+          <Link to={`/AdminEditUser/${user?.UserID}`}>
             <Button color="primary">Update</Button>
           </Link>
         </ModalFooter>

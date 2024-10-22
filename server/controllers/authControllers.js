@@ -392,6 +392,24 @@ const getUser = async (req, res) => {
   }
 };
 
+const getUserID = async (req, res) => {
+  const { UserID } = req.params;
+
+  try {
+    const user = await User.findOne({ UserID });
+    if (!user) {
+      return res.json({
+        message: "No account found",
+      });
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 const getAdmin = async (req, res) => {
   const { UserID } = req.params; // Extract UserID from route parameters
 
@@ -513,7 +531,7 @@ const addUser = async (req, res) => {
 
 // Update the data of the Student base on the _id
 const updateUser = async (req, res) => {
-  const { id } = req.params;
+  const { UserID } = req.params;
 
   function validatePassword(password) {
     const minLength = 8;
@@ -541,14 +559,20 @@ const updateUser = async (req, res) => {
     return null; // No error
   }
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({
-      message: "Invalid ID format",
-    });
-  }
-
   try {
-    const { email, password, role } = req.body;
+    const { FirstName, LastName, email, password, role } = req.body;
+
+    if (!FirstName) {
+      return res.json({
+        error: "Password is required",
+      });
+    }
+
+    if (!LastName) {
+      return res.json({
+        error: "Password is required",
+      });
+    }
 
     if (!password) {
       return res.json({
@@ -569,9 +593,11 @@ const updateUser = async (req, res) => {
 
     const hashedPassword = await hashPassword(password);
 
-    const user = await User.findByIdAndUpdate(
-      { _id: id },
+    const user = await User.findOneAndUpdate(
+      { UserID: UserID },
       {
+        FirstName,
+        LastName,
         email,
         password: hashedPassword,
         role,
@@ -604,14 +630,16 @@ const deleteUser = async (req, res) => {
       });
     }
 
-    // Step 2: Find and delete the parent if the user's email matches
-    const teacher = await Teacher.findOne({ email });
+    // Step 2: Find and delete the associated teacher and parent records if they exist
+    const teacherDeleted = await Teacher.findOneAndDelete({ email });
+    const parentDeleted = await ParentModel.findOneAndDelete({ email });
 
     // Step 6: Respond with success message after deletion
     res.json({
       message: "User and associated data deleted successfully",
       user,
-      parentDeleted: !!teacher,
+      teacherDeleted, // Indicates if a teacher was deleted
+      parentDeleted, // Indicates if a parent was deleted
     });
   } catch (error) {
     // Error handling
@@ -645,6 +673,7 @@ module.exports = {
   updateParent,
   addUser,
   getUsers,
+  getUserID,
   getAdmin,
   getUser,
   updateUser,

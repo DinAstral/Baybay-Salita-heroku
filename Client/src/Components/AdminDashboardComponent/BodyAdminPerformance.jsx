@@ -32,7 +32,7 @@ const BodyAdminPerformance = () => {
   const [performances, setPerformance] = useState([]);
   const [selectedPerformance, setSelectedPerformance] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const [usersPerPage] = useState(10);
+  const [usersPerPage] = useState(9);
   const [filteredRoles, setFilteredRoles] = useState([]);
   const [selectedRole, setSelectedRole] = useState("");
   const [selectedType, setSelectedType] = useState("");

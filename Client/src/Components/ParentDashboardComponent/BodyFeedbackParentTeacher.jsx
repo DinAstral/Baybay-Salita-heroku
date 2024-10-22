@@ -62,7 +62,7 @@ const BodyFeedbackParentTeacher = () => {
   }
 
   return (
-    <div className="content-body px-4 md:px-9 py-2">
+    <div className="px-4 md:px-9 py-2">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl md:text-3xl font-semibold">

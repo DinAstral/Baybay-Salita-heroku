@@ -43,7 +43,12 @@ const AdminSidebar = () => {
       <div className="flex flex-col gap-10 px-4 h-11 justify-between">
         {/* Logo Section */}
         <div className="logo-dash pr-1 pt-4">
-          <img src={logo} alt="Baybay Salita Logo" />
+          <img
+            src={logo}
+            alt="Baybay Salita Logo"
+            onClick={() => navigate("/")}
+            className="cursor-pointer"
+          />
         </div>
 
         {/* Separation Line */}

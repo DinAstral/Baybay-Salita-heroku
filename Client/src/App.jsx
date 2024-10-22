@@ -299,7 +299,7 @@ const App = () => {
                 }
               />
               <Route
-                path="/AdminEditUser/:id"
+                path="/AdminEditUser/:UserID"
                 element={
                   <RoleBasedRoute allowedRoles={["Admin"]}>
                     <AdminEditUser />

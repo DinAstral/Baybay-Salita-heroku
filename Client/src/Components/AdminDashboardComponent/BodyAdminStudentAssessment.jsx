@@ -15,6 +15,7 @@ import { useDownloadExcel } from "react-export-table-to-excel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo, faPrint } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
+import ReactPaginate from "react-paginate"; // Import ReactPaginate
 import "../ContentDasboard/Content.css";
 import PrintRecord from "../Modals/PrintRecord";
 import ImportWord from "../Modals/importWord";
@@ -36,6 +37,9 @@ const BodyAdminStudentAssessment = () => {
   const [modalShowSubmit, setModalShowSubmit] = useState(false);
   const [selectedType, setSelectedType] = useState("");
 
+  const [currentPage, setCurrentPage] = useState(0); // ReactPaginate uses 0-indexed pages
+  const [rowsPerPage] = useState(9); // Number of rows per page
+
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
@@ -53,6 +57,7 @@ const BodyAdminStudentAssessment = () => {
       .then((response) => {
         setActivities(response.data);
         setFilteredActivities(response.data);
+        setCurrentPage(0); // Reset to first page after data load
       })
       .catch((err) => console.log(err));
   };
@@ -108,6 +113,21 @@ const BodyAdminStudentAssessment = () => {
     }
 
     setFilteredActivities(filtered);
+    setCurrentPage(0); // Reset to first page after filtering
+  };
+
+  // Pagination logic
+  const indexOfLastItem = currentPage * rowsPerPage + rowsPerPage;
+  const indexOfFirstItem = currentPage * rowsPerPage;
+  const currentActivities = filteredActivities.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  const pageCount = Math.ceil(filteredActivities.length / rowsPerPage);
+
+  const handlePageClick = (event) => {
+    setCurrentPage(event.selected); // Update the current page based on user click
   };
 
   return (
@@ -251,7 +271,7 @@ const BodyAdminStudentAssessment = () => {
                     <TableColumn className="text-center">Actions</TableColumn>
                   </TableHeader>
                   <TableBody emptyContent={"No rows to display."}>
-                    {filteredActivities.map((activity) => (
+                    {currentActivities.map((activity) => (
                       <TableRow key={activity._id}>
                         <TableCell>{activity.ActivityCode}</TableCell>
                         <TableCell>{activity.Period}</TableCell>
@@ -284,6 +304,22 @@ const BodyAdminStudentAssessment = () => {
                     ))}
                   </TableBody>
                 </Table>
+              </div>
+
+              {/* ReactPaginate controls */}
+              <div className="pagination-controls">
+                <ReactPaginate
+                  previousLabel={"Previous"}
+                  nextLabel={"Next"}
+                  breakLabel={"..."}
+                  breakClassName={"break-me"}
+                  pageCount={pageCount}
+                  marginPagesDisplayed={2}
+                  pageRangeDisplayed={9}
+                  onPageChange={handlePageClick}
+                  containerClassName={"pagination"}
+                  activeClassName={"active"}
+                />
               </div>
             </div>
           </div>

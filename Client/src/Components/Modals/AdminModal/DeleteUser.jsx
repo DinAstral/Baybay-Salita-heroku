@@ -26,7 +26,7 @@ const DeleteSuccess = ({ show, onHide }) => (
         Delete User Successful
       </ModalHeader>
       <ModalBody>
-        <p>You have deleted the User information.</p>
+        <p>You have successfully deleted the User's information.</p>
       </ModalBody>
       <ModalFooter>
         <Button color="danger" onClick={onHide}>
@@ -42,9 +42,20 @@ const DeleteUser = ({ show, onHide, user, onDeleteSuccess }) => {
 
   const deleteUser = async () => {
     try {
-      await axios.delete(`/api/deleteUser/${user.email}`);
-      setModalDeleteSuccess(true);
-      onDeleteSuccess();
+      // Make sure user.email exists and is correct
+      if (!user || !user.email) {
+        toast.error("User not found.");
+        return;
+      }
+
+      const response = await axios.delete(`/api/deleteUser/${user.email}`);
+      if (response.status === 200) {
+        // Check if the deletion was successful
+        setModalDeleteSuccess(true);
+        onDeleteSuccess();
+      } else {
+        toast.error("Failed to delete user. Please try again.");
+      }
     } catch (err) {
       console.error("Error deleting user:", err);
       toast.error("Failed to delete user. Please try again later.");
@@ -88,12 +99,12 @@ const DeleteUser = ({ show, onHide, user, onDeleteSuccess }) => {
   );
 };
 
-// Add prop types validation
+// Ensure you handle prop types
 DeleteUser.propTypes = {
   show: PropTypes.bool.isRequired,
   onHide: PropTypes.func.isRequired,
   onDeleteSuccess: PropTypes.func.isRequired,
-  user: PropTypes.object,
+  user: PropTypes.object, // Consider making this more specific if possible
 };
 
 export default DeleteUser;

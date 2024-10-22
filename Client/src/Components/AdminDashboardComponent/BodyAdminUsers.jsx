@@ -75,11 +75,22 @@ const BodyAdminUsers = () => {
     sheet: "Users",
   });
 
-  // Fetch users data
+  // Fetch teacher and parent data
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("/api/users");
-      setUsers(response.data);
+      const [teachers, parents] = await Promise.all([
+        axios.get("/api/getTeacher"),
+        axios.get("/api/getParent"),
+      ]);
+      const teacherData = teachers.data.map((teacher) => ({
+        ...teacher,
+        role: "Teacher",
+      }));
+      const parentData = parents.data.map((parent) => ({
+        ...parent,
+        role: "Parent",
+      }));
+      setUsers([...teacherData, ...parentData]);
     } catch (err) {
       console.error(err);
     }
@@ -206,7 +217,7 @@ const BodyAdminUsers = () => {
             <SelectItem key="Teacher">Teacher</SelectItem>
           </Select>
 
-          <div className="w-full md:w-[40%] flex items-center mt-4 md:mt-0">
+          <div className="w-full md:w-[40%] flex items-center mt-4 md:mt-4">
             <Input
               variant="bordered"
               type="text"
@@ -224,7 +235,7 @@ const BodyAdminUsers = () => {
             />
           </div>
 
-          <div className="mt-4 md:mt-0">
+          <div className="mt-4 md:mt-4">
             <Button
               color="primary"
               className="w-full md:w-[120px] text-md"
@@ -252,7 +263,7 @@ const BodyAdminUsers = () => {
             </TableHeader>
             <TableBody emptyContent={"No rows to display."}>
               {currentUsers.map((user) => (
-                <TableRow key={user._id}>
+                <TableRow key={user.UserID}>
                   <TableCell>{user.UserID}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.role}</TableCell>
@@ -282,10 +293,10 @@ const BodyAdminUsers = () => {
                       </Button>
                       <Button
                         className="bg-[#ff505b] text-white"
-                        onClick={() =>
-                          setSelectedUser(user) ||
-                          handleModalStateChange("delete", true)
-                        }
+                        onClick={() => {
+                          setSelectedUser(user);
+                          handleModalStateChange("delete", true);
+                        }}
                       >
                         Delete
                       </Button>
@@ -301,10 +312,12 @@ const BodyAdminUsers = () => {
           pageCount={Math.ceil(filteredUsers.length / usersPerPage)}
           onPageChange={handlePageClick}
           containerClassName={"flex justify-center mt-4 space-x-2"}
-          activeClassName={"text-white bg-blue-600 px-3 py-1 rounded"}
-          pageLinkClassName={"px-2 py-1 border rounded hover:bg-gray-200"}
-          previousLinkClassName={"px-2 py-1 border rounded"}
-          nextLinkClassName={"px-2 py-1 border rounded"}
+          activeClassName={
+            "text-white bg-blue-600 hover:bg-gray-200 px-3 py-1 rounded"
+          }
+          pageLinkClassName={"px-2 py-1 rounded"}
+          previousLinkClassName={"px-2 py-1  rounded"}
+          nextLinkClassName={"px-2 py-1 rounded"}
         />
       </div>
     </div>

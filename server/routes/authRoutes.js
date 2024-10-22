@@ -17,6 +17,7 @@ const {
   getProfile,
   updateParent,
   deleteUser,
+  getUserID,
 } = require("../controllers/authControllers");
 
 const {
@@ -124,11 +125,12 @@ router.post("/userInputSentence", userInputSentence); //okay
 // Admin Routes
 router.post("/addUser", addUser); //okay
 router.get("/users", getUsers); //okay
+router.get("/getUserID/:UserID", getUserID); //okay
 router.get("/getUser/:id", getUser); //okay
 router.get("/getAdmin/:UserID", getAdmin); //okay
 router.patch("/updateUser/:id", updateUser);
 router.delete("/deleteUser/:email", deleteUser); //okay
-router.get("/profile", getProfile); //okay updateAdmin
+router.get("/profile", getProfile); //okay updateAdmin getUserID
 
 router.patch("/updateAdmin/:UserID", updateAdmin); //okay
 router.patch("/updateTeacher/:UserID", updateTeacher); //okay

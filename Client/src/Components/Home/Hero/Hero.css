@@ -32,7 +32,7 @@
     margin-left: 10px;
 }
 
-/* ------ media query ------ */
+/* ------ media queries ------ */
 
 @media (max-width: 850px) {
     .hero-text h1 {
@@ -41,6 +41,13 @@
 }
 
 @media (max-width: 650px) {
+    .hero {
+        background: url('../../../assets/Login_Right.png');
+        /* Removes background image */
+        background-color: #f0f0f0;
+        /* Adds a light background color instead */
+    }
+
     .hero-text h1 {
         font-size: 30px;
         max-width: 400px;

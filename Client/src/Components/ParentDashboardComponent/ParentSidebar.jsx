@@ -35,7 +35,12 @@ const ParentSidebar = () => {
     <>
       <div className="flex flex-col gap-10 px-4 h-11 justify-between">
         <div className="logo-dash pr-1">
-          <img src={logo} alt="Baybay Salita Logo" />
+          <img
+            src={logo}
+            alt="Baybay Salita Logo"
+            onClick={() => navigate("/")}
+            className="cursor-pointer"
+          />
         </div>
 
         {/* Separation Line */}
