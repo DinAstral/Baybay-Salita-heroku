@@ -13,7 +13,7 @@ const app = express();
 // Enable compression for better performance
 app.use(compression());
 
-/*/ Apply security headers using Helmet
+// Apply security headers using Helmet
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -67,7 +67,7 @@ app.use((req, res, next) => {
     "geolocation=(self), camera=(), microphone=()"
   ); // Adjust as needed
   next();
-}); */
+});
 
 // Database connection
 const uri = process.env.MONGODB_URI;
@@ -100,7 +100,7 @@ app.use((err, req, res, next) => {
   res.status(500).send("Something went wrong!");
 });
 
-/*/ Serve static files from the client build (React Vite build)
+// Serve static files from the client build (React Vite build)
 app.use(express.static(path.join(__dirname, "../Client/dist")));
 
 // Catch-all route to serve the React app (if no API route matches)
@@ -110,7 +110,7 @@ app.get("*", (req, res) => {
       res.status(500).send(err);
     }
   });
-}); */
+});
 
 // Start the server on the specified port
 const port = process.env.PORT || 5000;
