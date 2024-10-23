@@ -72,8 +72,8 @@ const BodyAdminUsers = () => {
   // Export all data except the "Actions" column
   const { onDownload } = useDownloadExcel({
     currentTableRef: tableRef.current,
-    filename: "Performance_List_Report",
-    sheet: "Performance",
+    filename: "User_List_Report",
+    sheet: "User",
     data: users.map(({ _id, ...rest }) => rest), // Exclude "Actions" from the Excel export
   });
 
