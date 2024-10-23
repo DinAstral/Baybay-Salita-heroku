@@ -19,10 +19,8 @@ import axios from "axios";
 import "../ContentDasboard/Content.css";
 
 import PrintRecord from "../Modals/PrintRecord";
-import ViewStudent from "../Modals/AdminModal/ViewStudent";
-import UpdateStudent from "../Modals/AdminModal/UpdateStudent";
-import DeletePerformance from "../Modals/DeletePerformance";
 import ViewPerformance from "../Modals/ViewPerformance";
+import DeletePerformance from "../Modals/DeletePerformance";
 
 const BodyAdminPerformance = () => {
   const [modalShowPrint, setModalShowPrint] = useState(false);
@@ -39,10 +37,12 @@ const BodyAdminPerformance = () => {
 
   const tableRef = useRef(null);
 
+  // Export all data except the "Actions" column
   const { onDownload } = useDownloadExcel({
     currentTableRef: tableRef.current,
-    filename: "Performance_List_Report_table",
+    filename: "Performance_List_Report",
     sheet: "Performance",
+    data: performances.map(({ _id, ...rest }) => rest), // Exclude "Actions" from the Excel export
   });
 
   const refreshActivities = () => {
@@ -241,6 +241,7 @@ const BodyAdminPerformance = () => {
                     <TableColumn>Type</TableColumn>
                     <TableColumn>Score</TableColumn>
                     <TableColumn>Result</TableColumn>
+                    {/* We are keeping "Actions" in the UI but excluding it from the Excel export */}
                     <TableColumn className="text-center">Actions</TableColumn>
                   </TableHeader>
                   <TableBody emptyContent={"No rows to display."}>

@@ -11,7 +11,7 @@ import {
   Button,
 } from "@nextui-org/react";
 
-const ShowStatus = ({ show, onHide, status, comment }) => (
+const ShowStatus = ({ show, onHide, status, comment, recommendation }) => (
   <Modal
     isOpen={show}
     onClose={onHide}
@@ -25,6 +25,7 @@ const ShowStatus = ({ show, onHide, status, comment }) => (
         <p>Status: {status ? status : "Status not available"}</p>{" "}
         {/* Display the status */}
         <p>Comment: {comment}</p> {/* Display the comment */}
+        <p>Recommendation: {recommendation}</p>
       </ModalBody>
       <ModalFooter>
         <Button color="primary" onClick={onHide}>

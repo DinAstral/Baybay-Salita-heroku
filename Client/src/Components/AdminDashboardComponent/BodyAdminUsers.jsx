@@ -69,10 +69,12 @@ const BodyAdminUsers = () => {
   const [selectedRole, setSelectedRole] = useState("default");
 
   const tableRef = useRef(null);
+  // Export all data except the "Actions" column
   const { onDownload } = useDownloadExcel({
     currentTableRef: tableRef.current,
-    filename: "Users table",
-    sheet: "Users",
+    filename: "Performance_List_Report",
+    sheet: "Performance",
+    data: users.map(({ _id, ...rest }) => rest), // Exclude "Actions" from the Excel export
   });
 
   // Fetch teacher and parent data
@@ -159,7 +161,7 @@ const BodyAdminUsers = () => {
         onDeleteSuccess={fetchUsers}
       />
 
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6 px-2">
         <div className="text-2xl md:text-3xl font-semibold">
           Manage User
           <Tooltip
@@ -193,15 +195,14 @@ const BodyAdminUsers = () => {
           >
             <FontAwesomeIcon
               icon={faPrint}
-              size="1x"
-              className="ml-2 cursor-pointer text-lg"
+              className=" pr-10 cursor-pointer text-lg size-8"
               onClick={() => handleModalStateChange("print", true)}
             />
           </Tooltip>
         </div>
       </div>
 
-      <div className="max-w-full bg-white p-4 md:p-6 rounded-lg">
+      <div className="max-w-full min-h-[75vh] bg-white p-4 md:p-6 rounded-3xl">
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <Select
             labelPlacement="outside"

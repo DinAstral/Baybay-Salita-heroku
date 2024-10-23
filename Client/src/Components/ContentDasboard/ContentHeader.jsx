@@ -25,18 +25,8 @@ const ContentHeader = () => {
 
   return (
     <div className="w-[100%] px-9">
-      <div className="flex gap-5 flex-between ">
-        <div className="search-box">
-          <FontAwesomeIcon
-            icon={faMagnifyingGlass}
-            size="1x"
-            inverse
-            className="con-icon"
-          />
-          <input type="text" placeholder="Search anything here..." />
-        </div>
-
-        <div className="flex items-center gap-1 justify-end w-[30%]">
+      <div className="flex gap-5 justify-end">
+        <div className="flex items-center gap-1 justify-end">
           <Tooltip
             showArrow={true}
             content={

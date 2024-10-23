@@ -47,10 +47,12 @@ const BodyAssessment = () => {
 
   const tableRef = useRef(null);
 
+  // Export all data except the "Actions" column
   const { onDownload } = useDownloadExcel({
     currentTableRef: tableRef.current,
-    filename: "Student_Assessment_Report_table",
-    sheet: "Assessment",
+    filename: "Performance_List_Report",
+    sheet: "Performance",
+    data: activities.map(({ _id, ...rest }) => rest), // Exclude "Actions" from the Excel export
   });
 
   // Fetch the teacher's section data

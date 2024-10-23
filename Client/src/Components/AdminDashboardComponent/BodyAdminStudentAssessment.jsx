@@ -15,72 +15,51 @@ import { useDownloadExcel } from "react-export-table-to-excel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo, faPrint } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
-import ReactPaginate from "react-paginate"; // Import ReactPaginate
+import ReactPaginate from "react-paginate";
 import "../ContentDasboard/Content.css";
 import PrintRecord from "../Modals/PrintRecord";
-import ImportWord from "../Modals/importWord";
-import DeleteAssessment from "../Modals/DeleteAssessment";
-import ImportSentence from "../Modals/importSentence";
-import ViewAssessment from "../Modals/ViewAssessment";
-import AdminCreateAssessment from "../Modals/AdminModal/AdminCreateAssessment";
 
 const BodyAdminStudentAssessment = () => {
   const [show, setShow] = useState(false);
-  const [modalShowImport, setModalShowImport] = useState(false);
-  const [modalShowView, setModalShowView] = useState(false);
-  const [modalShowImportSentence, setModalShowImportSentence] = useState(false);
   const [modalShowPrint, setModalShowPrint] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [activities, setActivities] = useState([]);
   const [filteredActivities, setFilteredActivities] = useState([]);
   const [selectedRole, setSelectedRole] = useState("");
-  const [modalShowSubmit, setModalShowSubmit] = useState(false);
   const [selectedType, setSelectedType] = useState("");
+  const [allData, setAllData] = useState([]);
 
-  const [currentPage, setCurrentPage] = useState(0); // ReactPaginate uses 0-indexed pages
-  const [rowsPerPage] = useState(9); // Number of rows per page
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [rowsPerPage] = useState(9);
 
   const tableRef = useRef(null);
 
+  // Export without the "Actions" column
   const { onDownload } = useDownloadExcel({
     currentTableRef: tableRef.current,
-    filename: "Student_Assessment_Report_table",
+    filename: "Full_Assessment_Report",
     sheet: "Assessment",
+    data: allData.map(({ _id, ...rest }) => rest), // Exclude "Actions"
   });
 
-  const refreshActivities = () => {
+  const fetchAllData = () => {
     axios
       .get("/api/getAssessments")
       .then((response) => {
         setActivities(response.data);
         setFilteredActivities(response.data);
-        setCurrentPage(0); // Reset to first page after data load
+        setAllData(response.data);
+        setCurrentPage(0);
       })
       .catch((err) => console.log(err));
   };
 
   useEffect(() => {
-    refreshActivities();
+    fetchAllData();
   }, []);
 
   const handlePrintClick = () => {
     setModalShowPrint(true);
-  };
-
-  const handleImportClick = () => {
-    setModalShowImport(true);
-  };
-
-  const handleImportClickSentence = () => {
-    setModalShowImportSentence(true);
-  };
-
-  const handleShowSubmit = (activity) => {
-    setSelectedActivity(activity);
-    setModalShowSubmit(true);
   };
 
   const handleFilterChange = (e, filterType) => {
@@ -113,10 +92,9 @@ const BodyAdminStudentAssessment = () => {
     }
 
     setFilteredActivities(filtered);
-    setCurrentPage(0); // Reset to first page after filtering
+    setCurrentPage(0);
   };
 
-  // Pagination logic
   const indexOfLastItem = currentPage * rowsPerPage + rowsPerPage;
   const indexOfFirstItem = currentPage * rowsPerPage;
   const currentActivities = filteredActivities.slice(
@@ -127,7 +105,7 @@ const BodyAdminStudentAssessment = () => {
   const pageCount = Math.ceil(filteredActivities.length / rowsPerPage);
 
   const handlePageClick = (event) => {
-    setCurrentPage(event.selected); // Update the current page based on user click
+    setCurrentPage(event.selected);
   };
 
   return (
@@ -137,30 +115,7 @@ const BodyAdminStudentAssessment = () => {
         onHide={() => setModalShowPrint(false)}
         print={onDownload}
       />
-      <AdminCreateAssessment
-        show={show}
-        handleClose={handleClose}
-        onSuccess={refreshActivities} // Pass callback to refresh activities on success
-      />
-      <ImportWord
-        show={modalShowImport}
-        onHide={() => setModalShowImport(false)}
-      />
-      <ImportSentence
-        show={modalShowImportSentence}
-        onHide={() => setModalShowImportSentence(false)}
-      />
-      <ViewAssessment
-        show={modalShowView}
-        activity={selectedActivity}
-        onHide={() => setModalShowView(false)}
-      />
-      <DeleteAssessment
-        show={modalShowSubmit}
-        activity={selectedActivity}
-        onHide={() => setModalShowSubmit(false)}
-        onDeleteSuccess={refreshActivities}
-      />
+
       <div className="content-title-header">
         <div>
           Manage Student Assessment
@@ -170,8 +125,7 @@ const BodyAdminStudentAssessment = () => {
               <div className="px-1 py-2">
                 <div className="text-small font-bold">Assessment Table</div>
                 <div className="text-tiny">
-                  This function will view the assessment of the students in each
-                  section.
+                  View detailed assessment reports here.
                 </div>
               </div>
             }
@@ -202,6 +156,7 @@ const BodyAdminStudentAssessment = () => {
           </Tooltip>
         </div>
       </div>
+
       <div className="content-container">
         <div className="row">
           <div className="col">
@@ -232,28 +187,14 @@ const BodyAdminStudentAssessment = () => {
                     value={selectedType}
                   >
                     <SelectItem key="">Select Type of Assessment:</SelectItem>
-                    <SelectItem key="Pagbabaybay">Assessment 1</SelectItem>
-                    <SelectItem key="Pantig">Assessment 2</SelectItem>
-                    <SelectItem key="Salita">Assessment 3</SelectItem>
-                    <SelectItem key="Pagbabasa">Assessment 4</SelectItem>
+                    <SelectItem key="Assessment 1">Assessment 1</SelectItem>
+                    <SelectItem key="Assessment 2">Assessment 2</SelectItem>
+                    <SelectItem key="Assessment 3">Assessment 3</SelectItem>
+                    <SelectItem key="Assessment 4">Assessment 4</SelectItem>
                   </Select>
                 </div>
-                <div className="flex flex-row gap-5 justify-end mt-3">
-                  <Button
-                    auto
-                    onClick={handleImportClickSentence}
-                    color="default"
-                  >
-                    Import Sentence
-                  </Button>
-                  <Button auto onClick={handleImportClick} color="default">
-                    Import Word
-                  </Button>
-                  <Button auto onClick={handleShow} color="primary">
-                    Create Activity
-                  </Button>
-                </div>
               </div>
+
               <div className="card-body scrollable-table scrollable-container">
                 <Table
                   aria-label="Assessment Table"
@@ -268,9 +209,10 @@ const BodyAdminStudentAssessment = () => {
                     <TableColumn>Section</TableColumn>
                     <TableColumn>Type</TableColumn>
                     <TableColumn>Status</TableColumn>
+                    {/* We are keeping the "Actions" column in the UI but excluding from the Excel export */}
                     <TableColumn className="text-center">Actions</TableColumn>
                   </TableHeader>
-                  <TableBody emptyContent={"No rows to display."}>
+                  <TableBody emptyContent={"No activity to display."}>
                     {currentActivities.map((activity) => (
                       <TableRow key={activity._id}>
                         <TableCell>{activity.ActivityCode}</TableCell>
@@ -306,7 +248,6 @@ const BodyAdminStudentAssessment = () => {
                 </Table>
               </div>
 
-              {/* ReactPaginate controls */}
               <div className="pagination-controls">
                 <ReactPaginate
                   previousLabel={"Previous"}

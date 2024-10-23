@@ -40,12 +40,13 @@ const BodyManagePerformance = () => {
   const { user } = useContext(UserContext);
   const [teacherSection, setTeacherSection] = useState(""); // Store teacher's section
 
+  // Export all data except the "Actions" column
   const { onDownload } = useDownloadExcel({
     currentTableRef: tableRef.current,
-    filename: "Performance_List_Report_table",
+    filename: "Performance_List_Report",
     sheet: "Performance",
+    data: performances.map(({ _id, ...rest }) => rest), // Exclude "Actions" from the Excel export
   });
-
   // Fetch the teacher's section data
   useEffect(() => {
     if (user && user.UserID) {
