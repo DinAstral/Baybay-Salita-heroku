@@ -106,7 +106,7 @@ const BodyViewStudent = () => {
                 ? `${data.FirstName} ${data.LastName}`
                 : "Name of the Student"}
             </h2>
-            <h4>{data ? `Section: ${data.Section}` : "Student section"}</h4>
+            <h3>{data ? `Section: ${data.Section}` : "Student section"}</h3>
             <div className="flex flex-col mt-4 text-gray-700">
               <div className="flex items-center gap-2">
                 <FontAwesomeIcon

@@ -155,7 +155,7 @@ const BodyParentProfile = () => {
             <h2 className="text-2xl font-bold">
               {user ? `${user.FirstName} ${user.LastName}` : "Parent Name"}
             </h2>
-            <h4>{user ? user.role : "Role"}</h4>
+            <h3>{user ? user.role : "Role"}</h3>
 
             <div className="flex flex-col mt-4 text-gray-700">
               <div className="flex items-center gap-2">

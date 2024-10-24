@@ -84,9 +84,9 @@ const BodyAdminViewTeacher = () => {
                 ? `${data.FirstName} ${data.LastName}`
                 : "Teacher Name"}
             </h2>
-            <h4>
+            <h3>
               {data.Section ? `Section: ${data.Section}` : "Teacher of section"}
-            </h4>
+            </h3>
             <div className="flex flex-col mt-4 text-gray-700">
               <div className="flex items-center gap-2">
                 <FontAwesomeIcon

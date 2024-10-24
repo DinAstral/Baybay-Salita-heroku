@@ -104,7 +104,7 @@ const BodyInformationKid = () => {
             <h2 className="text-2xl font-bold">
               {`${student.FirstName} ${student.LastName}`}
             </h2>
-            <h4>{`Section: ${student.Section}`}</h4>
+            <h3>{`Section: ${student.Section}`}</h3>
             <div className="flex flex-col mt-4 text-gray-700">
               <div className="flex items-center gap-2">
                 <FontAwesomeIcon

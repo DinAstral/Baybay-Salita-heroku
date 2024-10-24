@@ -145,10 +145,14 @@ const BodyAdminEditUser = () => {
     <div className="container mx-auto px-6 pt-[4rem]">
       <div className="bg-white shadow-md rounded-md px-8 pt-6 pb-8 mb-4 flex flex-col">
         <div className="flex items-center gap-3 mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">
+          <h2
+            id="update-user-info"
+            className="text-2xl font-bold text-gray-800"
+          >
             Update User's Information
           </h2>
           <Tooltip
+            aria-labelledby="update-user-info"
             content={
               <div className="px-1 py-2">
                 <div className="text-sm font-bold">Update Information</div>
@@ -163,6 +167,7 @@ const BodyAdminEditUser = () => {
               icon={faCircleInfo}
               size="lg"
               className="text-gray-600"
+              aria-label="Information icon"
             />
           </Tooltip>
         </div>
@@ -170,8 +175,12 @@ const BodyAdminEditUser = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* First Name */}
             <div className="flex flex-col">
-              <label className="font-medium text-gray-700">First Name</label>
+              <label htmlFor="first-name" className="font-medium text-gray-700">
+                First Name
+              </label>
               <Input
+                id="first-name"
+                aria-label="First Name"
                 underlined
                 type="text"
                 placeholder="Enter First Name"
@@ -186,8 +195,12 @@ const BodyAdminEditUser = () => {
 
             {/* Last Name */}
             <div className="flex flex-col">
-              <label className="font-medium text-gray-700">Last Name</label>
+              <label htmlFor="last-name" className="font-medium text-gray-700">
+                Last Name
+              </label>
               <Input
+                id="last-name"
+                aria-label="Last Name"
                 underlined
                 type="text"
                 placeholder="Enter Last Name"
@@ -200,8 +213,12 @@ const BodyAdminEditUser = () => {
 
             {/* Email */}
             <div className="flex flex-col">
-              <label className="font-medium text-gray-700">Email</label>
+              <label htmlFor="email" className="font-medium text-gray-700">
+                Email
+              </label>
               <Input
+                id="email"
+                aria-label="Email"
                 underlined
                 type="email"
                 placeholder="Enter the User's Email"
@@ -214,8 +231,12 @@ const BodyAdminEditUser = () => {
 
             {/* Password */}
             <div className="flex flex-col">
-              <label className="font-medium text-gray-700">Password</label>
+              <label htmlFor="password" className="font-medium text-gray-700">
+                Password
+              </label>
               <Input
+                id="password"
+                aria-label="Password"
                 underlined
                 type="password"
                 placeholder="Set Password"
@@ -228,8 +249,12 @@ const BodyAdminEditUser = () => {
 
             {/* Role */}
             <div className="flex flex-col">
-              <label className="font-medium text-gray-700">Role</label>
+              <label htmlFor="role" className="font-medium text-gray-700">
+                Role
+              </label>
               <Select
+                id="role"
+                aria-label="Role"
                 placeholder="Select Role"
                 value={data.role}
                 errorMessage={errors.role}
@@ -246,12 +271,13 @@ const BodyAdminEditUser = () => {
             </div>
           </div>
           <div className="flex justify-end mt-6">
-            <Button type="submit" color="primary">
+            <Button type="submit" color="primary" aria-label="Save Changes">
               Save Changes
             </Button>
             <Button
               className="bg-[#ff505b] text-white ml-4"
               onClick={() => navigate(-1)}
+              aria-label="Cancel"
             >
               Cancel
             </Button>

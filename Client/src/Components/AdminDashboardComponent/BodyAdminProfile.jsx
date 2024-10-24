@@ -198,7 +198,7 @@ const BodyAdminProfile = () => {
             <h2 className="text-2xl font-bold">
               {data ? `${data.FirstName} ${data.LastName}` : "Admin Name"}
             </h2>
-            <h4>{data ? data.role : "Position"}</h4>
+            <h3>{data ? data.role : "Position"}</h3>
             <div className="flex flex-col mt-4 text-gray-700">
               <div className="flex items-center gap-2">
                 <FontAwesomeIcon
