@@ -223,8 +223,10 @@ const BodyTeacherDashboard = () => {
         </div>
       </div>
 
-      <div className="mt-6">
-        <h2 className="text-2xl font-semibold mb-4">Student Status</h2>
+      <div className="mt-6 bg-white p-6 rounded-md shadow">
+        <h2 className="text-2xl font-semibold mb-4 items-center flex flex-col">
+          Student Status
+        </h2>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="bg-[#ff505b] rounded-lg shadow-2xl p-4 flex flex-row justify-between">
             <div className="text-white">

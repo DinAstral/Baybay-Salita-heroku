@@ -1,14 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Button,
-  Tooltip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from "@nextui-org/react";
+import { Button, Tooltip } from "@nextui-org/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
@@ -30,10 +21,6 @@ const BodyViewAssessment = () => {
     Items: [],
   });
 
-  // Modal visibility control and media content
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalContent, setModalContent] = useState({ type: "", src: "" });
-
   // Fetch data on mount
   useEffect(() => {
     const fetchData = async () => {
@@ -48,20 +35,20 @@ const BodyViewAssessment = () => {
     fetchData();
   }, [ActivityCode]);
 
-  // Function to open modal with the relevant content
-  const openModal = (type, src) => {
-    setModalContent({ type, src });
-    setModalVisible(true);
-  };
-
-  // Function to close modal
-  const closeModal = () => {
-    setModalVisible(false);
-    setModalContent({ type: "", src: "" });
+  // Function to handle external redirects
+  const handleRedirect = (url, isImage = false) => {
+    if (isImage) {
+      const img = new Image();
+      img.src = url;
+      const newTab = window.open("");
+      newTab.document.write(img.outerHTML);
+    } else {
+      window.open(url, "_blank");
+    }
   };
 
   return (
-    <div className="p-10">
+    <div className="px-9">
       <div className="flex items-center justify-start gap-2 mb-5">
         <h1 className="text-3xl font-semibold">View Assessment</h1>
         <Tooltip
@@ -161,7 +148,7 @@ const BodyViewAssessment = () => {
                             color="primary"
                             size="sm"
                             className="my-2"
-                            onPress={() => openModal("image", item.Image)}
+                            onPress={() => handleRedirect(item.Image, true)}
                           >
                             View Image
                           </Button>
@@ -173,7 +160,7 @@ const BodyViewAssessment = () => {
                             color="primary"
                             size="sm"
                             className="my-2"
-                            onPress={() => openModal("audio", item.Audio)}
+                            onPress={() => handleRedirect(item.Audio)}
                           >
                             Play Audio
                           </Button>
@@ -197,38 +184,6 @@ const BodyViewAssessment = () => {
           </Button>
         </div>
       </div>
-
-      {/* Modal to display either Image or Audio */}
-      <Modal
-        isOpen={modalVisible}
-        onClose={closeModal}
-        width="600px"
-        aria-labelledby="modal-title"
-      >
-        <ModalHeader>
-          <h3 className="text-lg font-semibold">
-            {modalContent.type === "image" ? "View Image" : "Play Audio"}
-          </h3>
-        </ModalHeader>
-        <ModalBody>
-          {modalContent.type === "image" ? (
-            <img
-              src={modalContent.src}
-              alt="Cloudinary Image"
-              style={{ width: "100%", objectFit: "contain" }}
-            />
-          ) : (
-            <audio controls src={modalContent.src} className="w-full">
-              Your browser does not support the audio element.
-            </audio>
-          )}
-        </ModalBody>
-        <ModalFooter>
-          <Button color="danger" variant="light" onPress={closeModal}>
-            Close
-          </Button>
-        </ModalFooter>
-      </Modal>
     </div>
   );
 };

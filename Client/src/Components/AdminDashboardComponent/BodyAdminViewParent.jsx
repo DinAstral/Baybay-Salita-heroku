@@ -144,12 +144,6 @@ const BodyAdminViewParent = () => {
                 </div>
                 <div>
                   <span className="block text-sm text-gray-600">
-                    Nationality:
-                  </span>
-                  <p className="text-gray-800">{data.Nationality || "N/A"}</p>
-                </div>
-                <div>
-                  <span className="block text-sm text-gray-600">
                     Civil Status:
                   </span>
                   <p className="text-gray-800">{data.Status || "N/A"}</p>

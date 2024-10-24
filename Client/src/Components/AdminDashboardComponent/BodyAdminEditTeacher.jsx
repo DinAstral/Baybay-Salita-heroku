@@ -132,7 +132,9 @@ const BodyAdminEditTeacher = () => {
             <label className="font-medium text-gray-700">Department</label>
             <Select
               value={data.Department}
-              onChange={(value) => setData({ ...data, Department: value })}
+              onChange={(value) =>
+                setData({ ...data, Department: e.target.value })
+              }
             >
               <SelectItem key="" disabled>
                 Select Department
@@ -147,7 +149,9 @@ const BodyAdminEditTeacher = () => {
             <label className="font-medium text-gray-700">Section</label>
             <Select
               value={data.Section}
-              onChange={(value) => setData({ ...data, Section: value })}
+              onChange={(value) =>
+                setData({ ...data, Section: e.target.value })
+              }
             >
               <SelectItem key="" disabled>
                 Select Section
@@ -177,7 +181,7 @@ const BodyAdminEditTeacher = () => {
             <label className="font-medium text-gray-700">Gender</label>
             <Select
               value={data.Gender}
-              onChange={(value) => setData({ ...data, Gender: value })}
+              onChange={(value) => setData({ ...data, Gender: e.target.value })}
             >
               <SelectItem key="" disabled>
                 Select Gender

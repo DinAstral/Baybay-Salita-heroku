@@ -60,7 +60,7 @@ const BodyAdminViewPerformance = () => {
   };
 
   return (
-    <div className="p-10">
+    <div className="px-9">
       <AddFeedback
         show={modalShowView}
         onHide={() => setModalShowView(false)}
