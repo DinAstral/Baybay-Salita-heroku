@@ -135,18 +135,19 @@ const BodyTeacherDashboard = () => {
     fetchAssessments();
   }, [user.UserID, teacher.Section]);
 
-  /// Prepare data for the dynamic student performance chart based on LRN
+  const assessmentTypes = ["Pagbabaybay", "Pantig", "Salita", "Pagbabasa"];
+  const maxScores = { Pagbabaybay: 10, Pantig: 10, Salita: 10, Pagbabasa: 5 };
+
   const studentsPerformanceData = students.map((student) => {
     const studentPerformances = performanceCounts.filter(
-      (performance) => performance.LRN === student.LRN // Use LRN to filter performance
+      (performance) => performance.LRN === student.LRN
     );
 
-    // Ensure that we get a score for every assessment type, even if it's not present (default to 0)
-    const scoresByAssessment = assessments.map((assessment) => {
+    const scoresByAssessment = assessmentTypes.map((assessment) => {
       const studentAssessment = studentPerformances.find(
-        (perf) => perf.Type === assessment.Type
+        (perf) => perf.Type === assessment
       );
-      return studentAssessment ? parseInt(studentAssessment.Score, 10) : 0; // Default score 0 if no data
+      return studentAssessment ? parseInt(studentAssessment.Score, 10) : 0;
     });
 
     return {
@@ -368,7 +369,7 @@ const BodyTeacherDashboard = () => {
               xAxis={[
                 {
                   label: "Assessment Type",
-                  data: assessmentLabels,
+                  data: assessmentTypes,
                   scaleType: "band",
                   tickSize: 10,
                 },
@@ -377,15 +378,15 @@ const BodyTeacherDashboard = () => {
                 {
                   label: "Score",
                   min: 0,
-                  max: 10, // Assuming scores are out of 100
+                  max: 10, // Set max score to 10 since it's the highest among assessments
                   tickCount: 6,
                   tickFormat: (value) => Math.floor(value),
                 },
               ]}
               series={studentsPerformanceData.map((studentData) => ({
-                data: studentData.scores, // Array of scores per assessment
-                label: studentData.studentName, // Student name as label
-                color: `#${Math.floor(Math.random() * 16777215).toString(16)}`, // Random color for each student
+                data: studentData.scores,
+                label: studentData.studentName,
+                color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
               }))}
               width={1500}
               height={500}

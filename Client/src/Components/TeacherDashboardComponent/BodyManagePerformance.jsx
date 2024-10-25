@@ -31,7 +31,7 @@ const BodyManagePerformance = () => {
   const [performances, setPerformances] = useState([]);
   const [selectedPerformance, setSelectedPerformance] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const [usersPerPage] = useState(10);
+  const [usersPerPage] = useState(9);
   const [filteredPerformances, setFilteredPerformances] = useState([]);
   const [selectedSection, setSelectedSection] = useState("");
   const [selectedType, setSelectedType] = useState("");

@@ -74,6 +74,7 @@ function Navbar() {
             Contact
           </LinkScroll>
         </li>
+        <li>Download</li>
         {user && (
           <>
             <li>

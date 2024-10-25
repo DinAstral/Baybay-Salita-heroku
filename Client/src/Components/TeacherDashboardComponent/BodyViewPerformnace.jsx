@@ -136,14 +136,14 @@ const BodyViewPerformance = () => {
                         : "border border-red-500"
                     } relative`}
                   >
-                    <p className="text-gray-800">
+                    <p className="text-gray-800 flex justify-start gap-2">
                       <strong>Question {index + 1}:</strong>{" "}
                       {questionObj.Question || "N/A"}
                     </p>
-                    <p className="text-gray-800">
+                    <p className="text-gray-800 flex justify-start gap-7">
                       <strong>Answer:</strong> {questionObj.Answer || "N/A"}
                     </p>
-                    <p className="text-gray-800">
+                    <p className="text-gray-800 flex justify-start gap-5">
                       <strong>Remarks:</strong> {questionObj.Remarks || "N/A"}
                     </p>
 
