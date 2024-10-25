@@ -215,8 +215,9 @@ const runComparisonAndSaveResult = async (
 
       const result = await run(defaultAudioUrl, userAudioUrl);
 
-      // Check the threshold dynamically
-      if (result.weightedSimilarity <= similarityThreshold) {
+      // Check the threshold dynamically and add Remarks
+      const isCorrect = result.weightedSimilarity <= similarityThreshold;
+      if (isCorrect) {
         totalScore += 1;
       }
 
@@ -226,9 +227,11 @@ const runComparisonAndSaveResult = async (
         chromaDistance: result.audioComparison.chromaDistance,
         zcr: result.audioComparison.zcr,
         stentWeightedSimilarity: result.weightedSimilarity,
+        Remarks: isCorrect ? "Correct" : "Incorrect", // Set Remarks based on comparison
       });
     }
 
+    // Save all comparison results to the database
     await CompareModel.create({
       UserInputId,
       ActivityCode,
@@ -238,7 +241,7 @@ const runComparisonAndSaveResult = async (
       Results: comparisonResults,
     });
 
-    return totalScore;
+    return { score: totalScore, resultsWithRemarks: comparisonResults };
   } catch (error) {
     console.error("Error during audio comparison:", error);
     throw error;

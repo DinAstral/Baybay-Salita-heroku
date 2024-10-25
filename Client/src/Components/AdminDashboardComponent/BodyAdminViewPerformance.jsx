@@ -2,7 +2,11 @@ import { useState, useEffect, useContext } from "react";
 import { Button, Tooltip } from "@nextui-org/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCircleInfo,
+  faCheckCircle,
+  faTimesCircle,
+} from "@fortawesome/free-solid-svg-icons";
 
 import { UserContext } from "../../../context/userContext";
 import axios from "axios";
@@ -35,7 +39,7 @@ const BodyAdminViewPerformance = () => {
     ActivityCode: "",
     Type: "",
     PerformanceItems: [],
-    Questions: [],
+    QuestionData: [],
     Score: "",
     TimeRead: "",
   });
@@ -116,24 +120,45 @@ const BodyAdminViewPerformance = () => {
             <h2 className="text-xl font-semibold mb-4">
               Questions and Answers
             </h2>
-            <p className="text-gray-700">
+            <p className="text-gray-700 mb-2">
               <strong>Time Read:</strong> {formatTimeRead(data.TimeRead)}
             </p>
 
-            {data.Questions && data.Questions.length > 0 ? (
+            {data.QuestionData && data.QuestionData.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {data.Questions.map((questionObj, index) => (
+                {data.QuestionData.map((questionObj, index) => (
                   <div
                     key={index}
-                    className="bg-gray-100 p-4 rounded-lg shadow"
+                    className={`p-4 bg-gray-50 rounded-lg shadow ${
+                      questionObj.Remarks === "Correct"
+                        ? "border-2 border-green-500"
+                        : "border-2 border-red-500"
+                    } relative`}
                   >
-                    <p className="text-gray-800">
+                    <p className="text-gray-800 flex justify-start gap-2">
                       <strong>Question {index + 1}:</strong>{" "}
                       {questionObj.Question || "N/A"}
                     </p>
-                    <p className="text-gray-800">
+                    <p className="text-gray-800 flex justify-start gap-7">
                       <strong>Answer:</strong> {questionObj.Answer || "N/A"}
                     </p>
+                    <p className="text-gray-800 flex justify-start gap-5">
+                      <strong>Remarks:</strong> {questionObj.Remarks || "N/A"}
+                    </p>
+
+                    {/* Check or Cross Icon */}
+                    <FontAwesomeIcon
+                      icon={
+                        questionObj.Remarks === "Correct"
+                          ? faCheckCircle
+                          : faTimesCircle
+                      }
+                      className={`absolute top-2 right-2 ${
+                        questionObj.Remarks === "Correct"
+                          ? "text-green-500"
+                          : "text-red-500"
+                      }`}
+                    />
                   </div>
                 ))}
               </div>
@@ -154,13 +179,20 @@ const BodyAdminViewPerformance = () => {
                 {data.PerformanceItems.map((item, index) => (
                   <div
                     key={index}
-                    className="bg-gray-100 p-4 rounded-lg shadow"
+                    className={`p-4 bg-gray-50 rounded-lg shadow ${
+                      item.Remarks === "Correct"
+                        ? "border-2 border-green-500"
+                        : "border-2 border-red-500"
+                    } relative`}
                   >
                     <p className="text-gray-800">
                       <strong>Item Code:</strong> {item.ItemCode}
                     </p>
                     <p className="text-gray-800">
                       <strong>Word:</strong> {item.Word || "N/A"}
+                    </p>
+                    <p className="text-gray-800">
+                      <strong>Remarks:</strong> {item.Remarks || "N/A"}
                     </p>
 
                     {/* Flex container for audio buttons */}
@@ -202,6 +234,19 @@ const BodyAdminViewPerformance = () => {
                           "No default audio available"
                         )}
                       </div>
+                      {/* Check or Cross Icon */}
+                      <FontAwesomeIcon
+                        icon={
+                          item.Remarks === "Correct"
+                            ? faCheckCircle
+                            : faTimesCircle
+                        }
+                        className={`absolute top-2 right-2 ${
+                          item.Remarks === "Correct"
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
+                      />
                     </div>
                   </div>
                 ))}

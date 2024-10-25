@@ -612,9 +612,7 @@ const userInputAudio = async (req, res) => {
       ];
 
       // Fetch words and default audio for each ItemCode from the database
-      const materials = await Material.find({
-        ItemCode: { $in: itemCodes },
-      });
+      const materials = await Material.find({ ItemCode: { $in: itemCodes } });
 
       // Create an array of items with their corresponding data
       const assessmentItems = itemCodes.map((itemCode, index) => {
@@ -628,8 +626,8 @@ const userInputAudio = async (req, res) => {
         };
       });
 
-      // Run audio comparison and save the results to the database, get the score
-      const score = await runComparisonAndSaveResult(
+      // Run audio comparison and save the results to the database, get the score and remarks
+      const { score, resultsWithRemarks } = await runComparisonAndSaveResult(
         InputID,
         ActivityCode,
         LRN,
@@ -648,12 +646,13 @@ const userInputAudio = async (req, res) => {
         Type,
         Score: score, // Store the total score
         Result: "Submitted",
-        PerformanceItems: assessmentItems.map((item, index) => ({
-          ItemCode: item.ItemCode,
-          Word: item.Word,
-          UserAudioURL: item.UserAudioURL,
-          DefaultAudio: item.Audio,
-          SecureAudio: item.SecureAudio,
+        PerformanceItems: resultsWithRemarks.map((result, index) => ({
+          ItemCode: result.ItemCode,
+          Word: assessmentItems[index].Word,
+          UserAudioURL: assessmentItems[index].UserAudioURL,
+          DefaultAudio: assessmentItems[index].Audio,
+          SecureAudio: assessmentItems[index].SecureAudio,
+          Remarks: result.Remarks, // Add Remarks field to PerformanceItems
         })),
       };
 
