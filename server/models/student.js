@@ -16,7 +16,7 @@ const studentSchema = new Schema(
     MotherTongue: String,
     ContactNumber: String,
     Gender: String,
-    picture: String,
+    Picture: String,
     status: String,
     role: String,
   },

@@ -14,6 +14,7 @@ const performanceSchema = new Schema(
     TimeRead: String,
     Score: Object,
     Result: String,
+    QuestionData: Object,
     PerformanceItems: Object,
   },
   { timestamps: true }

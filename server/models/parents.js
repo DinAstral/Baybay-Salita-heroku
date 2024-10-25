@@ -21,7 +21,7 @@ const parentsSchema = new Schema(
     ContactNumber: String,
     Student: Object,
     role: String,
-    picture: String,
+    Picture: String,
     verified: Boolean,
   },
   { timestamps: true }

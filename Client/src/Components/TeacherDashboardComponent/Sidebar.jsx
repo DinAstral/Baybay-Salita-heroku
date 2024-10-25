@@ -77,7 +77,7 @@ const Sidebar = () => {
             </Link>
           ))}
         </div>
-        <div className="px-3 pt-[14rem]">
+        <div className="px-3 pt-[15rem]">
           <Button
             color="error"
             className="w-full text-md font-semibold py-3 rounded-lg shadow-md transition-all duration-150 text-white bg-[#ff505b] hover:bg-red-600"

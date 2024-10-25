@@ -686,7 +686,7 @@ const userInputSentence = async (req, res) => {
   const InputID = generateRandomCodeUser(6);
 
   try {
-    const { Type, LRN, Section, ActivityCode, TimeRead, Score, ItemCode } =
+    const { Type, LRN, Section, ActivityCode, TimeRead, Score, QuestionData } =
       req.body;
 
     // Prepare the data for insertion into the Performance model
@@ -697,6 +697,7 @@ const userInputSentence = async (req, res) => {
       Section,
       Type,
       TimeRead,
+      QuestionData,
       Score,
       Result: "Submitted",
     };

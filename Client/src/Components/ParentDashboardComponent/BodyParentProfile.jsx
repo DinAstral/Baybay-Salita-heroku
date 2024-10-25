@@ -61,6 +61,32 @@ const BodyParentProfile = () => {
     }
   }, [parent.Birthday]);
 
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append("Profile", file);
+      formData.append("role", user.role); // Adjust role according to your user context
+      formData.append("UserID", user.UserID);
+
+      try {
+        const response = await axios.post("/api/profileUpdate", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        if (response.data.message) {
+          setProfileImg(response.data.updatedProfileUrl); // Update profile image URL
+          toast.success("Profile picture updated successfully!");
+        } else if (response.data.error) {
+          toast.error(`Error: ${response.data.error}`);
+        }
+      } catch (error) {
+        toast.error(
+          "Failed to update profile picture. Please try again later."
+        );
+      }
+    }
+  };
+
   const handleEditClick = () => {
     setModalShow(true);
   };
@@ -148,9 +174,14 @@ const BodyParentProfile = () => {
                 className="w-32 h-32 rounded-full"
                 alt="Profile"
               />
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileChange}
+              />
             </label>
           </Tooltip>
-
           <div className="flex-1">
             <h2 className="text-2xl font-bold">
               {user ? `${user.FirstName} ${user.LastName}` : "Parent Name"}
