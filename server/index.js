@@ -36,6 +36,7 @@ app.use(
           "'self'",
           "https://baybay-salita-heroku-8c328f3ddd0f.herokuapp.com",
           "https://api.web3forms.com",
+          "https://baybay-salita-heroku.onrender.com",
         ], // Allow connections to APIs
         frameSrc: ["'self'"], // For iframes (optional, if used)
         childSrc: ["'self'"], // For embedded content (optional)
