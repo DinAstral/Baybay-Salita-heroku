@@ -57,7 +57,7 @@ const RegisterSelect = () => {
                   <Checkbox value="Teacher">Teacher</Checkbox>
                 </CheckboxGroup>
                 {isInvalid && (
-                  <p className="text-red-600 text-sm mt-2">
+                  <p className="text-red-500 text-sm mt-2">
                     Please select exactly one role.
                   </p>
                 )}
