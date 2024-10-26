@@ -27,8 +27,7 @@ app.use(
         ], // Allow inline/eval for certain cases
         styleSrc: [
           "'self'",
-          "'sha256-JgpphxtupW+atTkR3NtSLqsE7EdOykRMk5Dv+tMhcpY='",
-          "'unsafe-inline'", // TailwindCSS and NextUI often use inline styles
+          "'sha256-JgpphxtupW+atTkR3NtSLqsE7EdOykRMk5Dv+tMhcpY='", // TailwindCSS and NextUI often use inline styles
           "https://fonts.googleapis.com", // Allow Google Fonts for NextUI
         ],
         fontSrc: ["'self'", "https://fonts.gstatic.com"], // Allow fonts from Google Fonts
