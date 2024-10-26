@@ -269,7 +269,26 @@ const ParentRegister = () => {
       if (response.data.error) {
         toast.error(response.data.error);
       } else {
-        setData({});
+        setData({
+          FirstName: "",
+          LastName: "",
+          StudentFirstName: "",
+          StudentLastName: "",
+          LRN: "",
+          Birthday: "",
+          Age: "",
+          StudentBirthday: "",
+          StudentAge: "",
+          Gender: "",
+          StudentGender: "",
+          Address: "",
+          Status: "",
+          ContactNumber: "",
+          MotherTongue: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
         toast.success("Register Verification.");
         localStorage.setItem("userId", response.data.data.userId);
         navigate("/verifyEmail");
