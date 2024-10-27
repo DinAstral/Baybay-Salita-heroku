@@ -578,39 +578,28 @@ const registerAdmin = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    const user = await User.findOne({ email });
     if (!email && !password) {
-      return res.json({
-        error: "Email and Password are required.",
-      });
+      return res.json({ error: "Email and Password are required." });
     }
     if (!email) {
-      return res.json({
-        error: "Email is Required.",
-      });
+      return res.json({ error: "Email is Required." });
     }
-    // Validate email format
     if (!emailRegex.test(email)) {
-      return res.json({
-        error: "Invalid email format.",
-      });
+      return res.json({ error: "Invalid email format." });
     }
 
-    // If the user is not found, return an error
+    // Find user by email
+    const user = await User.findOne({ email });
     if (!user) {
-      return res.json({
-        error: "Email does not exist. Please try again.",
-      });
+      return res.json({ error: "Email does not exist. Please try again." });
     }
 
-    // Check if the user is verified
+    // Check if the account is verified
     if (!user.verified) {
       // Send verification email
       await sendVerificationEmail({ UserID: user._id, email: user.email }, res);
-
       return res.json({
         error: "Account is not verified. A verification email has been sent.",
         data: { userId: user._id },
@@ -618,36 +607,31 @@ const loginUser = async (req, res) => {
     }
 
     if (!password) {
-      return res.json({
-        error: "Password is Required.",
-      });
+      return res.json({ error: "Password is Required." });
     }
 
-    //check password match
+    // Check if password matches
     const match = await comparePassword(password, user.password);
-    if (match) {
-      jwt.sign(
-        {
-          email: user.email,
-        },
-        process.env.JWT_SECRET,
-        {},
-        (err, token) => {
-          if (err) {
-            console.error(err);
-            return res.json({ error: "Failed to generate token" });
-          }
-          // Set cookie with token
-          res
-            .cookie("token", token, { httpOnly: true })
-            .json({ success: true, token, role: user.role, user });
-        }
-      );
-    } else if (!match) {
-      res.json({
-        error: "Email and Password doesn't match.",
-      });
+    if (!match) {
+      return res.json({ error: "Email and Password don't match." });
     }
+
+    // Generate JWT token for verified users
+    jwt.sign(
+      { email: user.email },
+      process.env.JWT_SECRET,
+      {},
+      (err, token) => {
+        if (err) {
+          console.error(err);
+          return res.json({ error: "Failed to generate token" });
+        }
+        // Set token cookie and send success response
+        res
+          .cookie("token", token, { httpOnly: true })
+          .json({ success: true, token, role: user.role, user });
+      }
+    );
   } catch (error) {
     console.error(error);
     return res.json({ error: "Server error" });
