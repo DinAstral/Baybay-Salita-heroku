@@ -69,7 +69,7 @@ const BodyInformationKid = () => {
       const formData = new FormData();
       formData.append("Profile", file);
       formData.append("role", user.role);
-      formData.append("LRN", user.LRN);
+      formData.append("LRN", student.LRN);
 
       try {
         const response = await axios.post("/api/profileUpdate", formData, {
