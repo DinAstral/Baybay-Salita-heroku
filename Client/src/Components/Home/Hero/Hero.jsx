@@ -4,7 +4,7 @@ const Hero = () => {
   return (
     <div className="hero">
       <div className="hero-text">
-        <h3>Mabuhay! Ito ang Baybay Salita</h3>
+        <h1>Mabuhay! Ito ang Baybay Salita</h1>
         <p>
           Isang makabago at dynamic na plataporma sa pag-aaral na naglalayong
           pahusayin ang kakayahan sa pag-unawa sa pagbasa ng mga estudyanteng

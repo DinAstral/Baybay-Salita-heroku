@@ -29,12 +29,7 @@ app.use(
         styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"], // Allow Google Fonts for NextUI
         fontSrc: ["'self'", "https://fonts.gstatic.com"], // Allow fonts from Google Fonts
         imgSrc: ["'self'", "data:", "https://res.cloudinary.com"], // Allow images from Cloudinary
-        connectSrc: [
-          "'self'",
-          "https://baybay-salita-heroku-8c328f3ddd0f.herokuapp.com",
-          "https://api.web3forms.com",
-          "https://baybay-salita-heroku.onrender.com",
-        ], // Allow connections to APIs
+        connectSrc: ["'self'", "https://api.web3forms.com"], // Allow connections to APIs
         frameSrc: ["'self'"], // For iframes (optional, if used)
         childSrc: ["'self'"], // For embedded content (optional)
         mediaSrc: ["'self'", "data:", "https://res.cloudinary.com"], // For media content
