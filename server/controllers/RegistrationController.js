@@ -721,8 +721,8 @@ const profileUpdate = async (req, res) => {
     try {
       // Extracting Type, Role, and ID from request body
       const { role, UserID, LRN } = req.body;
-      if (!role || !UserID || !LRN) {
-        return res.json({ error: "Role and User ID are required." });
+      if (!role) {
+        return res.json({ error: "Can't update your profile." });
       }
 
       // Uploading to Cloudinary
