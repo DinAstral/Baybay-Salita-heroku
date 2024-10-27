@@ -68,7 +68,7 @@ const BodyInformationKid = () => {
     if (file) {
       const formData = new FormData();
       formData.append("Profile", file);
-      formData.append("role", user.role);
+      formData.append("role", student.role);
       formData.append("LRN", student.LRN);
 
       try {
