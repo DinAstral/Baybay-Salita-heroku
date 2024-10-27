@@ -48,6 +48,7 @@ const AdminSidebar = () => {
             alt="Baybay Salita Logo"
             onClick={() => navigate("/")}
             className="cursor-pointer"
+            draggable="false"
           />
         </div>
 

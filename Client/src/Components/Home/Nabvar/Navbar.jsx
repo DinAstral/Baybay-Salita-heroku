@@ -28,7 +28,7 @@ function Navbar() {
 
   return (
     <nav className={`container-nav ${sticky ? "dark-nav" : ""}`}>
-      <img src={logo} alt="" className="logo" />
+      <img src={logo} alt="" className="logo" draggable="false" />
       <ul className={mobileMenu ? "" : "hide-mobile-menu"}>
         <li>
           <LinkScroll

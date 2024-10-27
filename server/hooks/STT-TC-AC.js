@@ -51,10 +51,26 @@ const detectSilentOrLowVoiceAudio = (features) => {
   const zcrThreshold = 0.02; // Adjust based on testing
   const energyThreshold = 0.01; // Adjust based on testing
 
+  // Calculate the average ZCR and energy
   const avgZCR = features.zcr.reduce((a, b) => a + b, 0) / features.zcr.length;
   const avgEnergy = features.energy ? features.energy : 0;
 
-  return avgZCR < zcrThreshold && avgEnergy < energyThreshold;
+  // Log the calculated values for debugging
+  console.log("Voice Detection - Average ZCR:", avgZCR);
+  console.log("Voice Detection - Average Energy:", avgEnergy);
+  console.log(
+    "ZCR Threshold:",
+    zcrThreshold,
+    "Energy Threshold:",
+    energyThreshold
+  );
+
+  // Check if the values are below the defined thresholds
+  const isSilentOrLowVoice =
+    avgZCR < zcrThreshold && avgEnergy < energyThreshold;
+  console.log("Is Silent or Low Voice Detected:", isSilentOrLowVoice);
+
+  return isSilentOrLowVoice;
 };
 
 // Function to extract audio features using Meyda
