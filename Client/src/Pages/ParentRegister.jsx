@@ -411,9 +411,7 @@ const ParentRegister = () => {
                     variant="bordered"
                     className="bg-transparent py-1 my-1"
                     value={data.Gender}
-                    onChange={(e) =>
-                      setData({ ...data, Gender: e.target.value })
-                    }
+                    onChange={(e) => setData({ ...data, Gender: e })}
                     errorMessage={errors.Gender}
                     isInvalid={!!errors.Gender}
                   >
@@ -450,9 +448,7 @@ const ParentRegister = () => {
                     variant="bordered"
                     className="bg-transparent py-1 my-1"
                     value={data.Status}
-                    onChange={(e) =>
-                      setData({ ...data, Status: e.target.value })
-                    }
+                    onChange={(e) => setData({ ...data, Status: e })}
                     errorMessage={errors.Status}
                     isInvalid={!!errors.Status}
                   >
@@ -636,9 +632,7 @@ const ParentRegister = () => {
                     variant="bordered"
                     className="bg-transparent py-1 my-1"
                     value={data.StudentGender}
-                    onChange={(e) =>
-                      setData({ ...data, StudentGender: e.target.value })
-                    }
+                    onChange={(e) => setData({ ...data, StudentGender: e })}
                     errorMessage={errors.StudentGender}
                     isInvalid={!!errors.StudentGender}
                   >

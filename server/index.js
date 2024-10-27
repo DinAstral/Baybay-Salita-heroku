@@ -25,11 +25,7 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"], // Allow self-hosted content
-        scriptSrc: [
-          "'self'",
-          (req, res) => `'nonce-${res.locals.nonce}'`,
-          "https://apis.google.com",
-        ], // Allow inline/eval for certain cases
+        scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline/eval for certain cases
         styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"], // Allow Google Fonts for NextUI
         fontSrc: ["'self'", "https://fonts.gstatic.com"], // Allow fonts from Google Fonts
         imgSrc: ["'self'", "data:", "https://res.cloudinary.com"], // Allow images from Cloudinary
