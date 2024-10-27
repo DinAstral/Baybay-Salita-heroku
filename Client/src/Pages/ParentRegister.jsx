@@ -622,8 +622,8 @@ const ParentRegister = () => {
                   variant="bordered"
                   className="bg-transparent py-1 my-1"
                   value={data.StudentGender || ""}
-                  onChange={(value) =>
-                    setData({ ...data, StudentGender: value })
+                  onChange={(e) =>
+                    setData({ ...data, StudentGender: e.target.value })
                   }
                   errorMessage={errors.StudentGender}
                   isInvalid={!!errors.StudentGender}
