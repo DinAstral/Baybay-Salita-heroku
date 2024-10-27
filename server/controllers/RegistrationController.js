@@ -755,7 +755,7 @@ const profileUpdate = async (req, res) => {
           break;
         case "student":
           updatedRecord = await Student.findOneAndUpdate(
-            { LRN: LRN }, // Filter: Find Student with this UserID
+            { LRN: LRN }, // Filter: Find Student with this LRN
             { Picture: profileFile }, // Update: Set new profile picture URL
             { new: true } // Return the updated document
           );
@@ -764,8 +764,8 @@ const profileUpdate = async (req, res) => {
           return res.json({ error: "Invalid role" });
       }
 
-      // Also update the User collection
-      if (updatedRecord) {
+      // Only update the User collection if the role is not "student"
+      if (updatedRecord && role !== "student") {
         await User.findOneAndUpdate(
           { UserID: UserID }, // Filter: Find User with this UserID
           { Picture: profileFile }, // Update: Set new profile picture URL
