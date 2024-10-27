@@ -720,8 +720,8 @@ const profileUpdate = async (req, res) => {
 
     try {
       // Extracting Type, Role, and ID from request body
-      const { role, UserID } = req.body;
-      if (!role || !UserID) {
+      const { role, UserID, LRN } = req.body;
+      if (!role || !UserID || !LRN) {
         return res.json({ error: "Role and User ID are required." });
       }
 
@@ -755,7 +755,7 @@ const profileUpdate = async (req, res) => {
           break;
         case "student":
           updatedRecord = await Student.findOneAndUpdate(
-            { UserID: UserID }, // Filter: Find Student with this UserID
+            { LRN: LRN }, // Filter: Find Student with this UserID
             { Picture: profileFile }, // Update: Set new profile picture URL
             { new: true } // Return the updated document
           );

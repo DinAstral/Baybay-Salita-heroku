@@ -54,7 +54,7 @@ const BodyInformationKid = () => {
         .get(`/api/getStudent/${LRN}`)
         .then((response) => {
           setStudent(response.data);
-          setProfileImgUrl(response.data.profileImage || profile);
+          setProfileImgUrl(response.data.Picture || profile);
         })
         .catch((err) => setError("Failed to load student data."))
         .finally(() => setLoading(false));
@@ -69,7 +69,7 @@ const BodyInformationKid = () => {
       const formData = new FormData();
       formData.append("Profile", file);
       formData.append("role", user.role);
-      formData.append("UserID", user.UserID);
+      formData.append("LRN", user.LRN);
 
       try {
         const response = await axios.post("/api/profileUpdate", formData, {
