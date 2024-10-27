@@ -43,19 +43,28 @@ const Login = () => {
 
         if (responseData.error) {
           // Handle unverified user case
-          if (responseData.data && responseData.data.userId) {
-            localStorage.setItem("userId", responseData.data.userId);
+          if (
+            responseData.error ===
+            "Account is not verified. A verification email has been sent."
+          ) {
+            // Save userId for verification purposes and navigate to verify email page
+            if (responseData.data && responseData.data.userId) {
+              localStorage.setItem("userId", responseData.data.userId);
+            }
             toast.error(responseData.error);
-            navigate("/verify-email");
+            navigate("/verify-email"); // Direct to verification page if unverified
           } else {
+            // Other login errors (e.g., incorrect password)
             toast.error(responseData.error);
           }
         } else {
+          // If no error, proceed with successful login
           localStorage.setItem("token", responseData.token);
           localStorage.setItem("user", JSON.stringify(responseData.user));
           setUser(responseData.user);
           toast.success("Login Successful.");
 
+          // Redirect based on user role
           if (responseData.role === "Parent") {
             navigate("/parentDashboard");
           } else if (responseData.role === "Teacher") {
