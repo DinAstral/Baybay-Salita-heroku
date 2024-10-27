@@ -278,26 +278,7 @@ const ParentRegister = () => {
       if (response.data.error) {
         toast.error(response.data.error);
       } else {
-        setData({
-          FirstName: "",
-          LastName: "",
-          StudentFirstName: "",
-          StudentLastName: "",
-          LRN: "",
-          Birthday: "",
-          Age: "",
-          StudentBirthday: "",
-          StudentAge: "",
-          Gender: "",
-          StudentGender: "",
-          Address: "",
-          Status: "",
-          ContactNumber: "",
-          MotherTongue: "",
-          email: "",
-          password: "",
-          confirmPassword: "",
-        });
+        setData({});
         toast.success("Register Verification.");
         localStorage.setItem("userId", response.data.data.userId);
         navigate("/verifyEmail");
@@ -631,8 +612,8 @@ const ParentRegister = () => {
                       StudentAge: age,
                     }); // Set both birthday and age
                   }}
-                  errorMessage={errors.Birthday}
-                  isInvalid={!!errors.Birthday}
+                  errorMessage={errors.StudentBirthday}
+                  isInvalid={!!errors.StudentBirthday}
                 />
                 <Select
                   label="Student Gender"
