@@ -11,36 +11,44 @@ import {
   Button,
 } from "@nextui-org/react";
 
-const ShowStatus = ({ show, onHide, status, comment, recommendation }) => (
-  <Modal
-    isOpen={show}
-    onClose={onHide}
-    aria-labelledby="contained-modal-title-vcenter"
-    isDismissable={false}
-    isKeyboardDismissDisabled={true}
-  >
-    <ModalContent>
-      <ModalHeader>Assess Student Performance Successfully</ModalHeader>
-      <ModalBody>
-        <p>Status: {status ? status : "Status not available"}</p>{" "}
-        {/* Display the status */}
-        <p>Comment: {comment}</p> {/* Display the comment */}
-        <p>Recommendation: {recommendation}</p>
-      </ModalBody>
-      <ModalFooter>
-        <Button color="primary" onClick={onHide}>
-          Close
-        </Button>
-      </ModalFooter>
-    </ModalContent>
-  </Modal>
-);
+const ShowStatus = ({ show, onHide, status, comment, recommendation }) => {
+  // Select a random recommendation from the array if it's an array
+  const randomRecommendation = Array.isArray(recommendation)
+    ? recommendation[Math.floor(Math.random() * recommendation.length)]
+    : recommendation;
+
+  return (
+    <Modal
+      isOpen={show}
+      onClose={onHide}
+      aria-labelledby="contained-modal-title-vcenter"
+      isDismissable={false}
+      isKeyboardDismissDisabled={true}
+    >
+      <ModalContent>
+        <ModalHeader>Assess Student Performance Successfully</ModalHeader>
+        <ModalBody>
+          <p>Status: {status ? status : "Status not available"}</p>
+          <p>Comment: {comment ? comment : "No comments available"}</p>
+
+          <p>Recommendation:</p>
+          <p>{randomRecommendation || "No recommendations available"}</p>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={onHide}>
+            Close
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+};
 
 const StudentStatus = ({ show, onHide, LRN, onStatusUpdate }) => {
   const [modalSubmitSuccess, setModalSubmitSuccess] = useState(false);
   const [status, setStatus] = useState(""); // State to store the status
   const [comment, setComment] = useState(""); // State to store the comment
-  const [recommendation, setRecommendation] = useState(""); // State to store the comment
+  const [recommendation, setRecommendation] = useState([]); // State to store recommendation(s)
 
   // Handle status update on button click
   const handleAssessClick = async () => {
@@ -89,26 +97,27 @@ const StudentStatus = ({ show, onHide, LRN, onStatusUpdate }) => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
       <ShowStatus
         show={modalSubmitSuccess}
         onHide={() => {
           setModalSubmitSuccess(false);
           onHide();
         }}
-        status={status} // Pass the status to ShowStatus
-        comment={comment} // Pass the comment to ShowStatus
-        recommendation={recommendation} // Pass the recommendation to ShowStatus
+        status={status}
+        comment={comment}
+        recommendation={recommendation} // Pass recommendation to ShowStatus
       />
     </>
   );
 };
 
-// Add prop types validation
+// Prop types validation
 StudentStatus.propTypes = {
   show: PropTypes.bool.isRequired,
   onHide: PropTypes.func.isRequired,
-  LRN: PropTypes.string.isRequired, // Updated prop type for LRN
-  onStatusUpdate: PropTypes.func.isRequired, // Add new prop type for onStatusUpdate
+  LRN: PropTypes.string.isRequired,
+  onStatusUpdate: PropTypes.func.isRequired,
 };
 
 export default StudentStatus;

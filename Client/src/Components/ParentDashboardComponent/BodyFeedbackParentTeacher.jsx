@@ -98,9 +98,9 @@ const BodyFeedbackParentTeacher = () => {
                   <p className="text-lg uppercase font-bold text-primary">
                     {feedback.Title}
                   </p>
-                  <small className="text-default-900">
+                  <h3 className="text-default-900">
                     Assessment Type: {feedback.Type}
-                  </small>
+                  </h3>
                   <h4 className="font-bold text-sm mt-1">
                     Assessment Code: {feedback.ActivityCode}
                   </h4>

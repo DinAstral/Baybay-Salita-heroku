@@ -26,6 +26,7 @@ const BodyAdminViewStudent = () => {
 
   const [modalShowStatus, setModalShowStatus] = useState(false);
   const [modalSubmitSuccess, setModalSubmitSuccess] = useState(false); // Track success modal state
+  const [profileImgUrl, setProfileImgUrl] = useState(profile);
 
   useEffect(() => {
     const fetchStudentData = async () => {
@@ -33,6 +34,7 @@ const BodyAdminViewStudent = () => {
         const studentResponse = await axios.get(`/api/getStudentID/${id}`);
         setData(studentResponse.data);
         setStatus(studentResponse.data.status); // Set the student status
+        setProfileImgUrl(response.data.Picture || profile);
         const performanceResponse = await axios.get(
           `/api/getPerformanceStudent/${studentResponse.data.LRN}`
         );
@@ -99,7 +101,11 @@ const BodyAdminViewStudent = () => {
       <div className="w-full max-w-8xl mx-auto bg-white shadow-lg rounded-lg p-[3rem]">
         {/* Profile Header */}
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-          <LazyProfileImage src={data?.profileImage || profile} alt="Profile" />
+          <LazyProfileImage
+            src={profileImgUrl}
+            className="w-32 h-32 rounded-full"
+            alt="Profile"
+          />
           <div className="flex-1">
             <h2 className="text-2xl font-bold">
               {data

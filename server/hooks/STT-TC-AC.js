@@ -46,6 +46,17 @@ const chunkArray = (arr, chunkSize) => {
   return chunks;
 };
 
+// Function to detect if audio contains significant sound/voice based on ZCR and energy
+const detectSilentOrLowVoiceAudio = (features) => {
+  const zcrThreshold = 0.02; // Adjust based on testing
+  const energyThreshold = 0.01; // Adjust based on testing
+
+  const avgZCR = features.zcr.reduce((a, b) => a + b, 0) / features.zcr.length;
+  const avgEnergy = features.energy ? features.energy : 0;
+
+  return avgZCR < zcrThreshold && avgEnergy < energyThreshold;
+};
+
 // Function to extract audio features using Meyda
 const extractAudioFeatures = async (audioPath) => {
   return new Promise((resolve, reject) => {
@@ -122,7 +133,6 @@ const extractAudioFeatures = async (audioPath) => {
 
 // Function to compare audio features
 const compareAudioFeatures = (features1, features2) => {
-  // Simple comparison by calculating the Euclidean distance between feature vectors
   const euclideanDistance = (vector1, vector2) => {
     const sumSquares = vector1.reduce(
       (acc, val, idx) => acc + Math.pow(val - vector2[idx], 2),
@@ -144,9 +154,9 @@ const compareAudioFeatures = (features1, features2) => {
 
 // Function to compute Stent Weighted Audio Similarity with NaN handling and scaling to 0-100
 const stentWeightedAudioSimilarity = (mfccDistance, chromaDistance, zcr) => {
-  const weightMfcc = 0.5; // Adjust weights as needed
+  const weightMfcc = 0.6; // Adjust weights as needed
   const weightChroma = 0.2;
-  const weightZcr = 0.3;
+  const weightZcr = 0.2;
 
   // Calculate the weighted sum
   let similarityScore =
@@ -158,23 +168,48 @@ const stentWeightedAudioSimilarity = (mfccDistance, chromaDistance, zcr) => {
 // Main comparison function that accepts dynamic audio URLs
 const run = async (defaultAudioUrl, userAudioUrl) => {
   try {
-    // Local file paths for downloaded audio files
-    const audioFile1 = "audio1.wav"; // For the default audio
-    const audioFile2 = "audio2.wav"; // For the user-uploaded audio
+    const audioFile1 = "audio1.wav"; // Default audio
+    const audioFile2 = "audio2.wav"; // User audio, before noise suppression
+    const noiseSuppressedAudio = "noise_suppressed_audio.wav"; // After noise suppression
 
-    // Download the audio files locally
     await downloadAudio(defaultAudioUrl, audioFile1);
     await downloadAudio(userAudioUrl, audioFile2);
 
-    // Extract audio features from both files
-    const features1 = await extractAudioFeatures(audioFile1); // Default audio
-    const features2 = await extractAudioFeatures(audioFile2); // User audio
+    // Noise suppress user audio using FFmpeg
+    await new Promise((resolve, reject) => {
+      ffmpeg(audioFile2)
+        .output(noiseSuppressedAudio)
+        .audioFilters("afftdn=nf=-25") // Adjust filter parameters as needed
+        .on("end", resolve)
+        .on("error", reject)
+        .run();
+    });
 
-    // Compare the extracted audio features
+    const features1 = await extractAudioFeatures(audioFile1); // Default audio
+    const features2 = await extractAudioFeatures(noiseSuppressedAudio); // Noise-suppressed user audio
+
+    deleteFileIfExists(audioFile2);
+    deleteFileIfExists(noiseSuppressedAudio);
+
+    // Check if the user audio contains voice or significant sounds
+    if (detectSilentOrLowVoiceAudio(features2)) {
+      console.log(
+        "No significant sound detected in user audio. Setting similarity score to max."
+      );
+
+      return {
+        audioComparison: {
+          mfccDistance: Infinity,
+          chromaDistance: Infinity,
+          zcr: Infinity,
+        },
+        weightedSimilarity: 100, // Max similarity score for "no match"
+      };
+    }
+
     const audioComparison = compareAudioFeatures(features1, features2);
     console.log("Audio Feature Comparison:", audioComparison);
 
-    // Compute Stent Weighted Audio Similarity
     const weightedSimilarity = stentWeightedAudioSimilarity(
       audioComparison.mfccDistance,
       audioComparison.chromaDistance,
@@ -184,7 +219,6 @@ const run = async (defaultAudioUrl, userAudioUrl) => {
     console.log("Mfcc Distance:", audioComparison.mfccDistance);
     console.log("Stent Weighted Audio Similarity:", weightedSimilarity);
 
-    // Return the comparison results
     return {
       audioComparison,
       weightedSimilarity,
@@ -231,7 +265,6 @@ const runComparisonAndSaveResult = async (
       });
     }
 
-    // Save all comparison results to the database
     await CompareModel.create({
       UserInputId,
       ActivityCode,

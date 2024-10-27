@@ -16,6 +16,7 @@ const BodyAdminViewParent = () => {
   const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(0);
   const { UserID } = useParams();
+  const [profileImgUrl, setProfileImgUrl] = useState(profile);
 
   const [data, setData] = useState({
     _id: "",
@@ -36,6 +37,7 @@ const BodyAdminViewParent = () => {
       .get(`/api/getParent/${UserID}`)
       .then((response) => {
         setData(response.data);
+        setProfileImgUrl(response.data.Picture || profile);
       })
       .catch((err) => {
         toast.error("Failed to fetch parent data. Please try again later.");
@@ -73,7 +75,11 @@ const BodyAdminViewParent = () => {
       <div className="w-full max-w-8xl mx-auto bg-white shadow-lg rounded-lg p-[3rem]">
         {/* Profile Header */}
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-          <img src={profile} className="w-32 h-32 rounded-full" alt="Profile" />
+          <img
+            src={profileImgUrl}
+            className="w-32 h-32 rounded-full"
+            alt="Profile"
+          />
           <div className="flex-1">
             <h2 className="text-2xl font-bold">
               {data ? `${data.FirstName} ${data.LastName}` : "Parent Name: "}
