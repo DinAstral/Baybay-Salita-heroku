@@ -39,7 +39,7 @@ const ParentRegister = () => {
       monthDifference < 0 ||
       (monthDifference === 0 && today.getDate() < birthDate.getDate())
     ) {
-      age--; // If birthday hasn't occurred this year, reduce age by 1
+      age--;
     }
     return age;
   };
@@ -144,16 +144,25 @@ const ParentRegister = () => {
     if (!data.Birthday) {
       newErrors.Birthday = "Birthday is required.";
       isValid = false;
+    } else {
+      const age = calculateAge(data.Birthday);
+      if (age < 18) {
+        newErrors.Birthday = "Parent must be at least 18 years old.";
+        isValid = false;
+      }
     }
+
     if (!data.StudentBirthday) {
       newErrors.StudentBirthday = "Student Birthday is required.";
       isValid = false;
+    } else {
+      const studentAge = calculateAge(data.StudentBirthday);
+      if (studentAge < 5) {
+        newErrors.StudentBirthday = "Student must be at least 5 years old.";
+        isValid = false;
+      }
     }
-    // Age validation: must be >= 5 years old
-    if (data.StudentAge < 5) {
-      newErrors.StudentBirthday = "Age must be at least 5 years old.";
-      isValid = false;
-    }
+
     if (!data.MotherTongue) {
       newErrors.MotherTongue = "MotherTongue is required.";
       isValid = false;
@@ -374,15 +383,15 @@ const ParentRegister = () => {
                   }
                 />
                 <Input
-                  className="pt-2"
+                  name="Birthday"
                   type="date"
                   label="Birthday"
                   variant="bordered"
                   value={data.Birthday}
                   onChange={(e) => {
                     const birthday = e.target.value;
-                    const age = calculateAge(birthday); // Calculate age
-                    setData({ ...data, Birthday: birthday, Age: age }); // Set both birthday and age
+                    const age = calculateAge(birthday);
+                    setData({ ...data, Birthday: birthday, Age: age });
                   }}
                   errorMessage={errors.Birthday}
                   isInvalid={!!errors.Birthday}
@@ -414,7 +423,7 @@ const ParentRegister = () => {
                   variant="bordered"
                   className="bg-transparent py-1 my-1"
                   value={data.Gender || ""}
-                  onChange={(value) => setData({ ...data, Gender: value })}
+                  onChange={(e) => setData({ ...data, Gender: e.target.value })}
                   errorMessage={errors.Gender}
                   isInvalid={!!errors.Gender}
                 >
@@ -448,7 +457,7 @@ const ParentRegister = () => {
                   variant="bordered"
                   className="bg-transparent py-1 my-1"
                   value={data.Status}
-                  onChange={(value) => setData({ ...data, Status: value })}
+                  onChange={(e) => setData({ ...data, Status: e.target.value })}
                   errorMessage={errors.Status}
                   isInvalid={!!errors.Status}
                 >
