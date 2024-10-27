@@ -20,25 +20,28 @@ const BodyFeedbackParentTeacher = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get(`/api/getParent/${user.UserID}`)
-      .then((response) => {
+    const fetchParent = async () => {
+      try {
+        const response = await axios.get(`/api/getParent/${user.UserID}`);
         setParent(response.data);
-      })
-      .catch((err) => {
+      } catch (err) {
         toast.error("Failed to load parent data.");
-      })
-      .finally(() => {
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+    fetchParent();
   }, [user.UserID]);
 
   useEffect(() => {
     const fetchFeedbacks = async () => {
+      if (!parent?.Student?.[0]?.LRN) return;
+
+      setLoading(true);
       try {
         const feedbackResponse = await axios.get(`/api/getFeedbacks`);
         const studentFeedbacks = feedbackResponse.data.filter(
-          (feedback) => feedback.LRN === parent?.Student?.[0]?.LRN
+          (feedback) => feedback.LRN === parent.Student[0].LRN
         );
         setFeedbacks(studentFeedbacks);
       } catch (error) {
@@ -48,10 +51,8 @@ const BodyFeedbackParentTeacher = () => {
       }
     };
 
-    if (parent?.LRN) {
-      fetchFeedbacks();
-    }
-  }, [parent]);
+    fetchFeedbacks();
+  }, [parent?.Student?.[0]?.LRN]);
 
   if (loading) {
     return (
