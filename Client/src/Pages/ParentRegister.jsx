@@ -332,338 +332,338 @@ const ParentRegister = () => {
         <Card>
           <form onSubmit={registerParent}>
             <CardBody>
-              {activeIndex === 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input
-                    type="text"
-                    name="FirstName"
-                    label="First Name"
-                    variant="bordered"
-                    value={data.FirstName}
-                    onChange={(e) =>
-                      setData({ ...data, FirstName: e.target.value })
-                    }
-                    errorMessage={errors.FirstName}
-                    isInvalid={!!errors.FirstName}
-                    endContent={
-                      <FontAwesomeIcon
-                        icon={faUser}
-                        className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                      />
-                    }
-                  />
-                  <Input
-                    type="text"
-                    name="LastName"
-                    label="Last Name"
-                    variant="bordered"
-                    value={data.LastName}
-                    onChange={(e) =>
-                      setData({ ...data, LastName: e.target.value })
-                    }
-                    errorMessage={errors.LastName}
-                    isInvalid={!!errors.LastName}
-                    endContent={
-                      <FontAwesomeIcon
-                        icon={faUser}
-                        className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                      />
-                    }
-                  />
-                  <Input
-                    className="pt-2"
-                    type="date"
-                    label="Birthday"
-                    variant="bordered"
-                    value={data.Birthday}
-                    onChange={(e) => {
-                      const birthday = e.target.value;
-                      const age = calculateAge(birthday); // Calculate age
-                      setData({ ...data, Birthday: birthday, Age: age }); // Set both birthday and age
-                    }}
-                    errorMessage={errors.Birthday}
-                    isInvalid={!!errors.Birthday}
-                  />
-                  <Input
-                    type="text"
-                    name="ContactNumber"
-                    label="Contact Number"
-                    maxLength={11}
-                    variant="bordered"
-                    className="bg-transparent py-1 my-1"
-                    value={data.ContactNumber}
-                    onChange={(e) =>
-                      setData({ ...data, ContactNumber: e.target.value })
-                    }
-                    errorMessage={errors.ContactNumber}
-                    isInvalid={!!errors.ContactNumber}
-                    endContent={
-                      <FontAwesomeIcon
-                        icon={faPhone}
-                        className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                      />
-                    }
-                  />
-                  <Select
-                    label="Gender"
-                    name="Gender"
-                    placeholder="Select your gender"
-                    variant="bordered"
-                    className="bg-transparent py-1 my-1"
-                    value={data.Gender}
-                    onChange={(e) => setData({ ...data, Gender: e })}
-                    errorMessage={errors.Gender}
-                    isInvalid={!!errors.Gender}
-                  >
-                    <SelectItem key="" disabled>
-                      Select Gender
-                    </SelectItem>
-                    <SelectItem key="Male">Male</SelectItem>
-                    <SelectItem key="Female">Female</SelectItem>
-                    <SelectItem key="Other">Other</SelectItem>
-                  </Select>
-                  <Input
-                    type="text"
-                    name="Address"
-                    label="Address"
-                    variant="bordered"
-                    className="bg-transparent py-1 my-1"
-                    value={data.Address}
-                    onChange={(e) =>
-                      setData({ ...data, Address: e.target.value })
-                    }
-                    errorMessage={errors.Address}
-                    isInvalid={!!errors.Address}
-                    endContent={
-                      <FontAwesomeIcon
-                        icon={faLocationDot}
-                        className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                      />
-                    }
-                  />
-                  <Select
-                    label="Status"
-                    name="Status"
-                    placeholder="Select your status"
-                    variant="bordered"
-                    className="bg-transparent py-1 my-1"
-                    value={data.Status}
-                    onChange={(e) => setData({ ...data, Status: e })}
-                    errorMessage={errors.Status}
-                    isInvalid={!!errors.Status}
-                  >
-                    <SelectItem key="" disabled>
-                      Select Status
-                    </SelectItem>
-                    <SelectItem key="Single">Single</SelectItem>
-                    <SelectItem key="Married">Married</SelectItem>
-                    <SelectItem key="Widowed">Widowed</SelectItem>
-                    <SelectItem key="Separated">Separated</SelectItem>
-                    <SelectItem key="Other">Other</SelectItem>
-                  </Select>
-                  <Input
-                    type="text"
-                    name="email"
-                    label="Email"
-                    variant="bordered"
-                    className="bg-transparent py-1 my-1"
-                    value={data.email}
-                    onChange={(e) =>
-                      setData({ ...data, email: e.target.value })
-                    }
-                    errorMessage={errors.email}
-                    isInvalid={!!errors.email}
-                    endContent={
-                      <FontAwesomeIcon
-                        icon={faEnvelope}
-                        className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                      />
-                    }
-                  />
-                  <Input
-                    name="password"
-                    label="Password"
-                    variant="bordered"
-                    className="bg-transparent py-1 my-1"
-                    value={data.password}
-                    onChange={(e) =>
-                      setData({ ...data, password: e.target.value })
-                    }
-                    errorMessage={errors.password}
-                    isInvalid={!!errors.password}
-                    endContent={
-                      <button
-                        className="focus:outline-none"
-                        type="button"
-                        onClick={toggleVisibility}
-                        aria-label="toggle password visibility"
-                      >
-                        {isVisible ? (
-                          <FontAwesomeIcon
-                            icon={faEyeSlash}
-                            className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                          />
-                        ) : (
-                          <FontAwesomeIcon
-                            icon={faEye}
-                            className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                          />
-                        )}
-                      </button>
-                    }
-                    type={isVisible ? "text" : "password"}
-                  />
-                  <Input
-                    name="confirmPassword"
-                    label="Confirm Password"
-                    variant="bordered"
-                    className="bg-transparent py-1 my-1"
-                    endContent={
-                      <button
-                        className="focus:outline-none"
-                        type="button"
-                        onClick={toggleVisibilityConfirm}
-                        aria-label="toggle password visibility"
-                      >
-                        {isVisibleConfirm ? (
-                          <FontAwesomeIcon
-                            icon={faEyeSlash}
-                            className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                          />
-                        ) : (
-                          <FontAwesomeIcon
-                            icon={faEye}
-                            className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                          />
-                        )}
-                      </button>
-                    }
-                    type={isVisibleConfirm ? "text" : "password"}
-                    value={data.confirmPassword}
-                    onChange={(e) =>
-                      setData({ ...data, confirmPassword: e.target.value })
-                    }
-                    errorMessage={errors.confirmPassword}
-                    isInvalid={!!errors.confirmPassword}
-                  />
-                </div>
-              )}
-
-              {activeIndex === 1 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input
-                    type="text"
-                    name="StudentName"
-                    label="Student First Name"
-                    variant="bordered"
-                    className="bg-transparent py-1 my-1"
-                    value={data.StudentFirstName}
-                    onChange={(e) =>
-                      setData({ ...data, StudentFirstName: e.target.value })
-                    }
-                    errorMessage={errors.StudentFirstName}
-                    isInvalid={!!errors.StudentFirstName}
-                    endContent={
-                      <FontAwesomeIcon
-                        icon={faUser}
-                        className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                      />
-                    }
-                  />
-                  <Input
-                    type="text"
-                    name="StudentName"
-                    label="Student Last Name"
-                    variant="bordered"
-                    className="bg-transparent py-1 my-1"
-                    value={data.StudentLastName}
-                    onChange={(e) =>
-                      setData({ ...data, StudentLastName: e.target.value })
-                    }
-                    errorMessage={errors.StudentLastName}
-                    isInvalid={!!errors.StudentLastName}
-                    endContent={
-                      <FontAwesomeIcon
-                        icon={faUser}
-                        className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                      />
-                    }
-                  />
-                  <Input
-                    type="text"
-                    name="LRN"
-                    label="LRN"
-                    variant="bordered"
-                    className="bg-transparent py-1 my-1"
-                    value={data.LRN}
-                    onChange={(e) => setData({ ...data, LRN: e.target.value })}
-                    errorMessage={errors.LRN}
-                    isInvalid={!!errors.LRN}
-                    maxLength={12}
-                    endContent={
-                      <FontAwesomeIcon
-                        icon={faIdCard}
-                        className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                      />
-                    }
-                  />
-                  <Input
-                    className="pt-2"
-                    type="date"
-                    label="Birthday"
-                    variant="bordered"
-                    value={data.StudentBirthday}
-                    onChange={(e) => {
-                      const birthday = e.target.value;
-                      const age = calculateAge(birthday); // Calculate age
-                      setData({
-                        ...data,
-                        StudentBirthday: birthday,
-                        StudentAge: age,
-                      }); // Set both birthday and age
-                    }}
-                    errorMessage={errors.Birthday}
-                    isInvalid={!!errors.Birthday}
-                  />
-                  <Select
-                    label="Gender"
-                    name="Gender"
-                    placeholder="Select your gender"
-                    variant="bordered"
-                    className="bg-transparent py-1 my-1"
-                    value={data.StudentGender}
-                    onChange={(e) => setData({ ...data, StudentGender: e })}
-                    errorMessage={errors.StudentGender}
-                    isInvalid={!!errors.StudentGender}
-                  >
-                    <SelectItem key="" disabled>
-                      Select Gender
-                    </SelectItem>
-                    <SelectItem key="Male">Male</SelectItem>
-                    <SelectItem key="Female">Female</SelectItem>
-                    <SelectItem key="Other">Other</SelectItem>
-                  </Select>
-                  <Input
-                    type="text"
-                    name="MotherTongue"
-                    label="Mother Tongue"
-                    variant="bordered"
-                    className="bg-transparent py-1 my-1"
-                    value={data.MotherTongue}
-                    onChange={(e) =>
-                      setData({ ...data, MotherTongue: e.target.value })
-                    }
-                    errorMessage={errors.MotherTongue}
-                    isInvalid={!!errors.MotherTongue}
-                    endContent={
-                      <FontAwesomeIcon
-                        icon={faUser}
-                        className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
-                      />
-                    }
-                  />
-                </div>
-              )}
+              <div
+                className={`${
+                  activeIndex === 0 ? "block" : "hidden"
+                } grid grid-cols-1 md:grid-cols-2 gap-4`}
+              >
+                <Input
+                  type="text"
+                  name="FirstName"
+                  label="First Name"
+                  variant="bordered"
+                  value={data.FirstName}
+                  onChange={(e) =>
+                    setData({ ...data, FirstName: e.target.value })
+                  }
+                  errorMessage={errors.FirstName}
+                  isInvalid={!!errors.FirstName}
+                  endContent={
+                    <FontAwesomeIcon
+                      icon={faUser}
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                    />
+                  }
+                />
+                <Input
+                  type="text"
+                  name="LastName"
+                  label="Last Name"
+                  variant="bordered"
+                  value={data.LastName}
+                  onChange={(e) =>
+                    setData({ ...data, LastName: e.target.value })
+                  }
+                  errorMessage={errors.LastName}
+                  isInvalid={!!errors.LastName}
+                  endContent={
+                    <FontAwesomeIcon
+                      icon={faUser}
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                    />
+                  }
+                />
+                <Input
+                  className="pt-2"
+                  type="date"
+                  label="Birthday"
+                  variant="bordered"
+                  value={data.Birthday}
+                  onChange={(e) => {
+                    const birthday = e.target.value;
+                    const age = calculateAge(birthday); // Calculate age
+                    setData({ ...data, Birthday: birthday, Age: age }); // Set both birthday and age
+                  }}
+                  errorMessage={errors.Birthday}
+                  isInvalid={!!errors.Birthday}
+                />
+                <Input
+                  type="text"
+                  name="ContactNumber"
+                  label="Contact Number"
+                  maxLength={11}
+                  variant="bordered"
+                  className="bg-transparent py-1 my-1"
+                  value={data.ContactNumber}
+                  onChange={(e) =>
+                    setData({ ...data, ContactNumber: e.target.value })
+                  }
+                  errorMessage={errors.ContactNumber}
+                  isInvalid={!!errors.ContactNumber}
+                  endContent={
+                    <FontAwesomeIcon
+                      icon={faPhone}
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                    />
+                  }
+                />
+                <Select
+                  label="Gender"
+                  name="Gender"
+                  placeholder="Select your gender"
+                  variant="bordered"
+                  className="bg-transparent py-1 my-1"
+                  value={data.Gender || ""}
+                  onChange={(value) => setData({ ...data, Gender: value })}
+                  errorMessage={errors.Gender}
+                  isInvalid={!!errors.Gender}
+                >
+                  <SelectItem key="Male">Male</SelectItem>
+                  <SelectItem key="Female">Female</SelectItem>
+                  <SelectItem key="Other">Other</SelectItem>
+                </Select>
+                <Input
+                  type="text"
+                  name="Address"
+                  label="Address"
+                  variant="bordered"
+                  className="bg-transparent py-1 my-1"
+                  value={data.Address}
+                  onChange={(e) =>
+                    setData({ ...data, Address: e.target.value })
+                  }
+                  errorMessage={errors.Address}
+                  isInvalid={!!errors.Address}
+                  endContent={
+                    <FontAwesomeIcon
+                      icon={faLocationDot}
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                    />
+                  }
+                />
+                <Select
+                  label="Status"
+                  name="Status"
+                  placeholder="Select your status"
+                  variant="bordered"
+                  className="bg-transparent py-1 my-1"
+                  value={data.Status}
+                  onChange={(value) => setData({ ...data, Status: value })}
+                  errorMessage={errors.Status}
+                  isInvalid={!!errors.Status}
+                >
+                  <SelectItem key="" disabled>
+                    Select Status
+                  </SelectItem>
+                  <SelectItem key="Single">Single</SelectItem>
+                  <SelectItem key="Married">Married</SelectItem>
+                  <SelectItem key="Widowed">Widowed</SelectItem>
+                  <SelectItem key="Separated">Separated</SelectItem>
+                  <SelectItem key="Other">Other</SelectItem>
+                </Select>
+                <Input
+                  type="text"
+                  name="email"
+                  label="Email"
+                  variant="bordered"
+                  className="bg-transparent py-1 my-1"
+                  value={data.email}
+                  onChange={(e) => setData({ ...data, email: e.target.value })}
+                  errorMessage={errors.email}
+                  isInvalid={!!errors.email}
+                  endContent={
+                    <FontAwesomeIcon
+                      icon={faEnvelope}
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                    />
+                  }
+                />
+                <Input
+                  name="password"
+                  label="Password"
+                  variant="bordered"
+                  className="bg-transparent py-1 my-1"
+                  value={data.password}
+                  onChange={(e) =>
+                    setData({ ...data, password: e.target.value })
+                  }
+                  errorMessage={errors.password}
+                  isInvalid={!!errors.password}
+                  endContent={
+                    <button
+                      className="focus:outline-none"
+                      type="button"
+                      onClick={toggleVisibility}
+                      aria-label="toggle password visibility"
+                    >
+                      {isVisible ? (
+                        <FontAwesomeIcon
+                          icon={faEyeSlash}
+                          className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      ) : (
+                        <FontAwesomeIcon
+                          icon={faEye}
+                          className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      )}
+                    </button>
+                  }
+                  type={isVisible ? "text" : "password"}
+                />
+                <Input
+                  name="confirmPassword"
+                  label="Confirm Password"
+                  variant="bordered"
+                  className="bg-transparent py-1 my-1"
+                  endContent={
+                    <button
+                      className="focus:outline-none"
+                      type="button"
+                      onClick={toggleVisibilityConfirm}
+                      aria-label="toggle password visibility"
+                    >
+                      {isVisibleConfirm ? (
+                        <FontAwesomeIcon
+                          icon={faEyeSlash}
+                          className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      ) : (
+                        <FontAwesomeIcon
+                          icon={faEye}
+                          className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                        />
+                      )}
+                    </button>
+                  }
+                  type={isVisibleConfirm ? "text" : "password"}
+                  value={data.confirmPassword}
+                  onChange={(e) =>
+                    setData({ ...data, confirmPassword: e.target.value })
+                  }
+                  errorMessage={errors.confirmPassword}
+                  isInvalid={!!errors.confirmPassword}
+                />
+              </div>
+              <div
+                className={`${
+                  activeIndex === 1 ? "block" : "hidden"
+                } grid grid-cols-1 md:grid-cols-2 gap-4`}
+              >
+                <Input
+                  type="text"
+                  name="StudentName"
+                  label="Student First Name"
+                  variant="bordered"
+                  className="bg-transparent py-1 my-1"
+                  value={data.StudentFirstName}
+                  onChange={(e) =>
+                    setData({ ...data, StudentFirstName: e.target.value })
+                  }
+                  errorMessage={errors.StudentFirstName}
+                  isInvalid={!!errors.StudentFirstName}
+                  endContent={
+                    <FontAwesomeIcon
+                      icon={faUser}
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                    />
+                  }
+                />
+                <Input
+                  type="text"
+                  name="StudentName"
+                  label="Student Last Name"
+                  variant="bordered"
+                  className="bg-transparent py-1 my-1"
+                  value={data.StudentLastName}
+                  onChange={(e) =>
+                    setData({ ...data, StudentLastName: e.target.value })
+                  }
+                  errorMessage={errors.StudentLastName}
+                  isInvalid={!!errors.StudentLastName}
+                  endContent={
+                    <FontAwesomeIcon
+                      icon={faUser}
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                    />
+                  }
+                />
+                <Input
+                  type="text"
+                  name="LRN"
+                  label="LRN"
+                  variant="bordered"
+                  className="bg-transparent py-1 my-1"
+                  value={data.LRN}
+                  onChange={(e) => setData({ ...data, LRN: e.target.value })}
+                  errorMessage={errors.LRN}
+                  isInvalid={!!errors.LRN}
+                  maxLength={12}
+                  endContent={
+                    <FontAwesomeIcon
+                      icon={faIdCard}
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                    />
+                  }
+                />
+                <Input
+                  className="pt-2"
+                  type="date"
+                  label="Birthday"
+                  variant="bordered"
+                  value={data.StudentBirthday}
+                  onChange={(e) => {
+                    const birthday = e.target.value;
+                    const age = calculateAge(birthday); // Calculate age
+                    setData({
+                      ...data,
+                      StudentBirthday: birthday,
+                      StudentAge: age,
+                    }); // Set both birthday and age
+                  }}
+                  errorMessage={errors.Birthday}
+                  isInvalid={!!errors.Birthday}
+                />
+                <Select
+                  label="Student Gender"
+                  name="StudentGender"
+                  placeholder="Select student gender"
+                  variant="bordered"
+                  className="bg-transparent py-1 my-1"
+                  value={data.StudentGender || ""}
+                  onChange={(value) =>
+                    setData({ ...data, StudentGender: value })
+                  }
+                  errorMessage={errors.StudentGender}
+                  isInvalid={!!errors.StudentGender}
+                >
+                  <SelectItem key="" disabled>
+                    Select Gender
+                  </SelectItem>
+                  <SelectItem key="Male">Male</SelectItem>
+                  <SelectItem key="Female">Female</SelectItem>
+                  <SelectItem key="Other">Other</SelectItem>
+                </Select>
+                <Input
+                  type="text"
+                  name="MotherTongue"
+                  label="Mother Tongue"
+                  variant="bordered"
+                  className="bg-transparent py-1 my-1"
+                  value={data.MotherTongue}
+                  onChange={(e) =>
+                    setData({ ...data, MotherTongue: e.target.value })
+                  }
+                  errorMessage={errors.MotherTongue}
+                  isInvalid={!!errors.MotherTongue}
+                  endContent={
+                    <FontAwesomeIcon
+                      icon={faUser}
+                      className="text-xl md:text-2xl text-default-400 pointer-events-none flex-shrink-0"
+                    />
+                  }
+                />
+              </div>
             </CardBody>
 
             <CardFooter className="flex flex-col md:flex-row justify-center gap-4 mt-6">
