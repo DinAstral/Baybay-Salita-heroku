@@ -37,34 +37,22 @@ const Login = () => {
         password: data.password,
       });
 
-      // Ensure response data exists before processing
       if (response && response.data) {
         const responseData = response.data;
 
         if (responseData.error) {
-          // Handle unverified user case
-          if (
-            responseData.error ===
-            "Account is not verified. A verification email has been sent."
-          ) {
-            // Save userId for verification purposes and navigate to verify email page
-            if (responseData.data && responseData.data.userId) {
-              localStorage.setItem("userId", responseData.data.userId);
-            }
-            toast.error(responseData.error);
-            navigate("/verify-email"); // Direct to verification page if unverified
-          } else {
-            // Other login errors (e.g., incorrect password)
-            toast.error(responseData.error);
+          toast.error(responseData.error);
+          if (responseData.data && responseData.data.userId) {
+            localStorage.setItem("userId", responseData.data.userId);
+            navigate("/verify-email");
           }
         } else {
-          // If no error, proceed with successful login
+          // Successful login actions
           localStorage.setItem("token", responseData.token);
           localStorage.setItem("user", JSON.stringify(responseData.user));
           setUser(responseData.user);
           toast.success("Login Successful.");
 
-          // Redirect based on user role
           if (responseData.role === "Parent") {
             navigate("/parentDashboard");
           } else if (responseData.role === "Teacher") {
@@ -73,12 +61,16 @@ const Login = () => {
             navigate("/AdminDashboard");
           }
         }
-      } else {
-        toast.error("Invalid server response. Please try again.");
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Error occurred while logging in.");
+      console.error("Error in loginUser client:", error);
+      if (error.response && error.response.data) {
+        // Handle expected errors from the server
+        toast.error(error.response.data.error);
+      } else {
+        // Handle unexpected errors
+        toast.error("Unexpected error occurred while logging in.");
+      }
     }
   };
 

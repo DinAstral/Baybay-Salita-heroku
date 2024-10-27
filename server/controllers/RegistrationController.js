@@ -580,43 +580,44 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    // Basic validation
+    // Check if both email and password are provided
     if (!email || !password) {
-      return res.json({ error: "Email and Password are required." });
-    }
-    if (!email) {
-      return res.json({ error: "Email is Required." });
-    }
-    if (!emailRegex.test(email)) {
-      return res.json({ error: "Invalid email format." });
+      return res
+        .status(400)
+        .json({ error: "Email and Password are required." });
     }
 
-    // Find the user
+    // Validate email format
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: "Invalid email format." });
+    }
+
+    // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
-      return res.json({ error: "Email does not exist. Please try again." });
+      return res
+        .status(404)
+        .json({ error: "Email does not exist. Please try again." });
     }
 
-    // Check if the account is verified
+    // Check if the user's email is verified
     if (!user.verified) {
-      await sendVerificationEmail({ UserID: user._id, email: email }, res);
-      return res.json({
+      await sendVerificationEmail({ UserID: user._id, email: user.email });
+      return res.status(403).json({
         error: "Account is not verified. A verification email has been sent.",
         data: { userId: user._id },
       });
     }
 
-    if (!password) {
-      return res.json({ error: "Password is Required." });
+    // Check if the password matches
+    const isMatch = await comparePassword(password, user.password);
+    if (!isMatch) {
+      return res
+        .status(401)
+        .json({ error: "Email and Password do not match." });
     }
 
-    // Check if password matches
-    const match = await comparePassword(password, user.password);
-    if (!match) {
-      return res.json({ error: "Email and Password don't match." });
-    }
-
-    // If password matches and user is verified, generate token
+    // Generate JWT token
     jwt.sign(
       { email: user.email },
       process.env.JWT_SECRET,
@@ -624,17 +625,17 @@ const loginUser = async (req, res) => {
       (err, token) => {
         if (err) {
           console.error(err);
-          return res.json({ error: "Failed to generate token" });
+          return res.status(500).json({ error: "Failed to generate token" });
         }
-        // Set cookie with token and respond with success
+        // Set the token in an HTTP-only cookie and respond with success
         return res
           .cookie("token", token, { httpOnly: true })
           .json({ success: true, token, role: user.role, user });
       }
     );
   } catch (error) {
-    console.error(error);
-    return res.json({ error: "Server error" });
+    console.error("Error in loginUser:", error);
+    return res.status(500).json({ error: "Server error occurred" });
   }
 };
 
