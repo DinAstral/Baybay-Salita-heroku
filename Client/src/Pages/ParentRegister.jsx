@@ -387,6 +387,7 @@ const ParentRegister = () => {
                   type="date"
                   label="Birthday"
                   variant="bordered"
+                  className="bg-transparent py-1 my-1"
                   value={data.Birthday}
                   onChange={(e) => {
                     const birthday = e.target.value;
