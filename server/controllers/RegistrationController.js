@@ -580,7 +580,8 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!email && !password) {
+    // Basic validation
+    if (!email || !password) {
       return res.json({ error: "Email and Password are required." });
     }
     if (!email) {
@@ -590,7 +591,7 @@ const loginUser = async (req, res) => {
       return res.json({ error: "Invalid email format." });
     }
 
-    // Find user by email
+    // Find the user
     const user = await User.findOne({ email });
     if (!user) {
       return res.json({ error: "Email does not exist. Please try again." });
@@ -598,8 +599,7 @@ const loginUser = async (req, res) => {
 
     // Check if the account is verified
     if (!user.verified) {
-      // Send verification email
-      await sendVerificationEmail({ UserID: user._id, email: user.email }, res);
+      await sendVerificationEmail({ UserID: user._id, email: email }, res);
       return res.json({
         error: "Account is not verified. A verification email has been sent.",
         data: { userId: user._id },
@@ -616,7 +616,7 @@ const loginUser = async (req, res) => {
       return res.json({ error: "Email and Password don't match." });
     }
 
-    // Generate JWT token for verified users
+    // If password matches and user is verified, generate token
     jwt.sign(
       { email: user.email },
       process.env.JWT_SECRET,
@@ -626,8 +626,8 @@ const loginUser = async (req, res) => {
           console.error(err);
           return res.json({ error: "Failed to generate token" });
         }
-        // Set token cookie and send success response
-        res
+        // Set cookie with token and respond with success
+        return res
           .cookie("token", token, { httpOnly: true })
           .json({ success: true, token, role: user.role, user });
       }
