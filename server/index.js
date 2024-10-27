@@ -7,11 +7,17 @@ const path = require("path");
 const cloudinary = require("cloudinary").v2;
 const compression = require("compression");
 const helmet = require("helmet"); // Import Helmet
+const crypto = require("crypto");
 
 const app = express();
 
 // Enable compression for better performance
 app.use(compression());
+
+app.use((req, res, next) => {
+  res.locals.nonce = crypto.randomBytes(16).toString("hex");
+  next();
+});
 
 // Apply security headers using Helmet
 app.use(
@@ -21,15 +27,10 @@ app.use(
         defaultSrc: ["'self'"], // Allow self-hosted content
         scriptSrc: [
           "'self'",
-          "'unsafe-inline'",
-          "'unsafe-eval'",
+          (req, res) => `'nonce-${res.locals.nonce}'`,
           "https://apis.google.com",
         ], // Allow inline/eval for certain cases
-        styleSrc: [
-          "'self'",
-          "'sha256-JgpphxtupW+atTkR3NtSLqsE7EdOykRMk5Dv+tMhcpY='", // TailwindCSS and NextUI often use inline styles
-          "https://fonts.googleapis.com", // Allow Google Fonts for NextUI
-        ],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"], // Allow Google Fonts for NextUI
         fontSrc: ["'self'", "https://fonts.gstatic.com"], // Allow fonts from Google Fonts
         imgSrc: ["'self'", "data:", "https://res.cloudinary.com"], // Allow images from Cloudinary
         connectSrc: [
@@ -51,12 +52,12 @@ app.use(
     noSniff: true,
     permissionsPolicy: {
       features: {
-        geolocation: ["'none'"], // Disable geolocation access
-        camera: ["'none'"], // Disable camera access
-        microphone: ["'none'"], // Disable microphone access
-        payment: ["'none'"], // Disable Payment API
-        usb: ["'none'"], // Block access to USB devices
-        accelerometer: ["'none'"], // Disable access to motion sensors
+        geolocation: ["'none'"],
+        camera: ["'none'"],
+        microphone: ["'none'"],
+        payment: ["'none'"],
+        usb: ["'none'"],
+        accelerometer: ["'none'"],
       },
     },
   })
