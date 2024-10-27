@@ -581,29 +581,25 @@ const loginUser = async (req, res) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     // Check if both email and password are provided
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ error: "Email and Password are required." });
+    if (!email && !password) {
+      return res.json({ error: "Email and Password are required." });
     }
 
     // Validate email format
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ error: "Invalid email format." });
+      return res.json({ error: "Invalid email format." });
     }
 
     // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
-      return res
-        .status(404)
-        .json({ error: "Email does not exist. Please try again." });
+      return res.json({ error: "Email does not exist. Please try again." });
     }
 
     // Check if the user's email is verified
     if (!user.verified) {
       await sendVerificationEmail({ UserID: user._id, email: user.email });
-      return res.status(403).json({
+      return res.json({
         error: "Account is not verified. A verification email has been sent.",
         data: { userId: user._id },
       });
@@ -612,9 +608,7 @@ const loginUser = async (req, res) => {
     // Check if the password matches
     const isMatch = await comparePassword(password, user.password);
     if (!isMatch) {
-      return res
-        .status(401)
-        .json({ error: "Email and Password do not match." });
+      return res.json({ error: "Email and Password do not match." });
     }
 
     // Generate JWT token
@@ -625,7 +619,7 @@ const loginUser = async (req, res) => {
       (err, token) => {
         if (err) {
           console.error(err);
-          return res.status(500).json({ error: "Failed to generate token" });
+          return res.json({ error: "Failed to generate token" });
         }
         // Set the token in an HTTP-only cookie and respond with success
         return res
@@ -635,7 +629,7 @@ const loginUser = async (req, res) => {
     );
   } catch (error) {
     console.error("Error in loginUser:", error);
-    return res.status(500).json({ error: "Server error occurred" });
+    return res.json({ error: "Server error occurred" });
   }
 };
 
