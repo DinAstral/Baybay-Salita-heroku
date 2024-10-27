@@ -6,32 +6,33 @@ const studentStatus = async (req, res) => {
   try {
     const { LRN } = req.params;
 
-    // Fetch student by LRN
+    // Fetch student by LRN from the database to ensure valid data processing
     const student = await Student.findOne({ LRN });
     if (!student) {
       return res.status(404).json({ error: "Student not found" });
     }
 
-    // Define the list of assessments with max scores and criteria for TimeRead
+    // List of assessment types and max scores; add criteria for TimeRead if applicable
     const assessments = [
       { name: "Pagbabaybay", maxScore: 10 },
       { name: "Pantig", maxScore: 10 },
       { name: "Salita", maxScore: 10 },
-      { name: "Pagbabasa", maxScore: 5 }, // Includes time read
+      { name: "Pagbabasa", maxScore: 5 },
     ];
 
-    // Fetch all the performance entries for the student's LRN
+    // Retrieve all performance data for the student to calculate their status
     const performances = await Performance.find({
       LRN: student.LRN,
-      Type: { $in: assessments.map((a) => a.name) }, // Filter by the required assessment types
+      Type: { $in: assessments.map((a) => a.name) },
     });
 
-    // If no performance data is found, the student is marked as incomplete
+    // If no performance data found, assign "Incomplete" status
     if (performances.length === 0) {
       const status = "Incomplete";
       const comment =
         "No assessments completed. Please complete the required assessments.";
 
+      // Updating student record for easier future tracking of incomplete statuses
       await Student.findByIdAndUpdate(student._id, { status });
 
       return res.status(200).json({
@@ -41,15 +42,15 @@ const studentStatus = async (req, res) => {
       });
     }
 
-    // Check which assessments are completed at least once
+    // Check which assessments are completed based on performance records
     const completedAssessments = new Set(performances.map((p) => p.Type));
 
-    // Ensure that every required assessment has been completed at least once
+    // Confirm that each assessment is completed to mark student as "Complete"
     const allAssessmentsCompleted = assessments.every((a) =>
       completedAssessments.has(a.name)
     );
 
-    // If not all assessments are completed, mark as 'Incomplete'
+    // If not all assessments are done, mark the student as "Incomplete"
     if (!allAssessmentsCompleted) {
       const status = "Incomplete";
       const comment =
@@ -64,40 +65,41 @@ const studentStatus = async (req, res) => {
       });
     }
 
-    // Calculate the total score and possible score based on the assessments in the database
+    // Calculate total score and max possible score based on completed assessments
     let totalScore = 0;
     let totalPossibleScore = 0;
-    let timeReadPercentage = 0; // For tracking percentage of reading completion in "Pagbabasa"
+    let timeReadPercentage = 0; // Track percentage completion for "Pagbabasa" reading time
 
     performances.forEach((performance) => {
       const assessment = assessments.find((a) => a.name === performance.Type);
       if (assessment) {
-        totalScore += performance.Score; // Add the actual score the student received
-        totalPossibleScore += assessment.maxScore; // Add the maximum possible score for that assessment
+        totalScore += performance.Score;
+        totalPossibleScore += assessment.maxScore;
 
-        // Track the reading time if it's for "Pagbabasa"
+        // Handle special case for reading time in "Pagbabasa" to track progress
         if (performance.Type === "Pagbabasa" && performance.TimeRead) {
-          const timeRead = parseInt(performance.TimeRead, 10); // Convert TimeRead to an integer
+          const timeRead = parseInt(performance.TimeRead, 10);
 
+          // Ensure valid TimeRead value to calculate the time read percentage
           if (!isNaN(timeRead)) {
-            timeReadPercentage = (timeRead / assessment.maxScore) * 100; // Calculate percentage if valid integer
+            timeReadPercentage = (timeRead / assessment.maxScore) * 100;
           } else {
-            console.warn(`Invalid TimeRead value for LRN: ${student.LRN}`); // Log warning for invalid values
+            console.warn(`Invalid TimeRead value for LRN: ${student.LRN}`); // Log an error if TimeRead is invalid
           }
         }
       }
     });
 
-    // Calculate weighted average score as a percentage
+    // Calculate average score percentage to evaluate student's reading level
     const averageScore = (totalScore / totalPossibleScore) * 100;
 
-    // Initial status and comment
+    // Initial default status, comment, and recommendation for student feedback
     let status = "Low Emerging Reader";
     let comment = "Keep practicing to improve your reading skills.";
     let recommendation =
       "Practice reading daily to strengthen foundational skills.";
 
-    // Assign status based on the new criteria including TimeRead percentage
+    // Define reading statuses based on score thresholds and TimeRead completion
     if (averageScore >= 0 && averageScore <= 16) {
       status = "Low Emerging Reader";
       comment = "Focus on improving your foundational reading skills.";
@@ -146,22 +148,22 @@ const studentStatus = async (req, res) => {
         "Maintain your progress by reading a variety of genres and challenging materials.";
     }
 
-    // Update student status based on calculated score and time read
+    // Update the student's status in the database
     await Student.findByIdAndUpdate(student._id, { status });
 
-    // Return the response with the status, comment, and recommendations
+    // Respond with updated status, score, and performance feedback
     return res.status(200).json({
       message: `Status updated to ${status}`,
       totalScore,
       totalPossibleScore,
       timeReadPercentage,
-      comment, // Include the comment in the response
+      comment,
       status,
-      recommendation, // Include the recommendation in the response
+      recommendation,
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Server error" });
+    console.error(error); // Log error details for debugging server-side issues
+    return res.status(500).json({ error: "Server error" }); // Respond with server error status if any unexpected issue occurs
   }
 };
 

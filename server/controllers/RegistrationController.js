@@ -598,7 +598,7 @@ const loginUser = async (req, res) => {
 
     // Check if the user's email is verified
     if (!user.verified) {
-      await sendVerificationEmail({ UserID: user._id, email: user.email });
+      sendVerificationEmail({ UserID: user._id, email: user.email });
       return res.json({
         error: "Account is not verified. A verification email has been sent.",
         data: { userId: user._id },
