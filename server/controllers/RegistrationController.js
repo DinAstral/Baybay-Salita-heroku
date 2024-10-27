@@ -598,11 +598,6 @@ const loginUser = async (req, res) => {
         error: "Invalid email format.",
       });
     }
-    if (!password) {
-      return res.json({
-        error: "Password is Required.",
-      });
-    }
 
     // If the user is not found, return an error
     if (!user) {
@@ -619,6 +614,12 @@ const loginUser = async (req, res) => {
       return res.json({
         error: "Account is not verified. A verification email has been sent.",
         data: { userId: user._id },
+      });
+    }
+
+    if (!password) {
+      return res.json({
+        error: "Password is Required.",
       });
     }
 
