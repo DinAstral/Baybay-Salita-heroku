@@ -232,29 +232,20 @@ const BodyAdminViewStudent = () => {
                     >
                       <div className="mb-2">
                         <span className="block text-sm text-gray-600">
-                          Title:
+                          Assessment: {assessment.Type || "N/A"}
                         </span>
-                        <p className="text-gray-800">{assessment.Title}</p>
-                      </div>
-                      <div className="mb-2">
                         <span className="block text-sm text-gray-600">
-                          Type:
+                          Activity Code: {assessment.ActivityCode || "N/A"}
                         </span>
-                        <p className="text-gray-800">{assessment.Type}</p>
                       </div>
-                      <div>
-                        <span className="block text-sm text-gray-600">
-                          Score:
-                        </span>
-                        <p className="text-gray-800">{assessment.Score}</p>
-                      </div>
+                      <p className="text-gray-800">
+                        Score: {assessment.Score || "N/A"}
+                      </p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center text-gray-600">
-                  No progress found.
-                </div>
+                <p className="text-gray-800">No performance data available.</p>
               )}
             </div>
           )}

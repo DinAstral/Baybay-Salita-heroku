@@ -35,7 +35,8 @@ const BodyViewStudent = () => {
         const studentResponse = await axios.get(`/api/getStudentID/${id}`);
         setData(studentResponse.data);
         setStatus(studentResponse.data.status); // Set the student status
-        setProfileImgUrl(response.data.Picture || profile);
+        setProfileImgUrl(studentResponse.data.Picture || profile);
+
         const performanceResponse = await axios.get(
           `/api/getPerformanceStudent/${studentResponse.data.LRN}`
         );
@@ -79,7 +80,7 @@ const BodyViewStudent = () => {
       <StudentStatus
         show={modalShowStatus}
         onHide={() => setModalShowStatus(false)}
-        LRN={data.LRN}
+        LRN={data?.LRN}
         onStatusUpdate={handleStatusSuccess} // Pass callback for status update
       />
       <div className="flex items-center justify-start gap-2 mb-5">

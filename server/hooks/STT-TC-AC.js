@@ -48,8 +48,8 @@ const chunkArray = (arr, chunkSize) => {
 
 // Function to detect if audio contains significant sound/voice based on ZCR and energy
 const detectSilentOrLowVoiceAudio = (features) => {
-  const zcrThreshold = 0.02; // Adjust based on testing
-  const energyThreshold = 0.01; // Adjust based on testing
+  const zcrThreshold = 8.0; // Adjust based on testing
+  const energyThreshold = 0.03; // Adjust based on testing
 
   // Calculate the average ZCR and energy
   const avgZCR = features.zcr.reduce((a, b) => a + b, 0) / features.zcr.length;
@@ -171,8 +171,8 @@ const compareAudioFeatures = (features1, features2) => {
 // Function to compute Stent Weighted Audio Similarity with NaN handling and scaling to 0-100
 const stentWeightedAudioSimilarity = (mfccDistance, chromaDistance, zcr) => {
   const weightMfcc = 0.6; // Adjust weights as needed
-  const weightChroma = 0.2;
-  const weightZcr = 0.2;
+  const weightChroma = 0.3;
+  const weightZcr = 0.1;
 
   // Calculate the weighted sum
   let similarityScore =

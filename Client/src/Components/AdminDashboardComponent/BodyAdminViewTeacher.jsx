@@ -110,7 +110,7 @@ const BodyAdminViewTeacher = () => {
           <Button
             color="primary"
             className="w-[120px] text-md p-1"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/AdminUsers")}
           >
             Back
           </Button>
