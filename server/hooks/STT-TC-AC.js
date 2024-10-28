@@ -7,6 +7,7 @@ const wav = require("wav-decoder");
 const mongoose = require("mongoose");
 const CompareModel = require("../models/ComparisonResult");
 
+// Function to download and save audio files locally
 const downloadAudio = async (url, filename) => {
   const response = await axios({
     method: "GET",
@@ -21,12 +22,14 @@ const downloadAudio = async (url, filename) => {
   });
 };
 
+// Function to delete a file if it exists
 const deleteFileIfExists = (filePath) => {
   if (fs.existsSync(filePath)) {
     fs.unlinkSync(filePath);
   }
 };
 
+// Helper function to chunk audio data into frames of a power of 2 size (512)
 const chunkArray = (arr, chunkSize) => {
   const chunks = [];
   for (let i = 0; i < arr.length; i += chunkSize) {
@@ -42,6 +45,7 @@ const chunkArray = (arr, chunkSize) => {
   return chunks;
 };
 
+// Function to detect if audio contains significant sound/voice based on ZCR and energy
 const detectSilentOrLowVoiceAudio = (features) => {
   const zcrThreshold = 10.0;
   const energyThreshold = 0.03;
@@ -54,7 +58,7 @@ const detectSilentOrLowVoiceAudio = (features) => {
   return avgZCR < zcrThreshold && avgEnergy < energyThreshold;
 };
 
-// Updated extractAudioFeatures to include pitch analysis with pitchfinder
+// Function to extract audio features using Meyda and pitchfinder
 const extractAudioFeatures = async (audioPath) => {
   return new Promise((resolve, reject) => {
     const tempOutput = `temp_${audioPath}`;
@@ -128,6 +132,7 @@ const extractAudioFeatures = async (audioPath) => {
   });
 };
 
+// Function to compare audio features
 const compareAudioFeatures = (features1, features2) => {
   const euclideanDistance = (vector1, vector2) => {
     const sumSquares = vector1.reduce(
@@ -152,6 +157,7 @@ const compareAudioFeatures = (features1, features2) => {
   };
 };
 
+// Function to compute Stent Weighted Audio Similarity with NaN handling and scaling to 0-100
 const stentWeightedAudioSimilarity = (
   mfccDistance,
   chromaDistance,
@@ -172,26 +178,28 @@ const stentWeightedAudioSimilarity = (
   return similarityScore;
 };
 
+// Main comparison function that accepts dynamic audio URLs
 const run = async (defaultAudioUrl, userAudioUrl) => {
   try {
-    const audioFile1 = "audio1.wav";
-    const audioFile2 = "audio2.wav";
-    const noiseSuppressedAudio = "noise_suppressed_audio.wav";
+    const audioFile1 = "audio1.wav"; // Default audio
+    const audioFile2 = "audio2.wav"; // User audio, before noise suppression
+    const noiseSuppressedAudio = "noise_suppressed_audio.wav"; // After noise suppression
 
     await downloadAudio(defaultAudioUrl, audioFile1);
     await downloadAudio(userAudioUrl, audioFile2);
 
+    // Noise suppress user audio using FFmpeg
     await new Promise((resolve, reject) => {
       ffmpeg(audioFile2)
         .output(noiseSuppressedAudio)
-        .audioFilters("afftdn=nf=-25")
+        .audioFilters("afftdn=nf=-25") // Adjust filter parameters as needed
         .on("end", resolve)
         .on("error", reject)
         .run();
     });
 
-    const features1 = await extractAudioFeatures(audioFile1);
-    const features2 = await extractAudioFeatures(noiseSuppressedAudio);
+    const features1 = await extractAudioFeatures(audioFile1); // Default audio
+    const features2 = await extractAudioFeatures(noiseSuppressedAudio); // Noise-suppressed user audio
 
     deleteFileIfExists(audioFile2);
     deleteFileIfExists(noiseSuppressedAudio);
@@ -208,7 +216,7 @@ const run = async (defaultAudioUrl, userAudioUrl) => {
           zcr: Infinity,
           pitchDifference: Infinity,
         },
-        weightedSimilarity: 100,
+        weightedSimilarity: 100, // Max similarity score for "no match"
       };
     }
 
@@ -230,6 +238,56 @@ const run = async (defaultAudioUrl, userAudioUrl) => {
     };
   } catch (error) {
     console.error("Error during audio comparison:", error.message);
+    throw error;
+  }
+};
+
+// Final function to run the comparison and save to MongoDB
+const runComparisonAndSaveResult = async (
+  UserInputId,
+  ActivityCode,
+  LRN,
+  Section,
+  Type,
+  fileUrls,
+  defaultAudios,
+  similarityThreshold = 25
+) => {
+  try {
+    const comparisonResults = [];
+    let totalScore = 0;
+
+    for (let i = 0; i < defaultAudios.length; i++) {
+      const userAudioUrl = fileUrls[`AudioURL${i + 1}`];
+      const defaultAudioUrl = defaultAudios[i];
+
+      const result = await run(defaultAudioUrl, userAudioUrl);
+      const isCorrect = result.weightedSimilarity <= similarityThreshold;
+      if (isCorrect) totalScore += 1;
+
+      comparisonResults.push({
+        ItemCode: `Itemcode${i + 1}`,
+        mfccDistance: result.audioComparison.mfccDistance,
+        chromaDistance: result.audioComparison.chromaDistance,
+        zcr: result.audioComparison.zcr,
+        pitchDifference: result.audioComparison.pitchDifference,
+        stentWeightedSimilarity: result.weightedSimilarity,
+        Remarks: isCorrect ? "Correct" : "Incorrect",
+      });
+    }
+
+    await CompareModel.create({
+      UserInputId,
+      ActivityCode,
+      LRN,
+      Section,
+      Type,
+      Results: comparisonResults,
+    });
+
+    return { score: totalScore, resultsWithRemarks: comparisonResults };
+  } catch (error) {
+    console.error("Error during audio comparison:", error);
     throw error;
   }
 };
