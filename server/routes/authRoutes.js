@@ -67,6 +67,7 @@ const {
   getSentence,
   userInputSentence,
   getPerformanceStudent,
+  getAssessmentIncomplete,
 } = require("../controllers/assessmentController");
 
 const {
@@ -122,6 +123,7 @@ router.get("/getAssessment/:id", getActivity); //okay
 router.delete("/deleteAssessment/:id", deleteAssessment); //Okay
 router.delete("/deletePerformance/:id", deletePerformance); //okay
 router.post("/userInputSentence", userInputSentence); //okay
+router.get("/getIncompleteAssessments", getAssessmentIncomplete);
 
 // Admin Routes
 router.post("/addUser", addUser); //okay

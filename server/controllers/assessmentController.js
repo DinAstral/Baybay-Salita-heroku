@@ -744,6 +744,22 @@ const userInputSentence = async (req, res) => {
   }
 };
 
+const getAssessmentIncomplete = async (req, res) => {
+  const { lrn, section } = req.query;
+
+  try {
+    const assessments = await AssessmentModel.find({
+      Section: section,
+      completedBy: { $ne: lrn },
+    }).lean();
+
+    return res.status(200).json(assessments);
+  } catch (error) {
+    console.error("Error fetching incomplete assessments:", error);
+    res.status(500).json({ error: "Failed to fetch assessments." });
+  }
+};
+
 const getImportWords = (req, res) => {
   Material.find()
     .then((users) => res.json(users))
@@ -765,4 +781,5 @@ module.exports = {
   userInputAudio,
   userInputSentence,
   getPerformanceStudent,
+  getAssessmentIncomplete,
 };
