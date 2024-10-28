@@ -8,7 +8,6 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import StudentStatus from "../Modals/StudentStatus";
 
-// Lazy load the image component
 const LazyProfileImage = ({ src, alt }) => (
   <img loading="lazy" src={src} alt={alt} className="w-32 h-32 rounded-full" />
 );
@@ -22,21 +21,24 @@ const BodyAdminViewStudent = () => {
   const [data, setData] = useState(null);
   const [performance, setPerformance] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState(""); // State for student status
+  const [status, setStatus] = useState("");
 
   const [modalShowStatus, setModalShowStatus] = useState(false);
-  const [modalSubmitSuccess, setModalSubmitSuccess] = useState(false); // Track success modal state
+  const [modalSubmitSuccess, setModalSubmitSuccess] = useState(false);
   const [profileImgUrl, setProfileImgUrl] = useState(profile);
 
   useEffect(() => {
     const fetchStudentData = async () => {
       try {
         const studentResponse = await axios.get(`/api/getStudentID/${id}`);
-        setData(studentResponse.data);
-        setStatus(studentResponse.data.status); // Set the student status
-        setProfileImgUrl(response.data.Picture || profile);
+        const studentData = studentResponse.data;
+
+        setData(studentData);
+        setStatus(studentData.status);
+        setProfileImgUrl(studentData.Picture || profile);
+
         const performanceResponse = await axios.get(
-          `/api/getPerformanceStudent/${studentResponse.data.LRN}`
+          `/api/getPerformanceStudent/${studentData.LRN}`
         );
         setPerformance(performanceResponse.data);
       } catch (err) {
@@ -65,10 +67,10 @@ const BodyAdminViewStudent = () => {
     setModalShowStatus(true);
   };
 
-  const handleStatusSuccess = (status) => {
-    setStatus(status);
-    setModalSubmitSuccess(true); // Show success modal
-    setModalShowStatus(false); // Hide the assess status modal
+  const handleStatusSuccess = (newStatus) => {
+    setStatus(newStatus);
+    setModalSubmitSuccess(true);
+    setModalShowStatus(false);
   };
 
   if (loading) return <div>Loading...</div>;
@@ -79,7 +81,7 @@ const BodyAdminViewStudent = () => {
         show={modalShowStatus}
         onHide={() => setModalShowStatus(false)}
         LRN={data.LRN}
-        onStatusUpdate={handleStatusSuccess} // Pass callback for status update
+        onStatusUpdate={handleStatusSuccess}
       />
       <div className="flex items-center justify-start gap-2 mb-5">
         <h1 className="text-3xl font-semibold">Student Information</h1>
@@ -99,13 +101,8 @@ const BodyAdminViewStudent = () => {
         </Tooltip>
       </div>
       <div className="w-full max-w-8xl mx-auto bg-white shadow-lg rounded-lg p-[3rem]">
-        {/* Profile Header */}
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-          <LazyProfileImage
-            src={profileImgUrl}
-            className="w-32 h-32 rounded-full"
-            alt="Profile"
-          />
+          <LazyProfileImage src={profileImgUrl} alt="Profile" />
           <div className="flex-1">
             <h2 className="text-2xl font-bold">
               {data
@@ -121,7 +118,6 @@ const BodyAdminViewStudent = () => {
                 />
                 <span>Learner Reference Number: {data?.LRN || "N/A"}</span>
               </div>
-              {/* Student Status Highlight */}
               <div className="mt-4">
                 <span className="text-sm font-bold">Status:</span>
                 <span
@@ -133,8 +129,8 @@ const BodyAdminViewStudent = () => {
                       : status === "Developing Reader"
                       ? "bg-yellow-200 text-yellow-800"
                       : status === "Incomplete"
-                      ? "bg-gray-200 text-gray-800" // New color for "Incomplete" status
-                      : "bg-red-200 text-red-800" // Default fallback for other statuses
+                      ? "bg-gray-200 text-gray-800"
+                      : "bg-red-200 text-red-800"
                   }`}
                 >
                   {status || "N/A"}
@@ -151,14 +147,12 @@ const BodyAdminViewStudent = () => {
           </Button>
         </div>
 
-        {/* Status Update Button */}
         <div className="mt-4">
           <Button color="primary" onClick={handleStatusClick}>
             Assess Status
           </Button>
         </div>
 
-        {/* Tabs */}
         <div className="mt-8">
           <div className="flex gap-6 border-b pb-2">
             <Button
@@ -183,7 +177,6 @@ const BodyAdminViewStudent = () => {
             </Button>
           </div>
 
-          {/* Content Based on Active Tab */}
           {activeIndex === 0 && (
             <div className="mt-6 bg-[#faf9f4] p-6 rounded-lg shadow">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -191,41 +184,42 @@ const BodyAdminViewStudent = () => {
                   <span className="block text-sm text-gray-600">
                     First Name:
                   </span>
-                  <p className="text-gray-800">{data.FirstName || "N/A"}</p>
+                  <p className="text-gray-800">{data?.FirstName || "N/A"}</p>
                 </div>
                 <div>
                   <span className="block text-sm text-gray-600">
                     Last Name:
                   </span>
-                  <p className="text-gray-800">{data.LastName || "N/A"}</p>
+                  <p className="text-gray-800">{data?.LastName || "N/A"}</p>
                 </div>
                 <div>
                   <span className="block text-sm text-gray-600">Gender:</span>
-                  <p className="text-gray-800">{data.Gender || "N/A"}</p>
+                  <p className="text-gray-800">{data?.Gender || "N/A"}</p>
                 </div>
                 <div>
                   <span className="block text-sm text-gray-600">Birthday:</span>
-                  <p className="text-gray-800">{data.Birthday || "N/A"}</p>
+                  <p className="text-gray-800">{data?.Birthday || "N/A"}</p>
                 </div>
                 <div>
                   <span className="block text-sm text-gray-600">Age:</span>
-                  <p className="text-gray-800">{data.Age || "N/A"}</p>
+                  <p className="text-gray-800">{data?.Age || "N/A"}</p>
                 </div>
                 <div>
                   <span className="block text-sm text-gray-600">Address:</span>
-                  <p className="text-gray-800">{data.Address || "N/A"}</p>
+                  <p className="text-gray-800">{data?.Address || "N/A"}</p>
                 </div>
                 <div>
                   <span className="block text-sm text-gray-600">
                     Contact Number:
                   </span>
-                  <p className="text-gray-800">{data.ContactNumber || "N/A"}</p>
+                  <p className="text-gray-800">
+                    {data?.ContactNumber || "N/A"}
+                  </p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Student Progress Grid */}
           {activeIndex === 1 && (
             <div className="mt-6 bg-[#f9f9f9] p-6 rounded-lg shadow">
               <h2 className="text-lg font-semibold mb-4">Student Progress</h2>
@@ -238,20 +232,29 @@ const BodyAdminViewStudent = () => {
                     >
                       <div className="mb-2">
                         <span className="block text-sm text-gray-600">
-                          Assessment: {assessment.Type || "N/A"}
+                          Title:
                         </span>
-                        <span className="block text-sm text-gray-600">
-                          Activity Code: {assessment.ActivityCode || "N/A"}
-                        </span>
+                        <p className="text-gray-800">{assessment.Title}</p>
                       </div>
-                      <p className="text-gray-800">
-                        Score: {assessment.Score || "N/A"}
-                      </p>
+                      <div className="mb-2">
+                        <span className="block text-sm text-gray-600">
+                          Type:
+                        </span>
+                        <p className="text-gray-800">{assessment.Type}</p>
+                      </div>
+                      <div>
+                        <span className="block text-sm text-gray-600">
+                          Score:
+                        </span>
+                        <p className="text-gray-800">{assessment.Score}</p>
+                      </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-800">No performance data available.</p>
+                <div className="text-center text-gray-600">
+                  No progress found.
+                </div>
               )}
             </div>
           )}
