@@ -660,6 +660,11 @@ const userInputAudio = async (req, res) => {
       const insert = await Performance.create(performanceData);
 
       if (insert) {
+        await AssessmentModel.updateOne(
+          { ActivityCode },
+          { $addToSet: { completedBy: LRN } }
+        );
+
         return res.json({
           message:
             "Audio files uploaded, data stored, and comparison results saved successfully.",
@@ -716,6 +721,11 @@ const userInputSentence = async (req, res) => {
     const insert = await Performance.create(performanceData);
 
     if (insert) {
+      await AssessmentModel.updateOne(
+        { ActivityCode },
+        { $addToSet: { completedBy: LRN } }
+      );
+
       return res.json({
         message: "Data stored save successfully.",
       });

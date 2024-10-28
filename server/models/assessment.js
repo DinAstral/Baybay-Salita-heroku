@@ -18,6 +18,7 @@ const assessSchema = new Schema(
     Questions: Object,
     Items: Object,
     Assessment: String,
+    completedBy: [{ type: String, ref: "Student" }],
   },
 
   { timestamps: true }

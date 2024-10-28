@@ -3,6 +3,7 @@ const Meyda = require("meyda");
 const fs = require("fs");
 const ffmpeg = require("fluent-ffmpeg");
 const wav = require("wav-decoder");
+const Pitchfinder = require("pitchfinder"); // Import Pitchfinder for pitch detection
 const mongoose = require("mongoose");
 const CompareModel = require("../models/ComparisonResult");
 
@@ -34,7 +35,6 @@ const chunkArray = (arr, chunkSize) => {
   const chunks = [];
   for (let i = 0; i < arr.length; i += chunkSize) {
     const chunk = arr.slice(i, i + chunkSize);
-    // If the last chunk is smaller, pad it with zeros
     if (chunk.length < chunkSize) {
       const paddedChunk = new Float32Array(chunkSize);
       paddedChunk.set(chunk);
@@ -48,29 +48,16 @@ const chunkArray = (arr, chunkSize) => {
 
 // Function to detect if audio contains significant sound/voice based on ZCR and energy
 const detectSilentOrLowVoiceAudio = (features) => {
-  const zcrThreshold = 10.0; // Adjust based on testing
-  const energyThreshold = 0.03; // Adjust based on testing
+  const zcrThreshold = 10.0;
+  const energyThreshold = 0.03;
 
-  // Calculate the average ZCR and energy
   const avgZCR = features.zcr.reduce((a, b) => a + b, 0) / features.zcr.length;
   const avgEnergy = features.energy ? features.energy : 0;
 
-  // Log the calculated values for debugging
   console.log("Voice Detection - Average ZCR:", avgZCR);
   console.log("Voice Detection - Average Energy:", avgEnergy);
-  console.log(
-    "ZCR Threshold:",
-    zcrThreshold,
-    "Energy Threshold:",
-    energyThreshold
-  );
 
-  // Check if the values are below the defined thresholds
-  const isSilentOrLowVoice =
-    avgZCR < zcrThreshold && avgEnergy < energyThreshold;
-  console.log("Is Silent or Low Voice Detected:", isSilentOrLowVoice);
-
-  return isSilentOrLowVoice;
+  return avgZCR < zcrThreshold && avgEnergy < energyThreshold;
 };
 
 // Function to extract audio features using Meyda
@@ -78,12 +65,11 @@ const extractAudioFeatures = async (audioPath) => {
   return new Promise((resolve, reject) => {
     const tempOutput = `temp_${audioPath}`;
 
-    // Delete any existing temp file before processing
     deleteFileIfExists(tempOutput);
 
     ffmpeg(audioPath)
       .toFormat("wav")
-      .on("end", () => {
+      .on("end", async () => {
         fs.readFile(tempOutput, async (err, data) => {
           if (err) {
             reject(err);
@@ -91,52 +77,41 @@ const extractAudioFeatures = async (audioPath) => {
           }
 
           try {
-            // Decode the WAV file
             const audioData = await wav.decode(data);
-
-            // Use the first audio channel for feature extraction
             const channelData = audioData.channelData[0];
-
-            // Define the buffer size (512, a power of 2)
             const bufferSize = 512;
-
-            // Chunk the audio data into frames of size 512
             const audioChunks = chunkArray(channelData, bufferSize);
 
-            // Extract features for each chunk and accumulate the results
-            const totalChunks = audioChunks.length;
-            const sumFeatures = audioChunks.reduce((acc, chunk, index) => {
+            const detectPitch = Pitchfinder.YIN({
+              sampleRate: audioData.sampleRate,
+            });
+            let sumFeatures = { mfcc: [], chroma: [], zcr: [], pitch: [] };
+
+            audioChunks.forEach((chunk) => {
               const features = Meyda.extract(["mfcc", "chroma", "zcr"], chunk);
 
-              // Initialize the accumulator for the first chunk
-              if (index === 0) {
-                Object.keys(features).forEach((key) => {
-                  acc[key] = Array.isArray(features[key])
-                    ? features[key].slice()
-                    : [features[key]];
-                });
-              } else {
-                // Accumulate features for subsequent chunks
-                Object.keys(features).forEach((key) => {
-                  if (Array.isArray(features[key])) {
-                    acc[key] = acc[key].map((val, i) => val + features[key][i]);
-                  } else {
-                    acc[key][0] += features[key];
-                  }
-                });
+              if (features) {
+                sumFeatures.mfcc.push(features.mfcc);
+                sumFeatures.chroma.push(features.chroma);
+                sumFeatures.zcr.push(features.zcr);
               }
 
-              return acc;
-            }, {});
-
-            // Average the features across all chunks
-            Object.keys(sumFeatures).forEach((key) => {
-              sumFeatures[key] = sumFeatures[key].map(
-                (val) => val / totalChunks
-              );
+              const pitch = detectPitch(chunk);
+              if (pitch) sumFeatures.pitch.push(pitch);
             });
 
-            resolve(sumFeatures);
+            const avgFeatures = {};
+            Object.keys(sumFeatures).forEach((key) => {
+              avgFeatures[key] =
+                sumFeatures[key].reduce(
+                  (acc, val) =>
+                    acc +
+                    (Array.isArray(val) ? val.reduce((a, b) => a + b, 0) : val),
+                  0
+                ) / sumFeatures[key].length;
+            });
+
+            resolve(avgFeatures);
           } catch (decodeError) {
             reject(decodeError);
           }
@@ -150,33 +125,39 @@ const extractAudioFeatures = async (audioPath) => {
 // Function to compare audio features
 const compareAudioFeatures = (features1, features2) => {
   const euclideanDistance = (vector1, vector2) => {
-    const sumSquares = vector1.reduce(
-      (acc, val, idx) => acc + Math.pow(val - vector2[idx], 2),
-      0
+    return Math.sqrt(
+      vector1.reduce(
+        (acc, val, idx) => acc + Math.pow(val - vector2[idx], 2),
+        0
+      )
     );
-    return Math.sqrt(sumSquares);
   };
 
   const mfccDistance = euclideanDistance(features1.mfcc, features2.mfcc);
   const chromaDistance = euclideanDistance(features1.chroma, features2.chroma);
-  const zcr = euclideanDistance(features1.zcr, features2.zcr);
+  const zcr = Math.abs(features1.zcr - features2.zcr);
+  const pitchDifference = Math.abs(features1.pitch - features2.pitch); // Pitch difference added
 
-  return {
-    mfccDistance,
-    chromaDistance,
-    zcr,
-  };
+  return { mfccDistance, chromaDistance, zcr, pitchDifference };
 };
 
-// Function to compute Stent Weighted Audio Similarity with NaN handling and scaling to 0-100
-const stentWeightedAudioSimilarity = (mfccDistance, chromaDistance, zcr) => {
-  const weightMfcc = 0.5; // Adjust weights as needed
-  const weightChroma = 0.4;
-  const weightZcr = 0.1;
+// Function to compute Weighted Audio Similarity with pitch added
+const stentWeightedAudioSimilarity = (
+  mfccDistance,
+  chromaDistance,
+  zcr,
+  pitchDifference
+) => {
+  const weightMfcc = 0.4;
+  const weightChroma = 0.3;
+  const weightZcr = 0.15;
+  const weightPitch = 0.15; // Add weight for pitch difference
 
-  // Calculate the weighted sum
-  let similarityScore =
-    weightMfcc * mfccDistance + weightChroma * chromaDistance + weightZcr * zcr;
+  const similarityScore =
+    weightMfcc * mfccDistance +
+    weightChroma * chromaDistance +
+    weightZcr * zcr +
+    weightPitch * pitchDifference;
 
   return similarityScore;
 };
@@ -184,67 +165,57 @@ const stentWeightedAudioSimilarity = (mfccDistance, chromaDistance, zcr) => {
 // Main comparison function that accepts dynamic audio URLs
 const run = async (defaultAudioUrl, userAudioUrl) => {
   try {
-    const audioFile1 = "audio1.wav"; // Default audio
-    const audioFile2 = "audio2.wav"; // User audio, before noise suppression
-    const noiseSuppressedAudio = "noise_suppressed_audio.wav"; // After noise suppression
+    const audioFile1 = "audio1.wav";
+    const audioFile2 = "audio2.wav";
+    const noiseSuppressedAudio = "noise_suppressed_audio.wav";
 
     await downloadAudio(defaultAudioUrl, audioFile1);
     await downloadAudio(userAudioUrl, audioFile2);
 
-    // Noise suppress user audio using FFmpeg
     await new Promise((resolve, reject) => {
       ffmpeg(audioFile2)
         .output(noiseSuppressedAudio)
-        .audioFilters("afftdn=nf=-25") // Adjust filter parameters as needed
+        .audioFilters("afftdn=nf=-25")
         .on("end", resolve)
         .on("error", reject)
         .run();
     });
 
-    const features1 = await extractAudioFeatures(audioFile1); // Default audio
-    const features2 = await extractAudioFeatures(noiseSuppressedAudio); // Noise-suppressed user audio
+    const features1 = await extractAudioFeatures(audioFile1);
+    const features2 = await extractAudioFeatures(noiseSuppressedAudio);
 
     deleteFileIfExists(audioFile2);
     deleteFileIfExists(noiseSuppressedAudio);
 
-    // Check if the user audio contains voice or significant sounds
     if (detectSilentOrLowVoiceAudio(features2)) {
-      console.log(
-        "No significant sound detected in user audio. Setting similarity score to max."
-      );
-
       return {
         audioComparison: {
           mfccDistance: Infinity,
           chromaDistance: Infinity,
           zcr: Infinity,
+          pitchDifference: Infinity,
         },
-        weightedSimilarity: 100, // Max similarity score for "no match"
+        weightedSimilarity: 100,
       };
     }
 
     const audioComparison = compareAudioFeatures(features1, features2);
-    console.log("Audio Feature Comparison:", audioComparison);
 
     const weightedSimilarity = stentWeightedAudioSimilarity(
       audioComparison.mfccDistance,
       audioComparison.chromaDistance,
-      audioComparison.zcr
+      audioComparison.zcr,
+      audioComparison.pitchDifference
     );
 
-    console.log("Mfcc Distance:", audioComparison.mfccDistance);
-    console.log("Stent Weighted Audio Similarity:", weightedSimilarity);
-
-    return {
-      audioComparison,
-      weightedSimilarity,
-    };
+    return { audioComparison, weightedSimilarity };
   } catch (error) {
     console.error("Error during audio comparison:", error.message);
-    throw error; // Ensure errors are caught and handled
+    throw error;
   }
 };
 
+// Main function to execute multiple comparisons and save results
 const runComparisonAndSaveResult = async (
   UserInputId,
   ActivityCode,
@@ -253,7 +224,7 @@ const runComparisonAndSaveResult = async (
   Type,
   fileUrls,
   defaultAudios,
-  similarityThreshold = 25 // Add a default threshold
+  similarityThreshold = 25
 ) => {
   try {
     const comparisonResults = [];
@@ -265,7 +236,6 @@ const runComparisonAndSaveResult = async (
 
       const result = await run(defaultAudioUrl, userAudioUrl);
 
-      // Check the threshold dynamically and add Remarks
       const isCorrect = result.weightedSimilarity <= similarityThreshold;
       if (isCorrect) {
         totalScore += 1;
@@ -276,8 +246,9 @@ const runComparisonAndSaveResult = async (
         mfccDistance: result.audioComparison.mfccDistance,
         chromaDistance: result.audioComparison.chromaDistance,
         zcr: result.audioComparison.zcr,
+        pitchDifference: result.audioComparison.pitchDifference,
         stentWeightedSimilarity: result.weightedSimilarity,
-        Remarks: isCorrect ? "Correct" : "Incorrect", // Set Remarks based on comparison
+        Remarks: isCorrect ? "Correct" : "Incorrect",
       });
     }
 
