@@ -22,11 +22,6 @@ const ContentHeader = () => {
     };
 
     updateProfilePic();
-
-    // If `userContext` supports subscriptions for changes:
-    const unsubscribe = userContext.subscribe(updateProfilePic);
-
-    return () => unsubscribe && unsubscribe();
   }, [user]);
 
   return (
