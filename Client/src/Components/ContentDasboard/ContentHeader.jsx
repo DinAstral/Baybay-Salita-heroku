@@ -1,10 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import "./Content.css";
 import { Tooltip } from "@nextui-org/react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { UserContext } from "../../../context/userContext";
-import defaultProfilePic from "../../assets/profile.png"; // Default profile image
+import defaultProfilePic from "../../assets/profile.png";
 import { Link } from "react-router-dom";
 
 const ContentHeader = () => {
@@ -12,15 +10,23 @@ const ContentHeader = () => {
   const [profilePic, setProfilePic] = useState(defaultProfilePic);
 
   useEffect(() => {
-    if (user && user.Picture) {
-      // Validate if the user.Picture is a valid URL
-      const img = new Image();
-      img.onload = () => setProfilePic(user.Picture);
-      img.onerror = () => setProfilePic(defaultProfilePic);
-      img.src = user.Picture;
-    } else {
-      setProfilePic(defaultProfilePic);
-    }
+    const updateProfilePic = () => {
+      if (user && user.Picture) {
+        const img = new Image();
+        img.onload = () => setProfilePic(user.Picture);
+        img.onerror = () => setProfilePic(defaultProfilePic);
+        img.src = user.Picture;
+      } else {
+        setProfilePic(defaultProfilePic);
+      }
+    };
+
+    updateProfilePic();
+
+    // If `userContext` supports subscriptions for changes:
+    const unsubscribe = userContext.subscribe(updateProfilePic);
+
+    return () => unsubscribe && unsubscribe();
   }, [user]);
 
   return (
