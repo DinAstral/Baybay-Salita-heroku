@@ -48,7 +48,7 @@ const chunkArray = (arr, chunkSize) => {
 
 // Function to detect if audio contains significant sound/voice based on ZCR and energy
 const detectSilentOrLowVoiceAudio = (features) => {
-  const zcrThreshold = 8.0; // Adjust based on testing
+  const zcrThreshold = 10.0; // Adjust based on testing
   const energyThreshold = 0.03; // Adjust based on testing
 
   // Calculate the average ZCR and energy
