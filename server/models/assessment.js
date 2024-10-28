@@ -18,7 +18,7 @@ const assessSchema = new Schema(
     Questions: Object,
     Items: Object,
     Assessment: String,
-    completedBy: [{ type: Schema.Types.ObjectId, ref: "Students" }],
+    completedBy: [{ type: String, ref: "Students" }],
   },
 
   { timestamps: true }
