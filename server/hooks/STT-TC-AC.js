@@ -1,6 +1,5 @@
 const axios = require("axios");
 const Meyda = require("meyda");
-const Pitchfinder = require("pitchfinder");
 const fs = require("fs");
 const ffmpeg = require("fluent-ffmpeg");
 const wav = require("wav-decoder");
@@ -14,6 +13,7 @@ const downloadAudio = async (url, filename) => {
     url: url,
     responseType: "stream",
   });
+
   return new Promise((resolve, reject) => {
     const writer = fs.createWriteStream(filename);
     response.data.pipe(writer);
@@ -34,6 +34,7 @@ const chunkArray = (arr, chunkSize) => {
   const chunks = [];
   for (let i = 0; i < arr.length; i += chunkSize) {
     const chunk = arr.slice(i, i + chunkSize);
+    // If the last chunk is smaller, pad it with zeros
     if (chunk.length < chunkSize) {
       const paddedChunk = new Float32Array(chunkSize);
       paddedChunk.set(chunk);
@@ -47,21 +48,37 @@ const chunkArray = (arr, chunkSize) => {
 
 // Function to detect if audio contains significant sound/voice based on ZCR and energy
 const detectSilentOrLowVoiceAudio = (features) => {
-  const zcrThreshold = 20.0;
-  const energyThreshold = 0.03;
+  const zcrThreshold = 10.0; // Adjust based on testing
+  const energyThreshold = 0.03; // Adjust based on testing
+
+  // Calculate the average ZCR and energy
   const avgZCR = features.zcr.reduce((a, b) => a + b, 0) / features.zcr.length;
   const avgEnergy = features.energy ? features.energy : 0;
 
+  // Log the calculated values for debugging
   console.log("Voice Detection - Average ZCR:", avgZCR);
   console.log("Voice Detection - Average Energy:", avgEnergy);
+  console.log(
+    "ZCR Threshold:",
+    zcrThreshold,
+    "Energy Threshold:",
+    energyThreshold
+  );
 
-  return avgZCR < zcrThreshold && avgEnergy < energyThreshold;
+  // Check if the values are below the defined thresholds
+  const isSilentOrLowVoice =
+    avgZCR < zcrThreshold && avgEnergy < energyThreshold;
+  console.log("Is Silent or Low Voice Detected:", isSilentOrLowVoice);
+
+  return isSilentOrLowVoice;
 };
 
-// Function to extract audio features using Meyda and pitchfinder
+// Function to extract audio features using Meyda
 const extractAudioFeatures = async (audioPath) => {
   return new Promise((resolve, reject) => {
     const tempOutput = `temp_${audioPath}`;
+
+    // Delete any existing temp file before processing
     deleteFileIfExists(tempOutput);
 
     ffmpeg(audioPath)
@@ -74,25 +91,24 @@ const extractAudioFeatures = async (audioPath) => {
           }
 
           try {
+            // Decode the WAV file
             const audioData = await wav.decode(data);
+
+            // Use the first audio channel for feature extraction
             const channelData = audioData.channelData[0];
+
+            // Define the buffer size (512, a power of 2)
             const bufferSize = 512;
+
+            // Chunk the audio data into frames of size 512
             const audioChunks = chunkArray(channelData, bufferSize);
 
-            // Initialize Pitchfinder's pitch detector
-            const detectPitch = Pitchfinder.YIN();
-            let totalPitch = 0;
-            let pitchCount = 0;
-
+            // Extract features for each chunk and accumulate the results
+            const totalChunks = audioChunks.length;
             const sumFeatures = audioChunks.reduce((acc, chunk, index) => {
               const features = Meyda.extract(["mfcc", "chroma", "zcr"], chunk);
-              const pitch = detectPitch(chunk);
 
-              if (pitch) {
-                totalPitch += pitch;
-                pitchCount += 1;
-              }
-
+              // Initialize the accumulator for the first chunk
               if (index === 0) {
                 Object.keys(features).forEach((key) => {
                   acc[key] = Array.isArray(features[key])
@@ -100,6 +116,7 @@ const extractAudioFeatures = async (audioPath) => {
                     : [features[key]];
                 });
               } else {
+                // Accumulate features for subsequent chunks
                 Object.keys(features).forEach((key) => {
                   if (Array.isArray(features[key])) {
                     acc[key] = acc[key].map((val, i) => val + features[key][i]);
@@ -108,18 +125,16 @@ const extractAudioFeatures = async (audioPath) => {
                   }
                 });
               }
+
               return acc;
             }, {});
 
-            // Average the MFCC, chroma, and ZCR features
+            // Average the features across all chunks
             Object.keys(sumFeatures).forEach((key) => {
               sumFeatures[key] = sumFeatures[key].map(
-                (val) => val / audioChunks.length
+                (val) => val / totalChunks
               );
             });
-
-            // Calculate average pitch if any pitches were detected
-            sumFeatures.pitch = pitchCount > 0 ? totalPitch / pitchCount : 0;
 
             resolve(sumFeatures);
           } catch (decodeError) {
@@ -146,34 +161,22 @@ const compareAudioFeatures = (features1, features2) => {
   const chromaDistance = euclideanDistance(features1.chroma, features2.chroma);
   const zcr = euclideanDistance(features1.zcr, features2.zcr);
 
-  // Calculate pitch difference
-  const pitchDifference = Math.abs(features1.pitch - features2.pitch);
-
   return {
     mfccDistance,
     chromaDistance,
     zcr,
-    pitchDifference, // Include pitch difference
   };
 };
 
 // Function to compute Stent Weighted Audio Similarity with NaN handling and scaling to 0-100
-const stentWeightedAudioSimilarity = (
-  mfccDistance,
-  chromaDistance,
-  zcr,
-  pitchDifference
-) => {
-  const weightMfcc = 0.35;
-  const weightChroma = 0.55;
+const stentWeightedAudioSimilarity = (mfccDistance, chromaDistance, zcr) => {
+  const weightMfcc = 0.5; // Adjust weights as needed
+  const weightChroma = 0.45;
   const weightZcr = 0.05;
-  const weightPitch = 0.05; // Add a weight for pitch comparison
 
+  // Calculate the weighted sum
   let similarityScore =
-    weightMfcc * mfccDistance +
-    weightChroma * chromaDistance +
-    weightZcr * zcr +
-    weightPitch * pitchDifference;
+    weightMfcc * mfccDistance + weightChroma * chromaDistance + weightZcr * zcr;
 
   return similarityScore;
 };
@@ -204,6 +207,7 @@ const run = async (defaultAudioUrl, userAudioUrl) => {
     deleteFileIfExists(audioFile2);
     deleteFileIfExists(noiseSuppressedAudio);
 
+    // Check if the user audio contains voice or significant sounds
     if (detectSilentOrLowVoiceAudio(features2)) {
       console.log(
         "No significant sound detected in user audio. Setting similarity score to max."
@@ -214,7 +218,6 @@ const run = async (defaultAudioUrl, userAudioUrl) => {
           mfccDistance: Infinity,
           chromaDistance: Infinity,
           zcr: Infinity,
-          pitchDifference: Infinity,
         },
         weightedSimilarity: 100, // Max similarity score for "no match"
       };
@@ -226,10 +229,10 @@ const run = async (defaultAudioUrl, userAudioUrl) => {
     const weightedSimilarity = stentWeightedAudioSimilarity(
       audioComparison.mfccDistance,
       audioComparison.chromaDistance,
-      audioComparison.zcr,
-      audioComparison.pitchDifference
+      audioComparison.zcr
     );
 
+    console.log("Mfcc Distance:", audioComparison.mfccDistance);
     console.log("Stent Weighted Audio Similarity:", weightedSimilarity);
 
     return {
@@ -238,11 +241,10 @@ const run = async (defaultAudioUrl, userAudioUrl) => {
     };
   } catch (error) {
     console.error("Error during audio comparison:", error.message);
-    throw error;
+    throw error; // Ensure errors are caught and handled
   }
 };
 
-// Final function to run the comparison and save to MongoDB
 const runComparisonAndSaveResult = async (
   UserInputId,
   ActivityCode,
@@ -251,7 +253,7 @@ const runComparisonAndSaveResult = async (
   Type,
   fileUrls,
   defaultAudios,
-  similarityThreshold = 25
+  similarityThreshold = 25 // Add a default threshold
 ) => {
   try {
     const comparisonResults = [];
@@ -262,17 +264,20 @@ const runComparisonAndSaveResult = async (
       const defaultAudioUrl = defaultAudios[i];
 
       const result = await run(defaultAudioUrl, userAudioUrl);
+
+      // Check the threshold dynamically and add Remarks
       const isCorrect = result.weightedSimilarity <= similarityThreshold;
-      if (isCorrect) totalScore += 1;
+      if (isCorrect) {
+        totalScore += 1;
+      }
 
       comparisonResults.push({
         ItemCode: `Itemcode${i + 1}`,
         mfccDistance: result.audioComparison.mfccDistance,
         chromaDistance: result.audioComparison.chromaDistance,
         zcr: result.audioComparison.zcr,
-        pitchDifference: result.audioComparison.pitchDifference,
         stentWeightedSimilarity: result.weightedSimilarity,
-        Remarks: isCorrect ? "Correct" : "Incorrect",
+        Remarks: isCorrect ? "Correct" : "Incorrect", // Set Remarks based on comparison
       });
     }
 

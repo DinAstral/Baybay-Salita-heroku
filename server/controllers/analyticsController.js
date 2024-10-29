@@ -12,29 +12,22 @@ const studentStatus = async (req, res) => {
       return res.status(404).json({ error: "Student not found" });
     }
 
-    // Define assessments with max scores and types
     const assessments = [
-      { name: "Pagbabaybay", maxScore: 10 }, // Assessment 1
-      { name: "Pantig", maxScore: 10 }, // Assessment 2
-      { name: "Salita", maxScore: 10 }, // Assessment 3
-      { name: "Pagbabasa", maxScore: 5 }, // Assessment 4 (includes comprehension)
+      { name: "Pagbabaybay", maxScore: 10 },
+      { name: "Pantig", maxScore: 10 },
+      { name: "Salita", maxScore: 10 },
+      { name: "Pagbabasa", maxScore: 5 },
     ];
 
-    // Fetch all performance entries for the student
     const performances = await Performance.find({
       LRN: student.LRN,
       Type: { $in: assessments.map((a) => a.name) },
     });
 
-    // If no performance data found, mark as "Incomplete"
     if (performances.length === 0) {
       const status = "Incomplete";
-      const comment =
-        "No assessments completed. Please ensure all assessments are completed for a comprehensive evaluation.";
-      const recommendations = [
-        "Schedule each assessment to complete the student’s profile.",
-        "Review incomplete areas, focusing on fundamental sounds and letters in assessments 1 and 2.",
-      ];
+      const comment = "No assessments completed. Complete all assessments.";
+      const recommendation = "Schedule each assessment to complete the student’s profile.";
 
       await Student.findByIdAndUpdate(student._id, { status });
 
@@ -42,25 +35,19 @@ const studentStatus = async (req, res) => {
         message: "No assessments completed, status set to Incomplete",
         status,
         comment,
-        recommendations,
+        recommendation, // Only one recommendation
       });
     }
 
-    // Check completed assessments
     const completedAssessments = new Set(performances.map((p) => p.Type));
     const allAssessmentsCompleted = assessments.every((a) =>
       completedAssessments.has(a.name)
     );
 
-    // If not all assessments are completed, mark as "Incomplete"
     if (!allAssessmentsCompleted) {
       const status = "Incomplete";
-      const comment =
-        "Some assessments are missing. Please complete all required assessments.";
-      const recommendations = [
-        "Identify missing assessments and schedule them.",
-        "Discuss with the student the importance of completing each assessment to track progress.",
-      ];
+      const comment = "Some assessments are missing. Complete all required assessments.";
+      const recommendation = "Identify missing assessments and schedule them.";
 
       await Student.findByIdAndUpdate(student._id, { status });
 
@@ -68,11 +55,10 @@ const studentStatus = async (req, res) => {
         message: "Status updated to Incomplete due to missing assessments",
         status,
         comment,
-        recommendations,
+        recommendation,
       });
     }
 
-    // Calculate scores
     let totalScore = 0;
     let totalPossibleScore = 0;
     let timeReadPercentage = 0;
@@ -94,91 +80,36 @@ const studentStatus = async (req, res) => {
       }
     });
 
-    // Calculate score percentage
     const averageScore = (totalScore / totalPossibleScore) * 100;
 
-    // Status, comments, and recommendations
     let status = "Low Emerging Reader";
-    let comment =
-      "The student faces challenges with sounds and letter recognition, particularly in assessments 1 and 2.";
-    let recommendations = [
-      "Focus on foundational phonics and letter-sound recognition, especially in assessments 1 (Pagbabaybay) and 2 (Pantig).",
-      "Incorporate sound-letter matching activities and use phonetic games to build familiarity.",
-    ];
+    let comment = "The student faces challenges with sounds and letter recognition.";
+    let recommendation = "Focus on foundational phonics and letter-sound recognition.";
 
-    // Assign feedback based on score and assessments completed
     if (averageScore >= 0 && averageScore <= 16) {
       status = "Low Emerging Reader";
-      comment =
-        "The student faces challenges with sounds and letter recognition, particularly in assessments 1 and 2.";
-      recommendations = [
-        "Focus on foundational phonics and letter-sound recognition, especially in assessments 1 and 2.",
-        "Introduce repetitive sound and letter matching exercises to reinforce understanding.",
-        "Consider additional support sessions focusing on letter recognition and sounds.",
-      ];
-    } else if (
-      averageScore >= 17 &&
-      averageScore <= 30 &&
-      timeReadPercentage < 25
-    ) {
+      comment = "Challenges with sounds and letter recognition in assessments 1 and 2.";
+      recommendation = "Focus on phonics and letter-sound recognition.";
+    } else if (averageScore >= 17 && averageScore <= 30 && timeReadPercentage < 25) {
       status = "High Emerging Reader";
-      comment =
-        "The student shows slight improvement but still struggles with sounds and letters, especially in assessments 1 and 2.";
-      recommendations = [
-        "Continue reinforcing phonics and letter-sound recognition.",
-        "Incorporate paired reading with another student to boost confidence.",
-        "Add phonics games that gradually increase in complexity to encourage progress.",
-      ];
-    } else if (
-      averageScore >= 17 &&
-      averageScore <= 30 &&
-      timeReadPercentage >= 26 &&
-      timeReadPercentage <= 50 &&
-      performances.filter((p) => p.correctAnswers >= 1).length > 0
-    ) {
+      comment = "Slight improvement but struggles remain, especially in assessments 1 and 2.";
+      recommendation = "Reinforce phonics and letter-sound recognition.";
+    } else if (averageScore >= 17 && averageScore <= 30 && timeReadPercentage >= 26 && timeReadPercentage <= 50 && performances.filter((p) => p.correctAnswers >= 1).length > 0) {
       status = "Developing Reader";
-      comment =
-        "The student can recognize sounds and letters but has some challenges with syllables and words in assessments 2 and 3.";
-      recommendations = [
-        "Practice combining letters into syllables to strengthen word recognition.",
-        "Focus on exercises that involve breaking down and blending syllables.",
-        "Encourage daily reading with simple text to reinforce understanding of sounds and words.",
-      ];
-    } else if (
-      averageScore >= 17 &&
-      averageScore <= 30 &&
-      timeReadPercentage >= 51 &&
-      timeReadPercentage <= 75 &&
-      performances.filter((p) => p.correctAnswers >= 2).length > 0
-    ) {
+      comment = "Recognition of sounds and letters but challenges with syllables and words.";
+      recommendation = "Practice combining letters into syllables.";
+    } else if (averageScore >= 17 && averageScore <= 30 && timeReadPercentage >= 51 && timeReadPercentage <= 75 && performances.filter((p) => p.correctAnswers >= 2).length > 0) {
       status = "Transitioning Reader";
-      comment =
-        "The student shows major improvements but still needs work with word recognition and basic comprehension in assessments 3 and 4.";
-      recommendations = [
-        "Introduce more complex word recognition exercises.",
-        "Practice comprehension questions after reading simple passages to improve understanding.",
-        "Incorporate activities that require the student to summarize or retell stories.",
-      ];
-    } else if (
-      averageScore >= 17 &&
-      averageScore <= 30 &&
-      timeReadPercentage >= 76 &&
-      performances.filter((p) => p.correctAnswers >= 4).length > 0
-    ) {
+      comment = "Improvements noted, needs work with word recognition and comprehension.";
+      recommendation = "Introduce complex word recognition exercises.";
+    } else if (averageScore >= 17 && averageScore <= 30 && timeReadPercentage >= 76 && performances.filter((p) => p.correctAnswers >= 4).length > 0) {
       status = "Grade Level Reader";
-      comment =
-        "The student has achieved grade-level reading skills with good comprehension and fluency.";
-      recommendations = [
-        "Encourage reading across various genres to further strengthen comprehension.",
-        "Engage the student in discussions about themes and messages in stories.",
-        "Set personalized reading goals to continue developing reading fluency and enjoyment.",
-      ];
+      comment = "Achieved grade-level reading with good comprehension.";
+      recommendation = "Encourage reading various genres.";
     }
 
-    // Update student status in the database
     await Student.findByIdAndUpdate(student._id, { status });
 
-    // Return response with status, comment, and recommendations
     return res.status(200).json({
       message: `Status updated to ${status}`,
       totalScore,
@@ -186,10 +117,10 @@ const studentStatus = async (req, res) => {
       timeReadPercentage,
       comment,
       status,
-      recommendations,
+      recommendation, // Only one recommendation
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error in studentStatus function:", error);
     return res.status(500).json({ error: "Server error" });
   }
 };

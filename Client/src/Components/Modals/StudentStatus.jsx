@@ -16,7 +16,7 @@ const ShowStatus = ({
   onHide,
   status,
   comment,
-  randomRecommendation,
+  recommendation,
 }) => (
   <Modal
     isOpen={show}
@@ -35,9 +35,8 @@ const ShowStatus = ({
           <b>Comment:</b> {comment || "No comments available"}
         </p>
         <p>
-          <b>Recommendation:</b>
+          <b>Recommendation:</b> {recommendation || "No recommendations available"}
         </p>
-        <p>{randomRecommendation || "No recommendations available"}</p>
       </ModalBody>
       <ModalFooter>
         <Button color="primary" onClick={onHide}>
@@ -52,9 +51,8 @@ const StudentStatus = ({ show, onHide, LRN, onStatusUpdate }) => {
   const [modalSubmitSuccess, setModalSubmitSuccess] = useState(false);
   const [status, setStatus] = useState("");
   const [comment, setComment] = useState("");
-  const [randomRecommendation, setRandomRecommendation] = useState("");
+  const [recommendation, setRecommendation] = useState("");
 
-  // Handle status update on button click
   const handleAssessClick = async () => {
     try {
       const response = await axios.patch(`/api/studentStatus/${LRN}`);
@@ -65,15 +63,8 @@ const StudentStatus = ({ show, onHide, LRN, onStatusUpdate }) => {
       setStatus(status);
       setComment(comment);
 
-      // Select a random recommendation and store it in state
-      if (Array.isArray(recommendation) && recommendation.length > 0) {
-        const randomIndex = Math.floor(Math.random() * recommendation.length);
-        setRandomRecommendation(recommendation[randomIndex]);
-      } else {
-        setRandomRecommendation(
-          recommendation || "No recommendations available"
-        );
-      }
+      // Set the single recommendation string
+      setRecommendation(recommendation || "No recommendations available");
 
       setModalSubmitSuccess(true);
     } catch (error) {
@@ -119,7 +110,7 @@ const StudentStatus = ({ show, onHide, LRN, onStatusUpdate }) => {
         }}
         status={status}
         comment={comment}
-        randomRecommendation={randomRecommendation} // Pass the selected random recommendation
+        recommendation={recommendation} // Pass the single recommendation
       />
     </>
   );
