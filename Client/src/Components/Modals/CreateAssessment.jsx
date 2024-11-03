@@ -133,6 +133,17 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
     }
   }, [data.Type, words]);
 
+  // Handle selection change for word items
+  const handleWordChange = (itemKey, selectedWord) => {
+    const selectedItem = filteredWords.find(
+      (word) => word.Word === selectedWord
+    );
+    setData((prevData) => ({
+      ...prevData,
+      [itemKey]: selectedItem ? selectedItem.ItemCode : "",
+    }));
+  };
+
   const validateInputs = () => {
     let isValid = true;
     let newErrors = {};
