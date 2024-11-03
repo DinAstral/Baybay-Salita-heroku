@@ -11,12 +11,13 @@ import {
   Button,
 } from "@nextui-org/react";
 
+// Modal component to show the student's status, comments, and recommendations
 const ShowStatus = ({
   show,
   onHide,
   status,
   comment,
-  recommendation,
+  recommendations, // Accept recommendations as an array
 }) => (
   <Modal
     isOpen={show}
@@ -34,9 +35,18 @@ const ShowStatus = ({
         <p>
           <b>Comment:</b> {comment || "No comments available"}
         </p>
-        <p>
-          <b>Recommendation:</b> {recommendation || "No recommendations available"}
-        </p>
+        <div>
+          <b>Recommendations:</b>
+          {recommendations && recommendations.length > 0 ? (
+            <ul>
+              {recommendations.map((rec, index) => (
+                <li key={index}>{rec}</li>
+              ))}
+            </ul>
+          ) : (
+            <p>No recommendations available</p>
+          )}
+        </div>
       </ModalBody>
       <ModalFooter>
         <Button color="primary" onClick={onHide}>
@@ -51,20 +61,21 @@ const StudentStatus = ({ show, onHide, LRN, onStatusUpdate }) => {
   const [modalSubmitSuccess, setModalSubmitSuccess] = useState(false);
   const [status, setStatus] = useState("");
   const [comment, setComment] = useState("");
-  const [recommendation, setRecommendation] = useState("");
+  const [recommendations, setRecommendations] = useState([]); // Update to store an array of recommendations
 
+  // Handle the click event to assess the student's performance
   const handleAssessClick = async () => {
     try {
       const response = await axios.patch(`/api/studentStatus/${LRN}`);
       console.log("Response data:", response.data);
 
-      const { status, comment, recommendation } = response.data;
+      const { status, comment, recommendations } = response.data; // Expect recommendations as an array
       onStatusUpdate(status);
       setStatus(status);
       setComment(comment);
 
-      // Set the single recommendation string
-      setRecommendation(recommendation || "No recommendations available");
+      // Set recommendations as an array (or empty array if none available)
+      setRecommendations(recommendations || []);
 
       setModalSubmitSuccess(true);
     } catch (error) {
@@ -75,6 +86,7 @@ const StudentStatus = ({ show, onHide, LRN, onStatusUpdate }) => {
 
   return (
     <>
+      {/* Modal for initiating the assessment */}
       <Modal
         isOpen={show}
         onClose={onHide}
@@ -102,6 +114,7 @@ const StudentStatus = ({ show, onHide, LRN, onStatusUpdate }) => {
         </ModalContent>
       </Modal>
 
+      {/* Modal for showing assessment results */}
       <ShowStatus
         show={modalSubmitSuccess}
         onHide={() => {
@@ -110,7 +123,7 @@ const StudentStatus = ({ show, onHide, LRN, onStatusUpdate }) => {
         }}
         status={status}
         comment={comment}
-        recommendation={recommendation} // Pass the single recommendation
+        recommendations={recommendations} // Pass the array of recommendations
       />
     </>
   );

@@ -1,3 +1,4 @@
+const _ = require("lodash");
 const mongoose = require("mongoose");
 const Performance = require("../models/performance");
 const Student = require("../models/student");
@@ -24,20 +25,24 @@ const studentStatus = async (req, res) => {
       Type: { $in: assessments.map((a) => a.name) },
     });
 
-    if (performances.length === 0) {
+    if (_.isEmpty(performances)) {
       const status = "Incomplete";
-      const comment = "No assessments completed. Complete all assessments.";
-      const recommendation = "Schedule each assessment to complete the student’s profile.";
-
+      const recommendations = [
+        "Complete all assessments to get a full evaluation.",
+        "Start with Pagbabaybay and Pantig for foundational skills.",
+      ];
       await Student.findByIdAndUpdate(student._id, { status });
 
       return res.status(200).json({
-        message: "No assessments completed, status set to Incomplete",
+        message: "Status updated to Incomplete.",
         status,
-        comment,
-        recommendation, // Only one recommendation
+        recommendations,
       });
     }
+
+    const totalScores = _.sumBy(performances, "Score");
+    const totalPossibleScore = _.sumBy(assessments, "maxScore");
+    const averageScore = (totalScores / totalPossibleScore) * 100;
 
     const completedAssessments = new Set(performances.map((p) => p.Type));
     const allAssessmentsCompleted = assessments.every((a) =>
@@ -46,81 +51,109 @@ const studentStatus = async (req, res) => {
 
     if (!allAssessmentsCompleted) {
       const status = "Incomplete";
-      const comment = "Some assessments are missing. Complete all required assessments.";
-      const recommendation = "Identify missing assessments and schedule them.";
-
+      const recommendations = [
+        "Identify and complete missing assessments.",
+        "Encourage the student to complete all assessments for better insights.",
+      ];
       await Student.findByIdAndUpdate(student._id, { status });
 
       return res.status(200).json({
-        message: "Status updated to Incomplete due to missing assessments",
+        message: "Incomplete assessments detected.",
         status,
-        comment,
-        recommendation,
+        recommendations,
       });
     }
 
-    let totalScore = 0;
-    let totalPossibleScore = 0;
-    let timeReadPercentage = 0;
+    const levels = [
+      {
+        name: "Low Emerging Reader",
+        min: 0,
+        max: 16,
+        comment: "Focus on phonics.",
+        recs: ["Reinforce letter sounds."],
+      },
+      {
+        name: "High Emerging Reader",
+        min: 17,
+        max: 30,
+        comment: "Continue phonics work.",
+        recs: ["Practice paired reading."],
+      },
+      {
+        name: "Developing Reader",
+        min: 31,
+        max: 50,
+        comment: "Work on syllables.",
+        recs: ["Practice word blending."],
+      },
+      {
+        name: "Transitioning Reader",
+        min: 51,
+        max: 75,
+        comment: "Focus on comprehension.",
+        recs: ["Add simple comprehension exercises."],
+      },
+      {
+        name: "Grade Level Reader",
+        min: 76,
+        max: 100,
+        comment: "Great reading fluency.",
+        recs: ["Encourage genre exploration."],
+      },
+    ];
 
-    performances.forEach((performance) => {
-      const assessment = assessments.find((a) => a.name === performance.Type);
-      if (assessment) {
-        totalScore += performance.Score;
-        totalPossibleScore += assessment.maxScore;
-
-        if (performance.Type === "Pagbabasa" && performance.TimeRead) {
-          const timeRead = parseInt(performance.TimeRead, 10);
-          if (!isNaN(timeRead)) {
-            timeReadPercentage = (timeRead / assessment.maxScore) * 100;
-          } else {
-            console.warn(`Invalid TimeRead value for LRN: ${student.LRN}`);
-          }
-        }
-      }
-    });
-
-    const averageScore = (totalScore / totalPossibleScore) * 100;
-
-    let status = "Low Emerging Reader";
-    let comment = "The student faces challenges with sounds and letter recognition.";
-    let recommendation = "Focus on foundational phonics and letter-sound recognition.";
-
-    if (averageScore >= 0 && averageScore <= 16) {
-      status = "Low Emerging Reader";
-      comment = "Challenges with sounds and letter recognition in assessments 1 and 2.";
-      recommendation = "Focus on phonics and letter-sound recognition.";
-    } else if (averageScore >= 17 && averageScore <= 30 && timeReadPercentage < 25) {
-      status = "High Emerging Reader";
-      comment = "Slight improvement but struggles remain, especially in assessments 1 and 2.";
-      recommendation = "Reinforce phonics and letter-sound recognition.";
-    } else if (averageScore >= 17 && averageScore <= 30 && timeReadPercentage >= 26 && timeReadPercentage <= 50 && performances.filter((p) => p.correctAnswers >= 1).length > 0) {
-      status = "Developing Reader";
-      comment = "Recognition of sounds and letters but challenges with syllables and words.";
-      recommendation = "Practice combining letters into syllables.";
-    } else if (averageScore >= 17 && averageScore <= 30 && timeReadPercentage >= 51 && timeReadPercentage <= 75 && performances.filter((p) => p.correctAnswers >= 2).length > 0) {
-      status = "Transitioning Reader";
-      comment = "Improvements noted, needs work with word recognition and comprehension.";
-      recommendation = "Introduce complex word recognition exercises.";
-    } else if (averageScore >= 17 && averageScore <= 30 && timeReadPercentage >= 76 && performances.filter((p) => p.correctAnswers >= 4).length > 0) {
-      status = "Grade Level Reader";
-      comment = "Achieved grade-level reading with good comprehension.";
-      recommendation = "Encourage reading various genres.";
-    }
+    const studentLevel = _.find(
+      levels,
+      (level) => averageScore >= level.min && averageScore <= level.max
+    );
+    const status = studentLevel.name;
+    const comment = studentLevel.comment;
 
     await Student.findByIdAndUpdate(student._id, { status });
 
+    // Additional Analysis: Determine words with frequent incorrect remarks
+    const performanceItems = _.flatMap(performances, "PerformanceItems"); // Flatten PerformanceItems from all performances
+    const incorrectRemarks = _.filter(
+      performanceItems,
+      (item) => item.Remarks && item.Remarks.toLowerCase() === "incorrect"
+    );
+
+    const wordErrorAnalysis = _(incorrectRemarks)
+      .groupBy("Word")
+      .map((items, word) => {
+        const assessmentsWithIssues = _.uniq(
+          items.map((item) => item.assessmentType)
+        ); // Get unique assessment types
+        return {
+          word,
+          totalAttempts: items.length,
+          incorrectAttempts: items.length,
+          incorrectPercentage: (items.length / performanceItems.length) * 100,
+          assessmentsWithIssues,
+        };
+      })
+      .orderBy("incorrectPercentage", "desc")
+      .value();
+
+    // Generate context-aware recommendations based on word errors and assessments
+    const recommendations = wordErrorAnalysis.map((entry) => {
+      const assessmentsStr = entry.assessmentsWithIssues.join(", ");
+      return `The word "${entry.word}" has a high error rate in assessments: ${assessmentsStr}. Focus on practicing this word, especially in ${assessmentsStr}. Use phonics and syllable-blending activities to reinforce understanding.`;
+    });
+
+    // Return response with status, comment, context-aware recommendations, and word error analysis
     return res.status(200).json({
       message: `Status updated to ${status}`,
-      totalScore,
+      totalScores,
       totalPossibleScore,
-      timeReadPercentage,
-      comment,
+      averageScore,
       status,
-      recommendation, // Only one recommendation
+      comment,
+      recommendations,
+      wordErrorAnalysis,
     });
   } catch (error) {
-    console.error("Error in studentStatus function:", error);
+    console.error(error);
     return res.status(500).json({ error: "Server error" });
   }
 };

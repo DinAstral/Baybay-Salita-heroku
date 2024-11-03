@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { useDownloadExcel } from "react-export-table-to-excel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChalkboardTeacher,
@@ -10,7 +9,6 @@ import {
 import { Table, Button, Tooltip, Select, SelectItem } from "@nextui-org/react";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { BarChart } from "@mui/x-charts/BarChart";
-import { LineChart } from "@mui/x-charts/LineChart";
 import axios from "axios";
 
 const BodyAdminDashboard = () => {
@@ -27,6 +25,7 @@ const BodyAdminDashboard = () => {
   const [selectedSection, setSelectedSection] = useState("All Sections");
 
   const [sectionStatusCounts, setSectionStatusCounts] = useState({});
+  const [sectionRecommendations, setSectionRecommendations] = useState({});
 
   const sections = [
     "Aster",
@@ -57,11 +56,6 @@ const BodyAdminDashboard = () => {
     Camia: 0,
     Dahlia: 0,
     Iris: 0,
-  });
-
-  const [scoreDistribution, setScoreDistribution] = useState({
-    scores: [],
-    counts: [],
   });
 
   const [statusCounts, setStatusCounts] = useState({
@@ -104,49 +98,23 @@ const BodyAdminDashboard = () => {
     try {
       const response = await axios.get("/api/getStudents");
       const data = response.data;
-
       setStudents(data);
 
-      // Group students by their status and update the state
-      const statusGroups = {
-        Incomplete: 0,
-        LowEmergingReader: 0,
-        HighEmergingReader: 0,
-        DevelopingReader: 0,
-        TransitioningReader: 0,
-        GradeLevelReader: 0,
-      };
-
-      data.forEach((student) => {
-        switch (student.status) {
-          case "Incomplete":
-            statusGroups.Incomplete += 1;
-            break;
-          case "Low Emerging Reader":
-            statusGroups.LowEmergingReader += 1;
-            break;
-          case "High Emerging Reader":
-            statusGroups.HighEmergingReader += 1;
-            break;
-          case "Developing Reader":
-            statusGroups.DevelopingReader += 1;
-            break;
-          case "Transitioning Reader":
-            statusGroups.TransitioningReader += 1;
-            break;
-          case "Grade Level Reader":
-            statusGroups.GradeLevelReader += 1;
-            break;
-          default:
-            break;
-        }
+      const statusGroups = {};
+      statusTypes.forEach((status) => {
+        statusGroups[status] = data.filter(
+          (student) => student.status === status
+        ).length;
       });
-
       setStatusCounts(statusGroups);
 
-      const sectionCounts = countStudentsBySection(data);
-      setSectionCounts(sectionCounts.totalCounts); // Set total counts
-      setSectionStatusCounts(sectionCounts.statusCounts); // Set status counts
+      const sectionGroups = {};
+      sections.forEach((section) => {
+        sectionGroups[section] = data.filter(
+          (student) => student.Section === section
+        ).length;
+      });
+      setSectionCounts(sectionGroups);
     } catch (err) {
       console.error("Error fetching students:", err);
     }
@@ -180,6 +148,54 @@ const BodyAdminDashboard = () => {
       console.error("Error fetching performance:", err);
     }
   };
+
+  const generateSectionRecommendations = () => {
+    const recommendations = {};
+
+    sections.forEach((section) => {
+      const sectionPerformances = performanceCounts.filter((performance) => {
+        const student = students.find((s) => s.LRN === performance.LRN);
+        return student && student.Section === section;
+      });
+
+      const lowScoreAssessments = {};
+      const wordErrorCounts = {};
+
+      // Identify assessments with low scores and words with frequent incorrect answers
+      sectionPerformances.forEach((performance) => {
+        // Identify low scores per assessment type
+        if (performance.Score < 5) {
+          lowScoreAssessments[performance.Type] =
+            (lowScoreAssessments[performance.Type] || 0) + 1;
+        }
+
+        // Track incorrect words
+        performance.PerformanceItems.forEach((item) => {
+          if (item.Remarks.toLowerCase() === "incorrect") {
+            wordErrorCounts[item.Word] = (wordErrorCounts[item.Word] || 0) + 1;
+          }
+        });
+      });
+
+      // Generate recommendations based on low-score assessments and common incorrect words
+      const lowScoreRecommendations = Object.keys(lowScoreAssessments).map(
+        (assessment) =>
+          `Focus on improving scores in ${assessment} by reviewing key concepts.`
+      );
+
+      const wordRecommendations = Object.keys(wordErrorCounts)
+        .slice(0, 5) // Get top 5 problematic words
+        .map((word) => `Practice with the word "${word}" to reduce errors.`);
+
+      recommendations[section] = [
+        ...lowScoreRecommendations,
+        ...wordRecommendations,
+      ];
+    });
+
+    setSectionRecommendations(recommendations);
+  };
+  generateSectionRecommendations();
 
   // Count the number of users by role (e.g., Teacher, Parent)
   const countByRole = (data, role) =>
@@ -339,7 +355,7 @@ const BodyAdminDashboard = () => {
     }
   };
 
-  // Prepare data for the chart
+  // Ensure sectionLabel and sectionData are retrieved from getChartData
   const { labels: sectionLabel, data: sectionData } = getChartData();
 
   return (
@@ -560,7 +576,7 @@ const BodyAdminDashboard = () => {
                 label: "Sections",
                 scaleType: "band",
                 data: sectionLabels,
-                tickSize: 10, // Larger tick size for better readability
+                tickSize: 10,
               },
             ]}
             yAxis={[
@@ -572,7 +588,37 @@ const BodyAdminDashboard = () => {
                 tickFormat: (value) => Math.floor(value),
               },
             ]}
-            series={statusSeries}
+            series={statusSeries.map((series) => ({
+              ...series,
+              element: (
+                <Tooltip
+                  content={
+                    sectionRecommendations[series.label] &&
+                    sectionRecommendations[series.label].length > 0 ? (
+                      <div>
+                        {sectionRecommendations[series.label].map(
+                          (rec, index) => (
+                            <p key={index}>{rec}</p>
+                          )
+                        )}
+                      </div>
+                    ) : (
+                      "No specific recommendation available"
+                    )
+                  }
+                  placement="top"
+                >
+                  <div
+                    style={{
+                      height: "100%",
+                      width: "100%",
+                      backgroundColor: series.color,
+                      cursor: "pointer",
+                    }}
+                  ></div>
+                </Tooltip>
+              ),
+            }))}
             gap={20}
             height={500}
           />
