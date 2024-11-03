@@ -73,6 +73,7 @@ const BodyAdminDashboard = () => {
       try {
         await Promise.all([fetchUsers(), fetchStudents(), fetchAssessment()]);
         await fetchPerformance(); // Fetch performance data separately
+        generateSectionRecommendations();
         computeAverageScores();
       } catch (err) {
         console.error("Error fetching data:", err);
