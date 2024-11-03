@@ -195,7 +195,6 @@ const BodyAdminDashboard = () => {
 
     setSectionRecommendations(recommendations);
   };
-  generateSectionRecommendations();
 
   // Count the number of users by role (e.g., Teacher, Parent)
   const countByRole = (data, role) =>
@@ -421,26 +420,7 @@ const BodyAdminDashboard = () => {
           </div>
         </div>
 
-        <div className="col-span-1 lg:col-span-1 bg-white rounded-lg shadow p-4">
-          <h2 className="text-xl font-semibold">User Distribution</h2>
-          <div className="pt-8 pl-5">
-            <PieChart
-              series={[
-                {
-                  data: [
-                    { id: 1, value: students.length, label: "Students" },
-                    { id: 2, value: teachersCount, label: "Teachers" },
-                    { id: 3, value: parentsCount, label: "Parents" },
-                  ],
-                },
-              ]}
-              width={400}
-              height={200}
-            />
-          </div>
-        </div>
-
-        <div className="col-span-1 lg:col-span-2 bg-white rounded-lg shadow p-4">
+        <div className="col-span-1 lg:col-span-3 bg-white rounded-lg shadow p-4">
           <h2 className="text-xl font-semibold">Students Per Section</h2>
           <BarChart
             xAxis={[

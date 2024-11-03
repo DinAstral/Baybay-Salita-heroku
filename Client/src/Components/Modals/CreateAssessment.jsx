@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -50,6 +49,12 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
   const [words, setWords] = useState([]);
   const [sentences, setSentences] = useState([]);
   const [filteredWords, setFilteredWords] = useState([]);
+  const [assessmentExist, setAssessmentExist] = useState({
+    "Assessment 1": false,
+    "Assessment 2": false,
+    "Assessment 3": false,
+    "Assessment 4": false,
+  });
   const [data, setData] = useState({
     Period: "",
     Type: "",
@@ -67,6 +72,39 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
   });
 
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    fetchAssessments();
+    fetchImportWord();
+    fetchImportSentence();
+  }, []);
+
+  const fetchAssessments = () => {
+    axios
+      .get(`/api/getAssessments`)
+      .then((response) => {
+        const assessments = response.data.filter(
+          (activity) =>
+            activity.UserID === userId && activity.Section === section
+        );
+        const assessmentStatus = {
+          "Assessment 1": assessments.some(
+            (activity) => activity.Type === "Pagbabaybay"
+          ),
+          "Assessment 2": assessments.some(
+            (activity) => activity.Type === "Pantig"
+          ),
+          "Assessment 3": assessments.some(
+            (activity) => activity.Type === "Salita"
+          ),
+          "Assessment 4": assessments.some(
+            (activity) => activity.Type === "Pagbabasa"
+          ),
+        };
+        setAssessmentExist(assessmentStatus);
+      })
+      .catch((err) => console.log(err));
+  };
 
   const fetchImportWord = () => {
     axios
@@ -87,11 +125,6 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
   };
 
   useEffect(() => {
-    fetchImportWord();
-    fetchImportSentence();
-  }, []);
-
-  useEffect(() => {
     if (data.Type && data.Type !== "Pagbabasa") {
       const filtered = words.filter((word) => word.Type === data.Type);
       setFilteredWords(filtered);
@@ -100,20 +133,10 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
     }
   }, [data.Type, words]);
 
-  const handleWordChange = (itemKey, selectedWord) => {
-    const selectedItem = filteredWords.find(
-      (word) => word.ItemCode === selectedWord
-    );
-
-    setData({ ...data, [itemKey]: selectedItem ? selectedItem.ItemCode : "" });
-  };
-
-  // Validation function
   const validateInputs = () => {
     let isValid = true;
     let newErrors = {};
 
-    // Check required fields
     if (!data.Period) {
       newErrors.Period = "Grading Period is required.";
       isValid = false;
@@ -123,13 +146,11 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
       isValid = false;
     }
 
-    // Title is required for Pagbabasa
     if (data.Type === "Pagbabasa" && !data.Title) {
       newErrors.Title = "Title is required for Pagbabasa.";
       isValid = false;
     }
 
-    // Only validate items if the type is NOT Pagbabasa
     if (data.Type !== "Pagbabasa") {
       for (let i = 1; i <= 10; i++) {
         if (!data[`Item${i}`]) {
@@ -237,7 +258,7 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
               <Select
                 labelPlacement="outside"
                 label="Type of Assessment"
-                placeholder="Select Type of Assessment:"
+                placeholder="Select Type of Assessment"
                 value={data.Type}
                 onChange={(e) => setData({ ...data, Type: e.target.value })}
                 className="w-full my-2"
@@ -245,14 +266,28 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                 errorMessage={errors.Type}
               >
                 <SelectItem key="Pagbabaybay">
-                  Assessment 1: Pagbabaybay Tunog at Letra
+                  Assessment 1: Pagbabaybay
                 </SelectItem>
-                <SelectItem key="Pantig">Assessment 2: Pantig</SelectItem>
-                <SelectItem key="Salita">Assessment 3: Salita</SelectItem>
-                <SelectItem key="Pagbabasa">Assessment 4: Pagbabasa</SelectItem>
+                <SelectItem
+                  key="Pantig"
+                  isDisabled={!assessmentExist["Assessment 1"]}
+                >
+                  Assessment 2: Pantig
+                </SelectItem>
+                <SelectItem
+                  key="Salita"
+                  isDisabled={!assessmentExist["Assessment 2"]}
+                >
+                  Assessment 3: Salita
+                </SelectItem>
+                <SelectItem
+                  key="Pagbabasa"
+                  isDisabled={!assessmentExist["Assessment 3"]}
+                >
+                  Assessment 4: Pagbabasa
+                </SelectItem>
               </Select>
 
-              {/* Only show title if type is Pagbabasa */}
               {data.Type === "Pagbabasa" && (
                 <Select
                   labelPlacement="outside"
@@ -272,7 +307,6 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                 </Select>
               )}
 
-              {/* Only show the item selection if type is NOT Pagbabasa */}
               {data.Type !== "Pagbabasa" && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[...Array(10)].map((_, i) => (
@@ -315,7 +349,6 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
   );
 };
 
-// Add prop types validation
 CreateAssessment.propTypes = {
   show: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
