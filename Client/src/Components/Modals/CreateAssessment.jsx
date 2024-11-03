@@ -133,7 +133,6 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
     }
   }, [data.Type, words]);
 
-  // Handle selection change for word items
   const handleWordChange = (itemKey, selectedWord) => {
     const selectedItem = filteredWords.find(
       (word) => word.Word === selectedWord
@@ -142,6 +141,10 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
       ...prevData,
       [itemKey]: selectedItem ? selectedItem.ItemCode : "",
     }));
+  };
+
+  const handleSelectChange = (field, value) => {
+    setData((prevData) => ({ ...prevData, [field]: value }));
   };
 
   const validateInputs = () => {
@@ -255,7 +258,7 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                 label="Grading Period"
                 placeholder="Select Grading Period"
                 value={data.Period}
-                onChange={(e) => setData({ ...data, Period: e.target.value })}
+                onChange={(e) => handleSelectChange("Period", e.target.value)}
                 className="w-full my-2"
                 isInvalid={!!errors.Period}
                 errorMessage={errors.Period}
@@ -271,7 +274,7 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                 label="Type of Assessment"
                 placeholder="Select Type of Assessment"
                 value={data.Type}
-                onChange={(e) => setData({ ...data, Type: e.target.value })}
+                onChange={(e) => handleSelectChange("Type", e.target.value)}
                 className="w-full my-2"
                 isInvalid={!!errors.Type}
                 errorMessage={errors.Type}
@@ -305,7 +308,7 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                   label="Title"
                   value={data.Title}
                   placeholder="Select a Title:"
-                  onChange={(e) => setData({ ...data, Title: e.target.value })}
+                  onChange={(e) => handleSelectChange("Title", e.target.value)}
                   className="w-full my-2"
                   isInvalid={!!errors.Title}
                   errorMessage={errors.Title}
