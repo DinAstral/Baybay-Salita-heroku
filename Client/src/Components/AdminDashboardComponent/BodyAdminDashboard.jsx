@@ -71,7 +71,6 @@ const BodyAdminDashboard = () => {
     try {
       const response = await axios.get("/api/getStudents");
       setStudents(response.data);
-      // Aggregate status and section counts
       setStatusCounts(getCounts(response.data, "status"));
       setSectionCounts(getCounts(response.data, "Section"));
     } catch (err) {
@@ -229,16 +228,28 @@ const BodyAdminDashboard = () => {
         <Select
           variant="bordered"
           value={selectedSection}
-          onChange={(e) => setSelectedSection(e.target.value)}
+          onChange={(e) => setSelectedSection(e)}
         >
-          <SelectItem key="All Sections">All Sections</SelectItem>
+          <SelectItem key="All Sections" value="All Sections">
+            All Sections
+          </SelectItem>
           {sections.map((section) => (
-            <SelectItem key={section}>{section}</SelectItem>
+            <SelectItem key={section} value={section}>
+              {section}
+            </SelectItem>
           ))}
         </Select>
         <BarChart
-          xAxis={[{ label: "Sections", data: sectionLabels }]}
-          yAxis={[{ label: "Average Score", max: 10, tickFormat: (v) => v }]}
+          xAxis={[
+            { label: "Sections", scaleType: "band", data: sectionLabels },
+          ]}
+          yAxis={[
+            {
+              label: "Average Score",
+              max: 10,
+              tickFormat: (v) => Math.floor(v),
+            },
+          ]}
           series={[
             {
               data: sectionData,
@@ -256,7 +267,8 @@ const BodyAdminDashboard = () => {
 // Helper components for cleaner UI
 const InfoCard = ({ title, count, color, icon }) => (
   <div
-    className={`bg-[${color}] rounded-lg shadow p-4 flex flex-row justify-between`}
+    className="rounded-lg shadow p-4 flex flex-row justify-between"
+    style={{ backgroundColor: color }}
   >
     <div className="text-white">
       <h2 className="text-xl font-semibold">{title}</h2>
@@ -268,7 +280,8 @@ const InfoCard = ({ title, count, color, icon }) => (
 
 const StatusCard = ({ status, count, color }) => (
   <div
-    className={`bg-[${color}] rounded-lg shadow p-4 flex flex-row justify-between`}
+    className="rounded-lg shadow p-4 flex flex-row justify-between"
+    style={{ backgroundColor: color }}
   >
     <div className="text-white">
       <h2 className="text-xl font-semibold">{status}</h2>
