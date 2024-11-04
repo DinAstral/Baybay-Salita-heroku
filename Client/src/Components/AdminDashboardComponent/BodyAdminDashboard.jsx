@@ -71,9 +71,7 @@ const BodyAdminDashboard = () => {
         await Promise.all([fetchUsers(), fetchStudents(), fetchAssessment()]);
         await fetchPerformance(); // Fetch performance data separately
         computeAverageScores();
-        const recommendations = generateSectionRecommendation(
-          studentResponse.data
-        );
+        const recommendations = generateSectionRecommendation(students);
         setSectionRecommendations(recommendations);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -308,9 +306,8 @@ const BodyAdminDashboard = () => {
       const lowScoreAssessments = {};
       const wordErrorCounts = {};
 
-      // Identify assessments with low scores and words with frequent incorrect answers
       sectionPerformances.forEach((performance) => {
-        // Identify low scores per assessment type
+        // Identify assessments with low scores (< 5)
         if (performance.Score < 5) {
           lowScoreAssessments[performance.Type] =
             (lowScoreAssessments[performance.Type] || 0) + 1;
@@ -324,14 +321,15 @@ const BodyAdminDashboard = () => {
         });
       });
 
-      // Generate recommendations based on low-score assessments and common incorrect words
+      // Generate recommendations based on low scores and frequent incorrect words
       const lowScoreRecommendations = Object.keys(lowScoreAssessments).map(
         (assessment) =>
           `Focus on improving scores in ${assessment} by reviewing key concepts.`
       );
 
       const wordRecommendations = Object.keys(wordErrorCounts)
-        .slice(0, 5) // Get top 5 problematic words
+        .sort((a, b) => wordErrorCounts[b] - wordErrorCounts[a])
+        .slice(0, 5) // Limit to top 5 words
         .map((word) => `Practice with the word "${word}" to reduce errors.`);
 
       recommendations[section] = [
@@ -572,15 +570,15 @@ const BodyAdminDashboard = () => {
                 tickFormat: (value) => Math.floor(value),
               },
             ]}
-            series={statusSeries.map((series) => ({
+            series={statusSeries.map((series, idx) => ({
               ...series,
               element: (
                 <Tooltip
                   content={
-                    sectionRecommendations[series.label] &&
-                    sectionRecommendations[series.label].length > 0 ? (
+                    sectionRecommendations[sectionLabels[idx]] &&
+                    sectionRecommendations[sectionLabels[idx]].length > 0 ? (
                       <div>
-                        {sectionRecommendations[series.label].map(
+                        {sectionRecommendations[sectionLabels[idx]].map(
                           (rec, index) => (
                             <p key={index}>{rec}</p>
                           )
