@@ -307,13 +307,11 @@ const BodyAdminDashboard = () => {
       const wordErrorCounts = {};
 
       sectionPerformances.forEach((performance) => {
-        // Identify assessments with low scores (< 5)
         if (performance.Score < 5) {
           lowScoreAssessments[performance.Type] =
             (lowScoreAssessments[performance.Type] || 0) + 1;
         }
 
-        // Track incorrect words
         performance.PerformanceItems.forEach((item) => {
           if (item.Remarks.toLowerCase() === "incorrect") {
             wordErrorCounts[item.Word] = (wordErrorCounts[item.Word] || 0) + 1;
@@ -321,7 +319,6 @@ const BodyAdminDashboard = () => {
         });
       });
 
-      // Generate recommendations based on low scores and frequent incorrect words
       const lowScoreRecommendations = Object.keys(lowScoreAssessments).map(
         (assessment) =>
           `Focus on improving scores in ${assessment} by reviewing key concepts.`
@@ -329,13 +326,20 @@ const BodyAdminDashboard = () => {
 
       const wordRecommendations = Object.keys(wordErrorCounts)
         .sort((a, b) => wordErrorCounts[b] - wordErrorCounts[a])
-        .slice(0, 5) // Limit to top 5 words
+        .slice(0, 5)
         .map((word) => `Practice with the word "${word}" to reduce errors.`);
 
       recommendations[section] = [
         ...lowScoreRecommendations,
         ...wordRecommendations,
       ];
+    });
+
+    // Ensure each section has at least an empty array for recommendations
+    sections.forEach((section) => {
+      if (!recommendations[section]) {
+        recommendations[section] = [];
+      }
     });
 
     setSectionRecommendations(recommendations);
@@ -575,7 +579,7 @@ const BodyAdminDashboard = () => {
               element: (
                 <Tooltip
                   content={
-                    sectionRecommendations[sectionLabels[idx]] &&
+                    Array.isArray(sectionRecommendations[sectionLabels[idx]]) &&
                     sectionRecommendations[sectionLabels[idx]].length > 0 ? (
                       <div>
                         {sectionRecommendations[sectionLabels[idx]].map(
