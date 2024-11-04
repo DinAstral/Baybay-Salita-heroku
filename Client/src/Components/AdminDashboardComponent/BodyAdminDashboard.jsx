@@ -11,12 +11,10 @@ import { BarChart } from "@mui/x-charts/BarChart";
 import axios from "axios";
 
 const BodyAdminDashboard = () => {
-  const [users, setUsers] = useState([]);
   const [students, setStudents] = useState([]);
   const [assessments, setAssessment] = useState([]);
   const [teachersCount, setTeachersCount] = useState(0);
   const [parentsCount, setParentsCount] = useState(0);
-  const [performanceData, setPerformanceData] = useState([]);
   const [selectedAssessment, setSelectedAssessment] = useState("Pagbabaybay");
   const [performanceCounts, setPerformanceCounts] = useState([]);
 
@@ -25,18 +23,6 @@ const BodyAdminDashboard = () => {
 
   const [sectionStatusCounts, setSectionStatusCounts] = useState({});
   const [sectionRecommendations, setSectionRecommendations] = useState({});
-
-  const sections = [
-    "Aster",
-    "Camia",
-    "Dahlia",
-    "Iris",
-    "Jasmin",
-    "Orchid",
-    "Rose",
-    "Tulip",
-    "SSC",
-  ];
 
   const [sectionCounts, setSectionCounts] = useState({
     Aster: 0,
@@ -66,6 +52,18 @@ const BodyAdminDashboard = () => {
     GradeLevelReader: 0,
   });
 
+  const sections = [
+    "Aster",
+    "Camia",
+    "Dahlia",
+    "Iris",
+    "Jasmin",
+    "Orchid",
+    "Rose",
+    "Tulip",
+    "SSC",
+  ];
+
   // Fetch data when the component loads or when the selectedAssessment changes
   useEffect(() => {
     const fetchData = async () => {
@@ -73,7 +71,10 @@ const BodyAdminDashboard = () => {
         await Promise.all([fetchUsers(), fetchStudents(), fetchAssessment()]);
         await fetchPerformance(); // Fetch performance data separately
         computeAverageScores();
-        generateSectionRecommendations();
+        const recommendations = generateSectionRecommendation(
+          studentResponse.data
+        );
+        setSectionRecommendations(recommendations);
       } catch (err) {
         console.error("Error fetching data:", err);
       }
@@ -86,7 +87,6 @@ const BodyAdminDashboard = () => {
     try {
       const response = await axios.get("/api/users");
       const data = response.data;
-      setUsers(data);
       setTeachersCount(countByRole(data, "Teacher"));
       setParentsCount(countByRole(data, "Parent"));
     } catch (err) {
@@ -296,7 +296,7 @@ const BodyAdminDashboard = () => {
     setAverageScores(avgScores);
   };
 
-  const generateSectionRecommendations = () => {
+  const generateSectionRecommendation = (students) => {
     const recommendations = {};
 
     sections.forEach((section) => {
