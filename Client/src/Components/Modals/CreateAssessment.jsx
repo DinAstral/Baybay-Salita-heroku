@@ -70,7 +70,6 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
     Item9: "",
     Item10: "",
   });
-
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -159,12 +158,10 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
       newErrors.Type = "Type of Assessment is required.";
       isValid = false;
     }
-
     if (data.Type === "Pagbabasa" && !data.Title) {
       newErrors.Title = "Title is required for Pagbabasa.";
       isValid = false;
     }
-
     if (data.Type !== "Pagbabasa") {
       for (let i = 1; i <= 10; i++) {
         if (!data[`Item${i}`]) {
@@ -258,7 +255,7 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                 label="Grading Period"
                 placeholder="Select Grading Period"
                 value={data.Period}
-                onChange={(e) => handleSelectChange("Period", e.target.value)}
+                onChange={(e) => handleSelectChange("Period", e)}
                 className="w-full my-2"
                 isInvalid={!!errors.Period}
                 errorMessage={errors.Period}
@@ -274,7 +271,7 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                 label="Type of Assessment"
                 placeholder="Select Type of Assessment"
                 value={data.Type}
-                onChange={(e) => handleSelectChange("Type", e.target.value)}
+                onChange={(e) => handleSelectChange("Type", e)}
                 className="w-full my-2"
                 isInvalid={!!errors.Type}
                 errorMessage={errors.Type}
@@ -308,7 +305,7 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                   label="Title"
                   value={data.Title}
                   placeholder="Select a Title:"
-                  onChange={(e) => handleSelectChange("Title", e.target.value)}
+                  onChange={(e) => handleSelectChange("Title", e)}
                   className="w-full my-2"
                   isInvalid={!!errors.Title}
                   errorMessage={errors.Title}
@@ -330,9 +327,7 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                       label={`Item ${i + 1}`}
                       value={data[`Item${i + 1}`]}
                       placeholder="Select a word:"
-                      onChange={(e) =>
-                        handleWordChange(`Item${i + 1}`, e.target.value)
-                      }
+                      onChange={(e) => handleWordChange(`Item${i + 1}`, e)}
                       className="w-full my-2"
                       isInvalid={!!errors[`Item${i + 1}`]}
                       errorMessage={errors[`Item${i + 1}`]}

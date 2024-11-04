@@ -297,6 +297,11 @@ const BodyAdminDashboard = () => {
   const generateSectionRecommendation = (students) => {
     const recommendations = {};
 
+    // Initialize each section with an empty array
+    sections.forEach((section) => {
+      recommendations[section] = [];
+    });
+
     sections.forEach((section) => {
       const sectionPerformances = performanceCounts.filter((performance) => {
         const student = students.find((s) => s.LRN === performance.LRN);
@@ -312,11 +317,14 @@ const BodyAdminDashboard = () => {
             (lowScoreAssessments[performance.Type] || 0) + 1;
         }
 
-        performance.PerformanceItems.forEach((item) => {
-          if (item.Remarks.toLowerCase() === "incorrect") {
-            wordErrorCounts[item.Word] = (wordErrorCounts[item.Word] || 0) + 1;
-          }
-        });
+        if (performance.PerformanceItems) {
+          performance.PerformanceItems.forEach((item) => {
+            if (item.Remarks && item.Remarks.toLowerCase() === "incorrect") {
+              wordErrorCounts[item.Word] =
+                (wordErrorCounts[item.Word] || 0) + 1;
+            }
+          });
+        }
       });
 
       const lowScoreRecommendations = Object.keys(lowScoreAssessments).map(
@@ -333,13 +341,6 @@ const BodyAdminDashboard = () => {
         ...lowScoreRecommendations,
         ...wordRecommendations,
       ];
-    });
-
-    // Ensure each section has at least an empty array for recommendations
-    sections.forEach((section) => {
-      if (!recommendations[section]) {
-        recommendations[section] = [];
-      }
     });
 
     setSectionRecommendations(recommendations);
