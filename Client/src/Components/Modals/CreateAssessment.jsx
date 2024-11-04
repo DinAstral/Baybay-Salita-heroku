@@ -255,15 +255,23 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                 label="Grading Period"
                 placeholder="Select Grading Period"
                 value={data.Period}
-                onChange={(e) => handleSelectChange("Period", e)}
+                onChange={(value) => handleSelectChange("Period", value)}
                 className="w-full my-2"
                 isInvalid={!!errors.Period}
                 errorMessage={errors.Period}
               >
-                <SelectItem key="1">Grading Period 1</SelectItem>
-                <SelectItem key="2">Grading Period 2</SelectItem>
-                <SelectItem key="3">Grading Period 3</SelectItem>
-                <SelectItem key="4">Grading Period 4</SelectItem>
+                <SelectItem key="1" value="1">
+                  Grading Period 1
+                </SelectItem>
+                <SelectItem key="2" value="2">
+                  Grading Period 2
+                </SelectItem>
+                <SelectItem key="3" value="3">
+                  Grading Period 3
+                </SelectItem>
+                <SelectItem key="4" value="4">
+                  Grading Period 4
+                </SelectItem>
               </Select>
 
               <Select
@@ -271,28 +279,31 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                 label="Type of Assessment"
                 placeholder="Select Type of Assessment"
                 value={data.Type}
-                onChange={(e) => handleSelectChange("Type", e)}
+                onChange={(value) => handleSelectChange("Type", value)}
                 className="w-full my-2"
                 isInvalid={!!errors.Type}
                 errorMessage={errors.Type}
               >
-                <SelectItem key="Pagbabaybay">
+                <SelectItem key="Pagbabaybay" value="Pagbabaybay">
                   Assessment 1: Pagbabaybay
                 </SelectItem>
                 <SelectItem
                   key="Pantig"
+                  value="Pantig"
                   isDisabled={!assessmentExist["Assessment 1"]}
                 >
                   Assessment 2: Pantig
                 </SelectItem>
                 <SelectItem
                   key="Salita"
+                  value="Salita"
                   isDisabled={!assessmentExist["Assessment 2"]}
                 >
                   Assessment 3: Salita
                 </SelectItem>
                 <SelectItem
                   key="Pagbabasa"
+                  value="Pagbabasa"
                   isDisabled={!assessmentExist["Assessment 3"]}
                 >
                   Assessment 4: Pagbabasa
@@ -305,7 +316,7 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                   label="Title"
                   value={data.Title}
                   placeholder="Select a Title:"
-                  onChange={(e) => handleSelectChange("Title", e)}
+                  onChange={(value) => handleSelectChange("Title", value)}
                   className="w-full my-2"
                   isInvalid={!!errors.Title}
                   errorMessage={errors.Title}
@@ -327,7 +338,9 @@ const CreateAssessment = ({ show, handleClose, userId, section }) => {
                       label={`Item ${i + 1}`}
                       value={data[`Item${i + 1}`]}
                       placeholder="Select a word:"
-                      onChange={(e) => handleWordChange(`Item${i + 1}`, e)}
+                      onChange={(value) =>
+                        handleWordChange(`Item${i + 1}`, value)
+                      }
                       className="w-full my-2"
                       isInvalid={!!errors[`Item${i + 1}`]}
                       errorMessage={errors[`Item${i + 1}`]}

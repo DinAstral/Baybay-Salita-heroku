@@ -1,12 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChalkboardTeacher,
   faChildReaching,
-  faCircleInfo,
-  faHouse,
 } from "@fortawesome/free-solid-svg-icons";
-import { Tooltip, Select, SelectItem } from "@nextui-org/react";
+import { Tooltip } from "@nextui-org/react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import axios from "axios";
 
@@ -17,13 +15,10 @@ const BodyAdminDashboard = () => {
   const [parentsCount, setParentsCount] = useState(0);
   const [selectedAssessment, setSelectedAssessment] = useState("Pagbabaybay");
   const [performanceCounts, setPerformanceCounts] = useState([]);
-
   const [averageScores, setAverageScores] = useState({});
   const [selectedSection, setSelectedSection] = useState("All Sections");
-
   const [sectionStatusCounts, setSectionStatusCounts] = useState({});
   const [sectionRecommendations, setSectionRecommendations] = useState({});
-
   const [sectionCounts, setSectionCounts] = useState({
     Aster: 0,
     Camia: 0,
@@ -34,22 +29,6 @@ const BodyAdminDashboard = () => {
     Rose: 0,
     Tulip: 0,
     SSC: 0,
-  });
-
-  const [activityCounts, setActivityCounts] = useState({
-    Aster: 0,
-    Camia: 0,
-    Dahlia: 0,
-    Iris: 0,
-  });
-
-  const [statusCounts, setStatusCounts] = useState({
-    Incomplete: 0,
-    LowEmergingReader: 0,
-    HighEmergingReader: 0,
-    DevelopingReader: 0,
-    TransitioningReader: 0,
-    GradeLevelReader: 0,
   });
 
   const sections = [
@@ -64,15 +43,22 @@ const BodyAdminDashboard = () => {
     "SSC",
   ];
 
-  // Fetch data when the component loads or when the selectedAssessment changes
+  const statusTypes = [
+    "Incomplete",
+    "Low Emerging Reader",
+    "High Emerging Reader",
+    "Developing Reader",
+    "Transitioning Reader",
+    "Grade Level Reader",
+  ];
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         await Promise.all([fetchUsers(), fetchStudents(), fetchAssessment()]);
-        await fetchPerformance(); // Fetch performance data separately
+        await fetchPerformance();
         computeAverageScores();
-        const recommendations = generateSectionRecommendation(students);
-        setSectionRecommendations(recommendations);
+        generateSectionRecommendation();
       } catch (err) {
         console.error("Error fetching data:", err);
       }
@@ -84,7 +70,7 @@ const BodyAdminDashboard = () => {
   const fetchUsers = async () => {
     try {
       const response = await axios.get("/api/users");
-      const data = response.data;
+      const data = Array.isArray(response.data) ? response.data : [];
       setTeachersCount(countByRole(data, "Teacher"));
       setParentsCount(countByRole(data, "Parent"));
     } catch (err) {
@@ -95,11 +81,9 @@ const BodyAdminDashboard = () => {
   const fetchStudents = async () => {
     try {
       const response = await axios.get("/api/getStudents");
-      const data = response.data;
-
+      const data = Array.isArray(response.data) ? response.data : [];
       setStudents(data);
 
-      // Group students by their status and update the state
       const statusGroups = {
         Incomplete: 0,
         LowEmergingReader: 0,
@@ -130,6 +114,7 @@ const BodyAdminDashboard = () => {
             statusGroups.GradeLevelReader += 1;
             break;
           default:
+            console.warn(`Unknown status: ${student.status}`);
             break;
         }
       });
@@ -137,8 +122,8 @@ const BodyAdminDashboard = () => {
       setStatusCounts(statusGroups);
 
       const sectionCounts = countStudentsBySection(data);
-      setSectionCounts(sectionCounts.totalCounts); // Set total counts
-      setSectionStatusCounts(sectionCounts.statusCounts); // Set status counts
+      setSectionCounts(sectionCounts.totalCounts);
+      setSectionStatusCounts(sectionCounts.statusCounts);
     } catch (err) {
       console.error("Error fetching students:", err);
     }
@@ -147,7 +132,7 @@ const BodyAdminDashboard = () => {
   const fetchAssessment = async () => {
     try {
       const response = await axios.get("/api/getAssessments");
-      const data = response.data;
+      const data = Array.isArray(response.data) ? response.data : [];
 
       const activities = ["Pagbabaybay", "Pantig", "Salita", "Pagbabasa"];
       const counts = activities.reduce((acc, activity) => {
@@ -165,41 +150,17 @@ const BodyAdminDashboard = () => {
   const fetchPerformance = async () => {
     try {
       const response = await axios.get("/api/getPerformance");
-      const data = response.data;
-
+      const data = Array.isArray(response.data) ? response.data : [];
       setPerformanceCounts(data);
     } catch (err) {
       console.error("Error fetching performance:", err);
     }
   };
 
-  // Count the number of users by role (e.g., Teacher, Parent)
   const countByRole = (data, role) =>
-    data.filter((user) => user.role === role).length;
+    Array.isArray(data) ? data.filter((user) => user.role === role).length : 0;
 
-  // Function to count students by section and status
   const countStudentsBySection = (students) => {
-    const sections = [
-      "Aster",
-      "Camia",
-      "Dahlia",
-      "Iris",
-      "Jasmin",
-      "Orchid",
-      "Rose",
-      "Tulip",
-      "SSC",
-    ];
-
-    const statusTypes = [
-      "Incomplete",
-      "Low Emerging Reader",
-      "High Emerging Reader",
-      "Developing Reader",
-      "Transitioning Reader",
-      "Grade Level Reader",
-    ];
-
     const totalCounts = {};
     const statusCounts = {};
 
@@ -220,7 +181,6 @@ const BodyAdminDashboard = () => {
     return { totalCounts, statusCounts };
   };
 
-  // Assign colors to statuses
   const getColorForStatus = (status) => {
     switch (status) {
       case "Incomplete":
@@ -236,53 +196,28 @@ const BodyAdminDashboard = () => {
       case "Grade Level Reader":
         return "#FF8080";
       default:
-        return "#ccc"; // Default color for unknown status
+        return "#ccc";
     }
   };
-
-  // Data preparation for the bar charts
-  const sectionLabels = Object.keys(sectionCounts);
-  const statusTypes = [
-    "Incomplete",
-    "Low Emerging Reader",
-    "High Emerging Reader",
-    "Developing Reader",
-    "Transitioning Reader",
-    "Grade Level Reader",
-  ];
-
-  // Create data series for the BarChart
-  const statusSeries = statusTypes.map((status) => ({
-    data: sectionLabels.map(
-      (section) =>
-        (sectionStatusCounts[section] &&
-          sectionStatusCounts[section][status]) ||
-        0
-    ),
-    label: status,
-    color: getColorForStatus(status),
-  }));
 
   const computeAverageScores = () => {
     const sectionScores = {};
 
-    // Initialize each section with an array to accumulate scores
     sections.forEach((section) => {
       sectionScores[section] = [];
     });
 
-    // Filter performance counts based on selected assessment
     performanceCounts.forEach((performance) => {
       const student = students.find((s) => s.LRN === performance.LRN);
-      if (student && student.Section) {
-        const section = student.Section;
-        if (performance.Type === selectedAssessment) {
-          sectionScores[section].push(parseInt(performance.Score, 10));
-        }
+      if (
+        student &&
+        student.Section &&
+        performance.Type === selectedAssessment
+      ) {
+        sectionScores[student.Section].push(parseInt(performance.Score, 10));
       }
     });
 
-    // Calculate the average score per section
     const avgScores = {};
     sections.forEach((section) => {
       const scores = sectionScores[section];
@@ -294,10 +229,9 @@ const BodyAdminDashboard = () => {
     setAverageScores(avgScores);
   };
 
-  const generateSectionRecommendation = (students) => {
+  const generateSectionRecommendation = () => {
     const recommendations = {};
 
-    // Initialize each section with an empty array
     sections.forEach((section) => {
       recommendations[section] = [];
     });
@@ -346,7 +280,6 @@ const BodyAdminDashboard = () => {
     setSectionRecommendations(recommendations);
   };
 
-  // Handle dynamic data based on section selection
   const getChartData = () => {
     if (selectedSection === "All Sections") {
       return {
@@ -361,8 +294,18 @@ const BodyAdminDashboard = () => {
     }
   };
 
-  // Prepare data for the chart
-  const { labels: sectionLabel, data: sectionData } = getChartData();
+  const { labels: sectionLabels, data: sectionData } = getChartData();
+
+  const statusSeries = statusTypes.map((status) => ({
+    data: sectionLabels.map(
+      (section) =>
+        (sectionStatusCounts[section] &&
+          sectionStatusCounts[section][status]) ||
+        0
+    ),
+    label: status,
+    color: getColorForStatus(status),
+  }));
 
   return (
     <div className="px-9">
