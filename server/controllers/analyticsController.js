@@ -28,7 +28,7 @@ const studentStatus = async (req, res) => {
     if (_.isEmpty(performances)) {
       const status = "Incomplete";
       const recommendations = [
-        "Complete all assessments to get a full evaluation.",
+        "The student must complete all assessments to get a full evaluation.",
         "Start with Pagbabaybay and Pantig for foundational skills.",
       ];
       await Student.findByIdAndUpdate(student._id, { status });

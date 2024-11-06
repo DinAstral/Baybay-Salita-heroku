@@ -32,10 +32,7 @@ const BodyViewPerformance = () => {
   const [modalShowView, setModalShowView] = useState(false);
   const { user } = useContext(UserContext);
   const { UserInputId } = useParams();
-  const [student, setStudent] = useState({
-    FirstName: "",
-    LastName: "",
-  });
+  const [student, setStudent] = useState({});
 
   const [data, setData] = useState({
     UserInputId: "",
@@ -69,7 +66,7 @@ const BodyViewPerformance = () => {
       const fetchStudentData = async () => {
         try {
           const response = await axios.get(`/api/getStudent/${data.LRN}`);
-          setStudent(response.data.student);
+          setStudent(response.data);
         } catch (err) {
           toast.error("Failed to fetch student data. Please try again later.");
         }
@@ -118,7 +115,7 @@ const BodyViewPerformance = () => {
           </p>
           <p className="text-gray-700">
             <strong>Name:</strong>{" "}
-            {student.FirstName + " " + student.LastName || "N/A"}
+            {student?.FirstName + " " + student?.LastName || "N/A"}
           </p>
           <p className="text-gray-700">
             <strong>LRN:</strong> {data.LRN || "N/A"}

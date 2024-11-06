@@ -25,7 +25,7 @@ const BodyTeacherAddStudent = () => {
 
   const [errors, setErrors] = useState({});
   const [verifiedParents, setVerifiedParents] = useState([]);
-  const [filteredStudents, setFilteredStudents] = useState([]); // Filtered student list
+  const [filteredLRNs, setFilteredLRNs] = useState([]);
   const [teacherSection, setTeacherSection] = useState("");
   const [selectedStudent, setSelectedStudent] = useState(null);
 
@@ -37,11 +37,6 @@ const BodyTeacherAddStudent = () => {
         const response = await axios.get("/api/getParent");
         if (response.data && response.data.length > 0) {
           setVerifiedParents(response.data);
-          setFilteredStudents(
-            response.data
-              .filter((parent) => parent.verified)
-              .flatMap((parent) => parent.Student || [])
-          );
         } else {
           toast.error("No verified parents found.");
         }
@@ -71,18 +66,42 @@ const BodyTeacherAddStudent = () => {
 
     fetchVerifiedParents();
     fetchTeacherData();
-  }, [user.UserID]);
+  }, []);
 
+  // Handle search in LRN input
+  const handleLRNSearch = (e) => {
+    const inputLRN = e.target.value;
+    setData({ ...data, LRN: inputLRN });
+
+    // Filter verified students based on the LRN input
+    if (inputLRN) {
+      const results = verifiedParents
+        .flatMap((parent) =>
+          Array.isArray(parent.Student) ? parent.Student : []
+        )
+        .filter((student) => student.LRN.includes(inputLRN));
+      setFilteredLRNs(results);
+    } else {
+      setFilteredLRNs([]);
+    }
+  };
+
+  // Handle LRN selection and auto-populate student data
   const handleLRNSelect = (selectedLRN) => {
     setData({ ...data, LRN: selectedLRN });
+    setFilteredLRNs([]);
 
     const student = verifiedParents
-      .flatMap((parent) => parent.Student || [])
+      .flatMap((parent) =>
+        Array.isArray(parent.Student) ? parent.Student : []
+      )
       .find((student) => student.LRN === selectedLRN);
 
     if (student) {
-      const parent = verifiedParents.find((p) =>
-        p.Student.some((s) => s.LRN === selectedLRN)
+      const parent = verifiedParents.find(
+        (p) =>
+          Array.isArray(p.Student) &&
+          p.Student.some((s) => s.LRN === selectedLRN)
       );
 
       setSelectedStudent(student);
@@ -103,16 +122,17 @@ const BodyTeacherAddStudent = () => {
     }
   };
 
-  const handleSearchChange = (searchValue) => {
-    setFilteredStudents(
-      verifiedParents
-        .flatMap((parent) => parent.Student || [])
-        .filter((student) =>
-          student.LRN.toLowerCase().includes(searchValue.toLowerCase())
-        )
-    );
+  // Handle Birthday input change and automatically update Age
+  const handleBirthdayChange = (e) => {
+    const birthday = e.target.value;
+    setData({
+      ...data,
+      Birthday: birthday,
+      Age: calculateAge(birthday), // Automatically calculate Age on birthday change
+    });
   };
 
+  // Helper function to calculate age based on birthday
   const calculateAge = (birthday) => {
     const birthDate = new Date(birthday);
     const today = new Date();
@@ -127,11 +147,13 @@ const BodyTeacherAddStudent = () => {
     return age;
   };
 
+  // Handle other input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setData({ ...data, [name]: value });
   };
 
+  // Validate inputs before adding the student
   const validateInputs = () => {
     let isValid = true;
     let newErrors = {};
@@ -185,6 +207,7 @@ const BodyTeacherAddStudent = () => {
     return isValid;
   };
 
+  // Handle form submission
   const addStudent = async (e) => {
     e.preventDefault();
 
@@ -247,25 +270,118 @@ const BodyTeacherAddStudent = () => {
         </h2>
         <form onSubmit={addStudent}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <Select
+            {/* LRN Input with Search and Suggestions */}
+            <div className="relative">
+              <Input
                 label="LRN"
-                placeholder="Select or search LRN"
+                placeholder="Enter or search LRN"
                 value={data.LRN}
-                onChange={handleLRNSelect}
-                onSearch={handleSearchChange} // Added search functionality
-                searchable
+                onChange={handleLRNSearch}
                 errorMessage={errors.LRN}
                 isInvalid={!!errors.LRN}
-              >
-                {filteredStudents.map((student) => (
-                  <SelectItem key={student.LRN} value={student.LRN}>
-                    {student.LRN}
-                  </SelectItem>
-                ))}
-              </Select>
+              />
+              {filteredLRNs.length > 0 && (
+                <div className="absolute z-10 bg-white border border-gray-200 rounded-md shadow-lg mt-1 w-full max-h-48 overflow-y-auto">
+                  {filteredLRNs.map((student) => (
+                    <div
+                      key={student.LRN}
+                      onClick={() => handleLRNSelect(student.LRN)}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    >
+                      <span className="font-semibold">{student.LRN}</span> -{" "}
+                      {student.FirstName} {student.LastName}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            {/* Rest of the form inputs */}
+            <Input
+              label="First Name"
+              type="text"
+              placeholder="Enter the First Name"
+              name="FirstName"
+              value={data.FirstName}
+              onChange={handleChange}
+              errorMessage={errors.FirstName}
+              isInvalid={!!errors.FirstName}
+            />
+            <Input
+              label="Last Name"
+              type="text"
+              placeholder="Enter the Last Name"
+              name="LastName"
+              value={data.LastName}
+              onChange={handleChange}
+              errorMessage={errors.LastName}
+              isInvalid={!!errors.LastName}
+            />
+            <Input
+              label="Birthday"
+              type="date"
+              name="Birthday"
+              value={data.Birthday.split("T")[0]} // Format date
+              onChange={handleChange}
+              errorMessage={errors.Birthday}
+              isInvalid={!!errors.Birthday}
+            />
+            <Input
+              label="Birthday"
+              type="date"
+              name="Birthday"
+              value={data.Birthday.split("T")[0]} // Format date
+              onChange={handleBirthdayChange} // Handle birthday change
+              errorMessage={errors.Birthday}
+              isInvalid={!!errors.Birthday}
+            />
+            <Input
+              label="Age"
+              type="text"
+              name="Age"
+              value={data.Age}
+              isDisabled={true} // Age field is read-only
+            />
+            <Input
+              label="Mother Tongue"
+              type="text"
+              placeholder="Enter the Mother Tongue"
+              name="MotherTongue"
+              value={data.MotherTongue}
+              onChange={handleChange}
+              errorMessage={errors.MotherTongue}
+              isInvalid={!!errors.MotherTongue}
+            />
+            {/* Gender */}
+            <Input
+              label="Gender"
+              type="text"
+              placeholder="Enter Gender"
+              name="Gender"
+              value={data.Gender}
+              onChange={handleChange}
+              errorMessage={errors.Gender}
+              isInvalid={!!errors.Gender}
+            />
+            <Input
+              label="Contact Number"
+              type="text"
+              placeholder="Enter the Contact Number"
+              name="ContactNumber"
+              value={data.ContactNumber}
+              onChange={handleChange}
+              errorMessage={errors.ContactNumber}
+              isInvalid={!!errors.ContactNumber}
+            />
+            <Input
+              label="Section"
+              type="text"
+              placeholder="Enter the Section"
+              name="Section"
+              value={data.Section}
+              onChange={handleChange}
+              errorMessage={errors.Section}
+              isInvalid={!!errors.Section}
+              readOnly // Make Section read-only
+            />
           </div>
           <div className="mt-6">
             <Button type="submit" color="primary" size="lg" radius="sm">

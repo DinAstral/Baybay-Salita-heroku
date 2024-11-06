@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChalkboardTeacher,
   faChildReaching,
+  faCircleInfo,
+  faHouse,
 } from "@fortawesome/free-solid-svg-icons";
-import { Tooltip } from "@nextui-org/react";
+import { Tooltip, Select, SelectItem } from "@nextui-org/react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import axios from "axios";
 
@@ -15,21 +17,12 @@ const BodyAdminDashboard = () => {
   const [parentsCount, setParentsCount] = useState(0);
   const [selectedAssessment, setSelectedAssessment] = useState("Pagbabaybay");
   const [performanceCounts, setPerformanceCounts] = useState([]);
+
   const [averageScores, setAverageScores] = useState({});
   const [selectedSection, setSelectedSection] = useState("All Sections");
+
   const [sectionStatusCounts, setSectionStatusCounts] = useState({});
   const [sectionRecommendations, setSectionRecommendations] = useState({});
-  const [sectionCounts, setSectionCounts] = useState({
-    Aster: 0,
-    Camia: 0,
-    Dahlia: 0,
-    Iris: 0,
-    Jasmin: 0,
-    Orchid: 0,
-    Rose: 0,
-    Tulip: 0,
-    SSC: 0,
-  });
 
   const sections = [
     "Aster",
@@ -43,22 +36,42 @@ const BodyAdminDashboard = () => {
     "SSC",
   ];
 
-  const statusTypes = [
-    "Incomplete",
-    "Low Emerging Reader",
-    "High Emerging Reader",
-    "Developing Reader",
-    "Transitioning Reader",
-    "Grade Level Reader",
-  ];
+  const [sectionCounts, setSectionCounts] = useState({
+    Aster: 0,
+    Camia: 0,
+    Dahlia: 0,
+    Iris: 0,
+    Jasmin: 0,
+    Orchid: 0,
+    Rose: 0,
+    Tulip: 0,
+    SSC: 0,
+  });
 
+  const [activityCounts, setActivityCounts] = useState({
+    Aster: 0,
+    Camia: 0,
+    Dahlia: 0,
+    Iris: 0,
+  });
+
+  const [statusCounts, setStatusCounts] = useState({
+    Incomplete: 0,
+    LowEmergingReader: 0,
+    HighEmergingReader: 0,
+    DevelopingReader: 0,
+    TransitioningReader: 0,
+    GradeLevelReader: 0,
+  });
+
+  // Fetch data when the component loads or when the selectedAssessment changes
   useEffect(() => {
     const fetchData = async () => {
       try {
         await Promise.all([fetchUsers(), fetchStudents(), fetchAssessment()]);
-        await fetchPerformance();
+        await fetchPerformance(); // Fetch performance data separately
         computeAverageScores();
-        generateSectionRecommendation();
+        generateSectionRecommendations();
       } catch (err) {
         console.error("Error fetching data:", err);
       }
@@ -70,7 +83,7 @@ const BodyAdminDashboard = () => {
   const fetchUsers = async () => {
     try {
       const response = await axios.get("/api/users");
-      const data = Array.isArray(response.data) ? response.data : [];
+      const data = response.data;
       setTeachersCount(countByRole(data, "Teacher"));
       setParentsCount(countByRole(data, "Parent"));
     } catch (err) {
@@ -81,9 +94,11 @@ const BodyAdminDashboard = () => {
   const fetchStudents = async () => {
     try {
       const response = await axios.get("/api/getStudents");
-      const data = Array.isArray(response.data) ? response.data : [];
+      const data = response.data;
+
       setStudents(data);
 
+      // Group students by their status and update the state
       const statusGroups = {
         Incomplete: 0,
         LowEmergingReader: 0,
@@ -114,7 +129,6 @@ const BodyAdminDashboard = () => {
             statusGroups.GradeLevelReader += 1;
             break;
           default:
-            console.warn(`Unknown status: ${student.status}`);
             break;
         }
       });
@@ -122,8 +136,8 @@ const BodyAdminDashboard = () => {
       setStatusCounts(statusGroups);
 
       const sectionCounts = countStudentsBySection(data);
-      setSectionCounts(sectionCounts.totalCounts);
-      setSectionStatusCounts(sectionCounts.statusCounts);
+      setSectionCounts(sectionCounts.totalCounts); // Set total counts
+      setSectionStatusCounts(sectionCounts.statusCounts); // Set status counts
     } catch (err) {
       console.error("Error fetching students:", err);
     }
@@ -132,7 +146,7 @@ const BodyAdminDashboard = () => {
   const fetchAssessment = async () => {
     try {
       const response = await axios.get("/api/getAssessments");
-      const data = Array.isArray(response.data) ? response.data : [];
+      const data = response.data;
 
       const activities = ["Pagbabaybay", "Pantig", "Salita", "Pagbabasa"];
       const counts = activities.reduce((acc, activity) => {
@@ -150,17 +164,41 @@ const BodyAdminDashboard = () => {
   const fetchPerformance = async () => {
     try {
       const response = await axios.get("/api/getPerformance");
-      const data = Array.isArray(response.data) ? response.data : [];
+      const data = response.data;
+
       setPerformanceCounts(data);
     } catch (err) {
       console.error("Error fetching performance:", err);
     }
   };
 
+  // Count the number of users by role (e.g., Teacher, Parent)
   const countByRole = (data, role) =>
-    Array.isArray(data) ? data.filter((user) => user.role === role).length : 0;
+    data.filter((user) => user.role === role).length;
 
+  // Function to count students by section and status
   const countStudentsBySection = (students) => {
+    const sections = [
+      "Aster",
+      "Camia",
+      "Dahlia",
+      "Iris",
+      "Jasmin",
+      "Orchid",
+      "Rose",
+      "Tulip",
+      "SSC",
+    ];
+
+    const statusTypes = [
+      "Incomplete",
+      "Low Emerging Reader",
+      "High Emerging Reader",
+      "Developing Reader",
+      "Transitioning Reader",
+      "Grade Level Reader",
+    ];
+
     const totalCounts = {};
     const statusCounts = {};
 
@@ -181,6 +219,7 @@ const BodyAdminDashboard = () => {
     return { totalCounts, statusCounts };
   };
 
+  // Assign colors to statuses
   const getColorForStatus = (status) => {
     switch (status) {
       case "Incomplete":
@@ -196,28 +235,53 @@ const BodyAdminDashboard = () => {
       case "Grade Level Reader":
         return "#FF8080";
       default:
-        return "#ccc";
+        return "#ccc"; // Default color for unknown status
     }
   };
+
+  // Data preparation for the bar charts
+  const sectionLabels = Object.keys(sectionCounts);
+  const statusTypes = [
+    "Incomplete",
+    "Low Emerging Reader",
+    "High Emerging Reader",
+    "Developing Reader",
+    "Transitioning Reader",
+    "Grade Level Reader",
+  ];
+
+  // Create data series for the BarChart
+  const statusSeries = statusTypes.map((status) => ({
+    data: sectionLabels.map(
+      (section) =>
+        (sectionStatusCounts[section] &&
+          sectionStatusCounts[section][status]) ||
+        0
+    ),
+    label: status,
+    color: getColorForStatus(status),
+  }));
 
   const computeAverageScores = () => {
     const sectionScores = {};
 
+    // Initialize each section with an array to accumulate scores
     sections.forEach((section) => {
       sectionScores[section] = [];
     });
 
+    // Filter performance counts based on selected assessment
     performanceCounts.forEach((performance) => {
       const student = students.find((s) => s.LRN === performance.LRN);
-      if (
-        student &&
-        student.Section &&
-        performance.Type === selectedAssessment
-      ) {
-        sectionScores[student.Section].push(parseInt(performance.Score, 10));
+      if (student && student.Section) {
+        const section = student.Section;
+        if (performance.Type === selectedAssessment) {
+          sectionScores[section].push(parseInt(performance.Score, 10));
+        }
       }
     });
 
+    // Calculate the average score per section
     const avgScores = {};
     sections.forEach((section) => {
       const scores = sectionScores[section];
@@ -229,14 +293,11 @@ const BodyAdminDashboard = () => {
     setAverageScores(avgScores);
   };
 
-  const generateSectionRecommendation = () => {
+  const generateSectionRecommendations = () => {
     const recommendations = {};
 
     sections.forEach((section) => {
-      recommendations[section] = [];
-    });
-
-    sections.forEach((section) => {
+      // Filter performances for the current section
       const sectionPerformances = performanceCounts.filter((performance) => {
         const student = students.find((s) => s.LRN === performance.LRN);
         return student && student.Section === section;
@@ -244,34 +305,55 @@ const BodyAdminDashboard = () => {
 
       const lowScoreAssessments = {};
       const wordErrorCounts = {};
+      let incompleteCount = 0;
 
+      // Analyze performances for incomplete and low scores
       sectionPerformances.forEach((performance) => {
+        // Count "Incomplete" statuses
+        if (performance.Status === "Incomplete") {
+          incompleteCount++;
+        }
+
+        // Track assessments with low scores
         if (performance.Score < 5) {
           lowScoreAssessments[performance.Type] =
             (lowScoreAssessments[performance.Type] || 0) + 1;
         }
 
-        if (performance.PerformanceItems) {
-          performance.PerformanceItems.forEach((item) => {
-            if (item.Remarks && item.Remarks.toLowerCase() === "incorrect") {
-              wordErrorCounts[item.Word] =
-                (wordErrorCounts[item.Word] || 0) + 1;
-            }
-          });
-        }
+        // Track words marked as incorrect
+        performance.PerformanceItems.forEach((item) => {
+          if (item.Remarks.toLowerCase() === "incorrect") {
+            wordErrorCounts[item.Word] = (wordErrorCounts[item.Word] || 0) + 1;
+          }
+        });
       });
 
+      // Generate recommendation messages based on analysis
+      const sectionRecommendations = [];
+
+      // Recommendation for high "Incomplete" count
+      if (incompleteCount > 5) {
+        // Adjust threshold as needed
+        sectionRecommendations.push(
+          "Many students in this section have incomplete assessments. Encourage them to complete their assignments."
+        );
+      }
+
+      // Low score recommendations
       const lowScoreRecommendations = Object.keys(lowScoreAssessments).map(
         (assessment) =>
-          `Focus on improving scores in ${assessment} by reviewing key concepts.`
+          `Consider reviewing concepts in ${assessment} as scores are low.`
       );
 
+      // Word error recommendations (top 5 most challenging words)
       const wordRecommendations = Object.keys(wordErrorCounts)
         .sort((a, b) => wordErrorCounts[b] - wordErrorCounts[a])
         .slice(0, 5)
-        .map((word) => `Practice with the word "${word}" to reduce errors.`);
+        .map((word) => `Practice with the word "${word}" to improve accuracy.`);
 
+      // Combine recommendations for each section
       recommendations[section] = [
+        ...sectionRecommendations,
         ...lowScoreRecommendations,
         ...wordRecommendations,
       ];
@@ -280,6 +362,7 @@ const BodyAdminDashboard = () => {
     setSectionRecommendations(recommendations);
   };
 
+  // Handle dynamic data based on section selection
   const getChartData = () => {
     if (selectedSection === "All Sections") {
       return {
@@ -294,18 +377,8 @@ const BodyAdminDashboard = () => {
     }
   };
 
-  const { labels: sectionLabels, data: sectionData } = getChartData();
-
-  const statusSeries = statusTypes.map((status) => ({
-    data: sectionLabels.map(
-      (section) =>
-        (sectionStatusCounts[section] &&
-          sectionStatusCounts[section][status]) ||
-        0
-    ),
-    label: status,
-    color: getColorForStatus(status),
-  }));
+  // Prepare data for the chart
+  const { labels: sectionLabel, data: sectionData } = getChartData();
 
   return (
     <div className="px-9">
@@ -518,15 +591,15 @@ const BodyAdminDashboard = () => {
                 tickFormat: (value) => Math.floor(value),
               },
             ]}
-            series={statusSeries.map((series, idx) => ({
+            series={statusSeries.map((series) => ({
               ...series,
               element: (
                 <Tooltip
                   content={
-                    Array.isArray(sectionRecommendations[sectionLabels[idx]]) &&
-                    sectionRecommendations[sectionLabels[idx]].length > 0 ? (
+                    sectionRecommendations[series.label] &&
+                    sectionRecommendations[series.label].length > 0 ? (
                       <div>
-                        {sectionRecommendations[sectionLabels[idx]].map(
+                        {sectionRecommendations[series.label].map(
                           (rec, index) => (
                             <p key={index}>{rec}</p>
                           )
